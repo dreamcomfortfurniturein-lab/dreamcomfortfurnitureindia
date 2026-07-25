@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #FAF6EF;
+  color: #24211D;
+}
+
+.swatch-strip {
+  background: repeating-linear-gradient(
+    90deg,
+    #2B1D14 0px,
+    #2B1D14 6px,
+    #B08D57 6px,
+    #B08D57 12px,
+    #4A5D45 12px,
+    #4A5D45 18px
+  );
+  height: 4px;
+}
+
+::selection {
+  background: #B08D57;
+  color: #FAF6EF;
+}
