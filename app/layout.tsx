@@ -4,6 +4,8 @@ import Link from "next/link";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import CartLink from "./cart-link";
+import NavAuth from "./nav-auth";
+import ConstructionBanner from "./construction-banner";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -28,6 +30,7 @@ export default function RootLayout({
       <body className={`${fraunces.variable} ${inter.variable} font-body`}>
         <CartProvider>
           <div className="swatch-strip" />
+          <ConstructionBanner />
           <header className="flex items-center justify-between px-6 md:px-12 py-5 bg-cream">
             <Link href="/" className="font-display text-xl md:text-2xl text-walnut tracking-tight">
               DreamComfort<span className="text-brass">Furniture</span>India
@@ -37,6 +40,7 @@ export default function RootLayout({
                 Shop
               </Link>
               <CartLink />
+              <NavAuth />
             </nav>
           </header>
           {children}

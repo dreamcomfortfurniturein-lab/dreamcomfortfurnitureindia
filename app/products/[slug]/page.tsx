@@ -12,8 +12,13 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
 
   return (
     <main className="px-6 md:px-12 py-12 grid md:grid-cols-2 gap-12">
-      <div className="aspect-square bg-linen rounded-sm flex items-center justify-center text-walnut/30 text-sm p-4 text-center">
-        Photo: {product.images[0]}
+      <div className="aspect-square bg-linen rounded-sm flex items-center justify-center overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="w-full h-full object-cover"
+        />
       </div>
       <div>
         <p className="text-xs uppercase tracking-wide text-brass mb-2">

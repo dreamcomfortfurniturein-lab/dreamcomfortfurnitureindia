@@ -40,8 +40,13 @@ export default function Home() {
               href={`/products/${p.slug}`}
               className="group block"
             >
-              <div className="aspect-square bg-linen rounded-sm mb-3 flex items-center justify-center text-walnut/30 text-xs overflow-hidden">
-                Photo: {p.images[0]}
+              <div className="aspect-square bg-linen rounded-sm mb-3 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.images[0]}
+                  alt={p.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <h3 className="font-medium text-charcoal group-hover:text-brass transition-colors">
                 {p.name}

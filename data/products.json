@@ -8,7 +8,7 @@
     "mrp": 42999,
     "stock": 6,
     "description": "Solid sheesham-wood frame with a hand-finished walnut stain and a soft cotton-blend cushion set. Built for daily use, finished for a formal living room.",
-    "images": ["/products/sofa-3seater-1.jpg", "/products/sofa-3seater-2.jpg"]
+    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785056393/products/ls6bcogam1i1b8mxwzhc.jpg"]
   },
   {
     "slug": "teak-dining-table-6-seater",
@@ -19,7 +19,7 @@
     "mrp": 33999,
     "stock": 4,
     "description": "A 72-inch teak dining table with a matte finish that resists water rings and everyday wear. Seats six comfortably.",
-    "images": ["/products/dining-table-1.jpg"]
+    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785059948/products/dcyb7npmynlna0frjgj3.jpg"]
   },
   {
     "slug": "brass-handle-bedside-table",

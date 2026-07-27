@@ -16,8 +16,13 @@ export default function ProductsPage() {
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {products.map((p) => (
           <Link key={p.slug} href={`/products/${p.slug}`} className="group block">
-            <div className="aspect-square bg-linen rounded-sm mb-3 flex items-center justify-center text-walnut/30 text-xs text-center p-2">
-              Photo: {p.images[0]}
+            <div className="aspect-square bg-linen rounded-sm mb-3 overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.images[0]}
+                alt={p.name}
+                className="w-full h-full object-cover"
+              />
             </div>
             <p className="text-xs uppercase tracking-wide text-brass mb-1">
               {p.category}
