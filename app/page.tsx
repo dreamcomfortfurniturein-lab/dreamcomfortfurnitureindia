@@ -1,6 +1,7 @@
 import Link from "next/link";
 import products from "@/data/products.json";
 import settings from "@/data/settings.json";
+import HeroVideo from "./hero-video";
 
 export default function Home() {
   const featured = products.slice(0, 3);
@@ -22,20 +23,13 @@ export default function Home() {
             href="/products"
             className="inline-block bg-walnut text-cream px-6 py-3 rounded-sm hover:bg-charcoal transition-colors"
           >
-            Browse the collection
+            View our projects
           </Link>
         </div>
         <div className="aspect-[4/3] bg-black rounded-sm overflow-hidden flex items-center justify-center text-walnut/40 text-sm">
   {settings.heroVideoUrl ? (
-    <video
-      src={settings.heroVideoUrl}
-      autoPlay
-      muted
-      loop
-      playsInline
-      className="w-full h-full object-contain"
-    />
-  ) : (
+  <HeroVideo src={settings.heroVideoUrl} />
+) : (
             "Add a hero video at /admin/upload, then paste its URL into data/settings.json"
           )}
         </div>
@@ -43,7 +37,7 @@ export default function Home() {
 
       <section className="px-6 md:px-12 py-16">
         <h2 className="font-display text-2xl md:text-3xl text-walnut mb-8">
-          Featured pieces
+          Featured projects
         </h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
           {featured.map((p) => (
