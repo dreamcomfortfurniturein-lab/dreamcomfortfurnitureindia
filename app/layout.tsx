@@ -6,6 +6,7 @@ import { CartProvider } from "@/lib/cart-context";
 import CartLink from "./cart-link";
 import NavAuth from "./nav-auth";
 import ConstructionBanner from "./construction-banner";
+import SocialLinks from "./social-links";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({
             <Link href="/" className="font-display text-base sm:text-xl md:text-2xl text-walnut tracking-tight">
               DreamComfort<span className="text-brass">Furniture</span>India
             </Link>
+            <SocialLinks />
             <nav className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-charcoal whitespace-nowrap">
               <Link href="/products" className="hover:text-brass transition-colors">
                 Shop
