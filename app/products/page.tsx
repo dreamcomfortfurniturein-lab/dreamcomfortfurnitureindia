@@ -1,5 +1,6 @@
 import Link from "next/link";
 import products from "@/data/products.json";
+import QuickAddButton from "./quick-add-button";
 
 export const metadata = { title: "Shop — DreamComfortFurnitureIndia" };
 
@@ -15,30 +16,33 @@ export default function ProductsPage() {
 
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {products.map((p) => (
-          <Link key={p.slug} href={`/products/${p.slug}`} className="group block">
-            <div className="aspect-square bg-linen rounded-sm mb-3 overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={p.images[0]}
-                alt={p.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <p className="text-xs uppercase tracking-wide text-brass mb-1">
-              {p.category}
-            </p>
-            <h3 className="font-medium text-charcoal group-hover:text-brass transition-colors">
-              {p.name}
-            </h3>
-            <p className="text-sm text-charcoal/60">
-              ₹{p.price.toLocaleString("en-IN")}
-              {p.mrp > p.price && (
-                <span className="line-through text-charcoal/30 ml-2">
-                  ₹{p.mrp.toLocaleString("en-IN")}
-                </span>
-              )}
-            </p>
-          </Link>
+          <div key={p.slug}>
+            <Link href={`/products/${p.slug}`} className="group block">
+              <div className="aspect-square bg-linen rounded-sm mb-3 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.images[0]}
+                  alt={p.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p className="text-xs uppercase tracking-wide text-brass mb-1">
+                {p.category}
+              </p>
+              <h3 className="font-medium text-charcoal group-hover:text-brass transition-colors">
+                {p.name}
+              </h3>
+              <p className="text-sm text-charcoal/60">
+                ₹{p.price.toLocaleString("en-IN")}
+                {p.mrp > p.price && (
+                  <span className="line-through text-charcoal/30 ml-2">
+                    ₹{p.mrp.toLocaleString("en-IN")}
+                  </span>
+                )}
+              </p>
+            </Link>
+            <QuickAddButton product={p} />
+          </div>
         ))}
       </div>
     </main>

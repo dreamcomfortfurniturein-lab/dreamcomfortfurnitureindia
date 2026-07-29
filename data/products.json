@@ -1,35 +1,35 @@
 [
   {
     "slug": "walnut-sheesham-sofa-3-seater",
-    "name": "Walnut Sheesham 3-Seater Sofa",
+    "name": "resort",
     "category": "Living Room",
     "material": "Sheesham wood, cotton upholstery",
-    "price": 34999,
+    "price": 320000,
     "mrp": 42999,
     "stock": 6,
     "description": "Solid sheesham-wood frame with a hand-finished walnut stain and a soft cotton-blend cushion set. Built for daily use, finished for a formal living room.",
-    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785056393/products/ls6bcogam1i1b8mxwzhc.jpg"]
+    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785303695/products/erjbquvjpztsbdtxa9yi.jpg"]
   },
   {
     "slug": "teak-dining-table-6-seater",
-    "name": "Teak Wood Dining Table (6-Seater)",
+    "name": "individual house",
     "category": "Dining",
     "material": "Teak wood",
-    "price": 27999,
+    "price": 250000,
     "mrp": 33999,
     "stock": 4,
     "description": "A 72-inch teak dining table with a matte finish that resists water rings and everyday wear. Seats six comfortably.",
-    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785059948/products/dcyb7npmynlna0frjgj3.jpg"]
+    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785303758/products/ueeivb3pu0lirfcakuw0.jpg"]
   },
   {
     "slug": "brass-handle-bedside-table",
-    "name": "Brass-Handle Bedside Table",
+    "name": "individual house",
     "category": "Bedroom",
     "material": "Mango wood, brass hardware",
-    "price": 4499,
+    "price": 250000,
     "mrp": 5999,
     "stock": 20,
     "description": "Compact bedside table in mango wood with hand-cast brass handles and a single soft-close drawer.",
-    "images": ["/products/bedside-table-1.jpg"]
+    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785303758/products/ueeivb3pu0lirfcakuw0.jpg"]
   }
 ]

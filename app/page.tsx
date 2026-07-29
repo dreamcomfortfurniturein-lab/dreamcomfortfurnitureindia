@@ -1,5 +1,6 @@
 import Link from "next/link";
 import products from "@/data/products.json";
+import settings from "@/data/settings.json";
 
 export default function Home() {
   const featured = products.slice(0, 3);
@@ -24,8 +25,19 @@ export default function Home() {
             Browse the collection
           </Link>
         </div>
-        <div className="aspect-[4/3] bg-walnut/10 rounded-sm flex items-center justify-center text-walnut/40 text-sm">
-          Add a hero product photo at /public/hero.jpg
+        <div className="aspect-[4/3] bg-black rounded-sm overflow-hidden flex items-center justify-center text-walnut/40 text-sm">
+  {settings.heroVideoUrl ? (
+    <video
+      src={settings.heroVideoUrl}
+      autoPlay
+      muted
+      loop
+      playsInline
+      className="w-full h-full object-contain"
+    />
+  ) : (
+            "Add a hero video at /admin/upload, then paste its URL into data/settings.json"
+          )}
         </div>
       </section>
 
