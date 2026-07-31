@@ -5,7 +5,6 @@ import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import CartLink from "./cart-link";
 import NavAuth from "./nav-auth";
-import ConstructionBanner from "./construction-banner";
 import SocialLinks from "./social-links";
 
 const fraunces = Fraunces({
@@ -31,17 +30,12 @@ export default function RootLayout({
       <body className={`${fraunces.variable} ${inter.variable} font-body`}>
         <CartProvider>
           <div className="swatch-strip" />
-          <ConstructionBanner />
           <header className="flex flex-wrap items-center justify-between gap-y-2 px-4 sm:px-6 md:px-12 py-4 md:py-5 bg-cream">
             <Link href="/" className="font-display text-base sm:text-xl md:text-2xl text-walnut tracking-tight">
               DreamComfort<span className="text-brass">Furniture</span>India
             </Link>
             <SocialLinks />
             <nav className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-charcoal whitespace-nowrap">
-              <Link href="/products" className="hover:text-brass transition-colors">
-                Shop
-              </Link>
-              <CartLink />
               <NavAuth />
             </nav>
           </header>

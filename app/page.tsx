@@ -13,24 +13,18 @@ export default function Home() {
             Made in India, room by room
           </p>
           <h1 className="font-display text-4xl md:text-6xl leading-tight text-walnut mb-6">
-            Furniture built to <em>live</em> in, not just look at.
+            Interiors built to <em>live</em> in, not just look at.
           </h1>
           <p className="text-charcoal/80 mb-8 max-w-md">
-            Sheesham, teak and mango wood pieces, hand-finished and shipped
-            direct from our workshop to your home.
+            From concept to completion, we design and build interiors that
+            reflect how you actually live — see our recent projects below.
           </p>
-          <Link
-            href="/products"
-            className="inline-block bg-walnut text-cream px-6 py-3 rounded-sm hover:bg-charcoal transition-colors"
-          >
-            View our projects
-          </Link>
         </div>
         <div className="aspect-[4/3] bg-black rounded-sm overflow-hidden flex items-center justify-center text-walnut/40 text-sm">
-  {settings.heroVideoUrl ? (
-  <HeroVideo src={settings.heroVideoUrl} />
-) : (
-            "Add a hero video at /admin/upload, then paste its URL into data/settings.json"
+          {settings.heroVideos && settings.heroVideos.length > 0 && settings.heroVideos[0] ? (
+            <HeroVideo videos={settings.heroVideos} />
+          ) : (
+            "Add hero videos at /admin/upload, then list their URLs in data/settings.json"
           )}
         </div>
       </section>
@@ -41,11 +35,7 @@ export default function Home() {
         </h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
           {featured.map((p) => (
-            <Link
-              key={p.slug}
-              href={`/products/${p.slug}`}
-              className="group block"
-            >
+            <div key={p.slug}>
               <div className="aspect-square bg-linen rounded-sm mb-3 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -54,13 +44,10 @@ export default function Home() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="font-medium text-charcoal group-hover:text-brass transition-colors">
+              <h3 className="font-medium text-charcoal">
                 {p.name}
               </h3>
-              <p className="text-sm text-charcoal/60">
-                ₹{p.price.toLocaleString("en-IN")}
-              </p>
-            </Link>
+            </div>
           ))}
         </div>
       </section>
