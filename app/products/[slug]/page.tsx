@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 import Link from "next/link";
-=======
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
 import products from "@/data/products.json";
 import { notFound } from "next/navigation";
 import AddToCartButton from "./add-to-cart-button";
@@ -15,7 +12,6 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
   if (!product) return notFound();
 
   return (
-<<<<<<< HEAD
     <main className="bg-navy-900 text-sand-100 min-h-screen py-12 px-4 sm:px-8 lg:px-12">
       <div className="max-w-6xl mx-auto space-y-10">
         {/* Breadcrumb */}
@@ -58,50 +54,53 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
             )}
 
             {/* Quality Specs Callout */}
-            <div className="glass-card p-5 rounded-2xl border border-navy-700 grid grid-cols-3 gap-4 text-center">
-              <div>
-                <span className="text-gold text-lg block">🪵</span>
-                <span className="text-xs font-bold text-sand-100 block">Solid Wood</span>
-                <span className="text-[10px] text-slate-400">Kiln Seasoned</span>
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800 text-center">
+              <div className="p-3 rounded-xl bg-navy-950/70 border border-slate-800">
+                <span className="text-base block mb-0.5">🪵</span>
+                <span className="text-[11px] text-slate-400 block font-medium">Wood Quality</span>
+                <span className="text-xs font-bold text-sand-100">{product.material}</span>
               </div>
-              <div>
-                <span className="text-gold text-lg block">🛡️</span>
-                <span className="text-xs font-bold text-sand-100 block">10-Yr Warranty</span>
-                <span className="text-[10px] text-slate-400">Anti-Termite</span>
+              <div className="p-3 rounded-xl bg-navy-950/70 border border-slate-800">
+                <span className="text-base block mb-0.5">🛡️</span>
+                <span className="text-[11px] text-slate-400 block font-medium">Warranty</span>
+                <span className="text-xs font-bold text-sand-100">{(product as any).warranty || "10 Year Warranty"}</span>
               </div>
-              <div>
-                <span className="text-gold text-lg block">🚚</span>
-                <span className="text-xs font-bold text-sand-100 block">White-Glove</span>
-                <span className="text-[10px] text-slate-400">Assembly in 48h</span>
+              <div className="p-3 rounded-xl bg-navy-950/70 border border-slate-800">
+                <span className="text-base block mb-0.5">🚚</span>
+                <span className="text-[11px] text-slate-400 block font-medium">Dispatch</span>
+                <span className="text-xs font-bold text-sand-100">{(product as any).leadTime || "3-5 Working Days"}</span>
               </div>
             </div>
           </div>
 
-          {/* Buying & MLM Volume Info Column */}
+          {/* Purchasing & MLM Earning Details */}
           <div className="lg:col-span-5 space-y-6">
             <div>
-              <span className="text-xs uppercase font-bold text-gold tracking-wider">
+              <span className="text-xs font-semibold text-gold tracking-widest uppercase">
                 {product.category}
               </span>
               <h1 className="font-display text-2xl sm:text-3xl font-bold text-sand-100 mt-1">
                 {product.name}
               </h1>
-              <p className="text-xs text-slate-400 mt-2 font-mono">
-                Material: {product.material}
+              <p className="text-xs text-slate-400 mt-1">
+                SKU: <span className="font-mono text-slate-300">{product.slug.toUpperCase()}</span> | Stock:{" "}
+                <span className={product.stock > 0 ? "text-emerald-400 font-semibold" : "text-red-400 font-semibold"}>
+                  {product.stock > 0 ? `${product.stock} Units Available` : "Backorder"}
+                </span>
               </p>
             </div>
 
-            {/* Price & BV Box */}
-            <div className="p-5 rounded-2xl bg-navy-950 border border-gold/30 space-y-3">
+            {/* Price Box */}
+            <div className="glass-card p-5 rounded-2xl border border-gold/30 space-y-3">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <span className="text-xs text-slate-400 block text-[10px]">Retail Price:</span>
+                  <span className="text-xs text-slate-400 block">Retail Price (MRP)</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-sand-100">
+                    <span className="font-display text-2xl sm:text-3xl font-bold text-sand-100">
                       ₹{product.price.toLocaleString("en-IN")}
                     </span>
                     {product.mrp > product.price && (
-                      <span className="line-through text-slate-500 text-sm">
+                      <span className="line-through text-xs text-slate-500">
                         ₹{product.mrp.toLocaleString("en-IN")}
                       </span>
                     )}
@@ -109,19 +108,17 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[10px] text-gold font-bold block">
-                    Distributor Member Rate:
-                  </span>
-                  <span className="text-xl font-black text-gold">
+                  <span className="text-[11px] text-gold font-semibold block">Distributor Member Price</span>
+                  <span className="text-xl font-bold text-gold">
                     ₹{product.memberPrice.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
 
-              {/* Commission Yield Metric */}
-              <div className="p-3 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-between text-xs">
+              {/* Commission Volume Box */}
+              <div className="p-3 rounded-xl bg-navy-950 border border-emerald-900/60 flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-gold block">Business Volume (BV)</span>
+                  <span className="text-xs font-semibold text-emerald-400 block">Leadership Volume Credit</span>
                   <span className="text-[10px] text-slate-400">Qualifies for binary & generation match</span>
                 </div>
                 <div className="text-right">
@@ -157,37 +154,6 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
             </div>
           </div>
         </div>
-=======
-    <main className="px-6 md:px-12 py-12 grid md:grid-cols-2 gap-12">
-      <div className="aspect-square bg-linen rounded-sm flex items-center justify-center overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={product.images[0]}
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div>
-        <p className="text-xs uppercase tracking-wide text-brass mb-2">
-          {product.category}
-        </p>
-        <h1 className="font-display text-3xl text-walnut mb-3">{product.name}</h1>
-        <p className="text-2xl text-charcoal mb-1">
-          ₹{product.price.toLocaleString("en-IN")}
-          {product.mrp > product.price && (
-            <span className="line-through text-charcoal/30 text-base ml-3">
-              ₹{product.mrp.toLocaleString("en-IN")}
-            </span>
-          )}
-        </p>
-        <p className="text-sm text-charcoal/60 mb-6">
-          {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-        </p>
-        <p className="text-charcoal/80 mb-2">{product.description}</p>
-        <p className="text-sm text-charcoal/60 mb-8">Material: {product.material}</p>
-
-        <AddToCartButton product={product} />
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
       </div>
     </main>
   );

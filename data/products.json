@@ -1,6 +1,5 @@
 [
   {
-<<<<<<< HEAD
     "slug": "royal-sheesham-maharaja-sofa-set",
     "name": "Royal Sheesham Maharaja 7-Seater Sofa Suite",
     "category": "Living Room",
@@ -148,38 +147,5 @@
     "images": [
       "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=1200&q=80"
     ]
-=======
-    "slug": "walnut-sheesham-sofa-3-seater",
-    "name": "resort",
-    "category": "Living Room",
-    "material": "Sheesham wood, cotton upholstery",
-    "price": 320000,
-    "mrp": 42999,
-    "stock": 6,
-    "description": "Solid sheesham-wood frame with a hand-finished walnut stain and a soft cotton-blend cushion set. Built for daily use, finished for a formal living room.",
-    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785303695/products/erjbquvjpztsbdtxa9yi.jpg"]
-  },
-  {
-    "slug": "teak-dining-table-6-seater",
-    "name": "Individual house",
-    "category": "Dining",
-    "material": "Teak wood",
-    "price": 350000,
-    "mrp": 33999,
-    "stock": 4,
-    "description": "A 72-inch teak dining table with a matte finish that resists water rings and everyday wear. Seats six comfortably.",
-    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785303758/products/ueeivb3pu0lirfcakuw0.jpg"]
-  },
-  {
-    "slug": "brass-handle-bedside-table",
-    "name": "Apartment",
-    "category": "Bedroom",
-    "material": "Mango wood, brass hardware",
-    "price": 300000,
-    "mrp": 5999,
-    "stock": 20,
-    "description": "Compact bedside table in mango wood with hand-cast brass handles and a single soft-close drawer.",
-    "images": ["https://res.cloudinary.com/og57tmj8/image/upload/v1785349873/products/o49eaht0zvlq3g8gvyd4.jpg"]
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
   }
 ]

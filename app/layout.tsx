@@ -3,37 +3,21 @@ import { Fraunces, Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
-<<<<<<< HEAD
 import CartButton from "./cart-button";
 import CartDrawer from "./cart-drawer";
 import NavAuth from "./nav-auth";
-=======
-import CartLink from "./cart-link";
-import NavAuth from "./nav-auth";
-import SocialLinks from "./social-links";
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
 
 const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
-<<<<<<< HEAD
   weight: ["400", "500", "600", "700"],
-=======
-  weight: ["400", "500", "600"],
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
 });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-<<<<<<< HEAD
   title: "Dream Comfort Furniture India | Luxury Furniture & Direct Selling Opportunity",
   description:
     "India's premier direct selling furniture brand. Handcrafted solid Sheesham & Teak furniture, ergonomic luxury office solutions, and high-yield leadership MLM earnings.",
-=======
-  title: "DreamComfortFurnitureIndia — Furniture & Interiors",
-  description:
-    "Handcrafted furniture and interiors, made in India. Shop sofas, dining sets, bedroom and storage furniture.",
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
 };
 
 export default function RootLayout({
@@ -42,7 +26,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-<<<<<<< HEAD
     <html lang="en" className="dark">
       <body className={`${fraunces.variable} ${inter.variable} font-body bg-navy-900 text-sand-100 min-h-screen flex flex-col antialiased`}>
         <CartProvider>
@@ -234,28 +217,6 @@ export default function RootLayout({
                 </div>
               </div>
             </div>
-=======
-    <html lang="en">
-      <body className={`${fraunces.variable} ${inter.variable} font-body`}>
-        <CartProvider>
-          <div className="swatch-strip" />
-          <header className="flex flex-wrap items-center justify-between gap-y-2 px-4 sm:px-6 md:px-12 py-4 md:py-5 bg-cream">
-            <Link href="/" className="font-display text-base sm:text-xl md:text-2xl text-walnut tracking-tight">
-              DreamComfort<span className="text-brass">Furniture</span>India
-            </Link>
-            <SocialLinks />
-            <nav className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-charcoal whitespace-nowrap">
-              <NavAuth />
-            </nav>
-          </header>
-          {children}
-          <footer className="mt-24 border-t border-walnut/10 px-6 md:px-12 py-10 text-sm text-charcoal/70 bg-cream">
-            <p className="font-display text-walnut text-lg mb-2">
-              DreamComfortFurnitureIndia
-            </p>
-            <p>Handmade furniture & interiors, shipped across India.</p>
-            <p className="mt-4">© {new Date().getFullYear()} DreamComfortFurnitureIndia. All rights reserved.</p>
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
           </footer>
         </CartProvider>
       </body>

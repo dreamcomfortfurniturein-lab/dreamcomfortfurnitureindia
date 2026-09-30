@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-<<<<<<< HEAD
 :root {
   --primary-navy: #0F172A;
   --primary-gold: #D97706;
@@ -76,27 +75,4 @@ body {
 ::selection {
   background: #D97706;
   color: #FFFFFF;
-=======
-body {
-  background-color: #FAF6EF;
-  color: #24211D;
-}
-
-.swatch-strip {
-  background: repeating-linear-gradient(
-    90deg,
-    #2B1D14 0px,
-    #2B1D14 6px,
-    #B08D57 6px,
-    #B08D57 12px,
-    #4A5D45 12px,
-    #4A5D45 18px
-  );
-  height: 4px;
-}
-
-::selection {
-  background: #B08D57;
-  color: #FAF6EF;
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
 }

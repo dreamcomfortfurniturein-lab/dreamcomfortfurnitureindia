@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useCart } from "@/lib/cart-context";
 
 export default function CartPage() {
-<<<<<<< HEAD
   const {
     items,
     removeItem,
@@ -37,155 +36,165 @@ export default function CartPage() {
             Explore Furniture Store →
           </Link>
         </div>
-=======
-  const { items, removeItem, setQty, subtotal } = useCart();
-
-  if (items.length === 0) {
-    return (
-      <main className="px-6 md:px-12 py-16 text-center">
-        <h1 className="font-display text-2xl text-walnut mb-4">Your cart is empty</h1>
-        <Link href="/products" className="text-brass underline">
-          Browse the collection
-        </Link>
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
       </main>
     );
   }
 
   return (
-<<<<<<< HEAD
     <main className="bg-navy-900 text-sand-100 min-h-screen py-12 px-4 sm:px-8 lg:px-12">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-navy-700/80 pb-6">
           <div>
-            <h1 className="font-display text-3xl font-bold text-sand-100">Shopping Cart & Business Volume</h1>
-            <p className="text-xs text-slate-400 mt-1">Review items and manage distributor pricing benefits.</p>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-sand-100">
+              Shopping Cart & Order Volume
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              Review your selected luxury furniture pieces and PV/BV rewards calculation.
+            </p>
           </div>
 
-          <div className="glass-card p-3 rounded-xl border border-gold/30 flex items-center gap-3">
-            <div>
-              <span className="text-xs font-bold text-gold block">Distributor Member Discount</span>
-              <span className="text-[10px] text-slate-400">Wholesale pricing activated</span>
-            </div>
-            <button
-              onClick={() => setIsMemberPricing(!isMemberPricing)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                isMemberPricing ? "bg-gold" : "bg-slate-700"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isMemberPricing ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
-          </div>
+          <button
+            onClick={clear}
+            className="text-xs text-slate-400 hover:text-red-400 transition-colors self-start md:self-auto"
+          >
+            Clear Entire Cart
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Cart Table */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Items List */}
           <div className="lg:col-span-8 space-y-4">
-            <div className="glass-card rounded-2xl border border-navy-700 divide-y divide-navy-700/60 p-4 sm:p-6">
-              {items.map((item) => {
-                const itemPrice = isMemberPricing
-                  ? (item.memberPrice || item.price * 0.8)
-                  : item.price;
+            {items.map((item) => {
+              const unitPrice = isMemberPricing ? (item.memberPrice || item.price * 0.8) : item.price;
+              const lineTotal = unitPrice * item.qty;
+              const lineBV = (item.bv || Math.round(item.price * 0.4)) * item.qty;
+              const linePV = (item.pv || Math.round(item.price * 0.004)) * item.qty;
 
-                return (
-                  <div key={item.slug} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-20 h-20 object-cover rounded-xl border border-navy-700"
-                      />
-                      <div>
-                        <h3 className="font-display font-bold text-sm text-sand-100">{item.name}</h3>
-                        <div className="flex items-baseline gap-2 mt-1">
-                          <span className="text-sm font-bold text-gold">₹{itemPrice.toLocaleString("en-IN")}</span>
-                          {isMemberPricing && (
-                            <span className="text-xs line-through text-slate-500">₹{item.price.toLocaleString("en-IN")}</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-emerald-400 font-mono mt-1">
-                          <span>BV: {((item.bv || Math.round(item.price * 0.4)) * item.qty).toLocaleString("en-IN")}</span>
-                          <span>•</span>
-                          <span>PV: {((item.pv || Math.round(item.price * 0.004)) * item.qty)}</span>
-                        </div>
-                      </div>
+              return (
+                <div
+                  key={item.slug}
+                  className="glass-card p-4 sm:p-5 rounded-2xl border border-slate-700/60 flex flex-col sm:flex-row items-center gap-5"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border border-slate-700 flex-shrink-0"
+                  />
+
+                  <div className="flex-1 text-center sm:text-left space-y-1">
+                    <Link
+                      href={`/products/${item.slug}`}
+                      className="font-display font-semibold text-sand-100 hover:text-gold transition-colors text-base"
+                    >
+                      {item.name}
+                    </Link>
+
+                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs">
+                      <span className="text-gold font-bold text-sm">
+                        ₹{unitPrice.toLocaleString("en-IN")}
+                      </span>
+                      {isMemberPricing && (
+                        <span className="line-through text-slate-500">
+                          ₹{item.price.toLocaleString("en-IN")}
+                        </span>
+                      )}
+                      <span className="px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 text-[10px] font-mono">
+                        +{lineBV.toLocaleString("en-IN")} BV
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-purple-950/60 text-purple-300 border border-purple-800/40 text-[10px] font-mono">
+                        +{linePV} PV
+                      </span>
                     </div>
 
-                    <div className="flex items-center justify-between sm:justify-end gap-4">
-                      <div className="flex items-center border border-slate-700 rounded-lg bg-navy-950 text-xs">
+                    <div className="pt-2 flex items-center justify-center sm:justify-start gap-4">
+                      <div className="flex items-center rounded-lg border border-slate-700 bg-navy-950 overflow-hidden">
                         <button
                           onClick={() => setQty(item.slug, item.qty - 1)}
-                          className="px-2.5 py-1 text-slate-300 hover:text-white"
+                          className="px-3 py-1 text-slate-300 hover:bg-slate-800 transition-colors"
                         >
                           -
                         </button>
-                        <span className="px-3 font-semibold text-sand-100">{item.qty}</span>
+                        <span className="px-3 py-1 text-xs font-bold text-sand-100 font-mono">
+                          {item.qty}
+                        </span>
                         <button
                           onClick={() => setQty(item.slug, item.qty + 1)}
-                          className="px-2.5 py-1 text-slate-300 hover:text-white"
+                          className="px-3 py-1 text-slate-300 hover:bg-slate-800 transition-colors"
                         >
                           +
                         </button>
                       </div>
 
-                      <div className="text-right min-w-[100px]">
-                        <span className="font-bold text-sand-100 text-sm">
-                          ₹{(itemPrice * item.qty).toLocaleString("en-IN")}
-                        </span>
-                      </div>
-
                       <button
                         onClick={() => removeItem(item.slug)}
-                        className="text-xs text-red-400 hover:text-red-300 p-1"
-                        title="Remove item"
+                        className="text-xs text-red-400/80 hover:text-red-400 transition-colors"
                       >
-                        ✕
+                        Remove
                       </button>
                     </div>
                   </div>
-                );
-              })}
-            </div>
 
-            <button
-              onClick={clear}
-              className="text-xs text-slate-400 hover:text-red-400 transition-colors"
-            >
-              Clear shopping cart
-            </button>
+                  <div className="text-center sm:text-right flex-shrink-0">
+                    <span className="text-xs text-slate-400 block">Total</span>
+                    <span className="font-display font-bold text-lg text-sand-100">
+                      ₹{lineTotal.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Summary Box */}
-          <div className="lg:col-span-4 space-y-4">
+          {/* Cart Summary & MLM Commission Box */}
+          <div className="lg:col-span-4 space-y-6">
             <div className="glass-card p-6 rounded-2xl border border-gold/30 space-y-5">
-              <h2 className="font-display font-bold text-lg text-sand-100">Order & BV Summary</h2>
+              <h2 className="font-display font-bold text-lg text-sand-100 border-b border-slate-700/60 pb-3">
+                Order Summary
+              </h2>
 
-              <div className="p-4 rounded-xl bg-gold/10 border border-gold/20 space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gold font-bold">Business Volume (BV):</span>
-                  <span className="font-bold text-emerald-400 font-mono">{totalBV.toLocaleString("en-IN")} BV</span>
+              {/* Member toggle in summary */}
+              <div className="p-3 rounded-xl bg-navy-950 border border-gold/30 flex items-center justify-between text-xs">
+                <div>
+                  <span className="font-semibold text-sand-100 block">Distributor Rates</span>
+                  <span className="text-[10px] text-gold">20% Wholesale Privilege</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gold font-bold">Personal Volume (PV):</span>
-                  <span className="font-bold text-emerald-400 font-mono">{totalPV} PV</span>
+                <button
+                  onClick={() => setIsMemberPricing(!isMemberPricing)}
+                  className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors ${
+                    isMemberPricing ? "bg-gold" : "bg-slate-700"
+                  }`}
+                >
+                  <div
+                    className={`bg-navy-950 w-4 h-4 rounded-full shadow-md transform transition-transform ${
+                      isMemberPricing ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Volume metrics */}
+              <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-xs space-y-1.5 font-mono">
+                <div className="flex justify-between text-emerald-400">
+                  <span>Credited Business Volume (BV):</span>
+                  <span className="font-bold">{totalBV.toLocaleString("en-IN")} BV</span>
                 </div>
-                <p className="text-[10px] text-slate-400 pt-1 border-t border-gold/20">
-                  Credited directly to sponsor ID upon confirmed doorstep delivery.
+                <div className="flex justify-between text-purple-300">
+                  <span>Credited Personal Volume (PV):</span>
+                  <span className="font-bold">{totalPV} PV</span>
+                </div>
+                <p className="text-[10px] text-slate-400 pt-1 font-sans">
+                  Volume is automatically synced with your binary tree upon confirmed delivery.
                 </p>
               </div>
 
-              <div className="space-y-2 text-xs text-slate-300 border-t border-slate-700/60 pt-3">
+              <div className="space-y-2.5 text-xs text-slate-300 border-t border-slate-700/60 pt-4">
                 <div className="flex justify-between">
-                  <span>Subtotal (Retail):</span>
+                  <span>Retail Price:</span>
                   <span>₹{subtotal.toLocaleString("en-IN")}</span>
                 </div>
-                {isMemberPricing && savings > 0 && (
-                  <div className="flex justify-between text-emerald-400">
-                    <span>Distributor Discount (20%):</span>
+                {isMemberPricing && (
+                  <div className="flex justify-between text-emerald-400 font-semibold">
+                    <span>Distributor Direct Savings:</span>
                     <span>-₹{savings.toLocaleString("en-IN")}</span>
                   </div>
                 )}
@@ -209,46 +218,6 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-=======
-    <main className="px-6 md:px-12 py-12">
-      <h1 className="font-display text-3xl text-walnut mb-8">Your cart</h1>
-      <div className="space-y-6 mb-10">
-        {items.map((item) => (
-          <div key={item.slug} className="flex items-center justify-between border-b border-walnut/10 pb-4">
-            <div>
-              <p className="font-medium text-charcoal">{item.name}</p>
-              <p className="text-sm text-charcoal/60">₹{item.price.toLocaleString("en-IN")} each</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <input
-                type="number"
-                min={1}
-                value={item.qty}
-                onChange={(e) => setQty(item.slug, Number(e.target.value))}
-                className="w-16 border border-walnut/20 rounded-sm px-2 py-1 text-center"
-              />
-              <p className="w-24 text-right">₹{(item.price * item.qty).toLocaleString("en-IN")}</p>
-              <button
-                onClick={() => removeItem(item.slug)}
-                className="text-sm text-charcoal/50 hover:text-red-700"
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="flex justify-between items-center mb-8">
-        <p className="text-lg">Subtotal</p>
-        <p className="text-xl font-medium text-walnut">₹{subtotal.toLocaleString("en-IN")}</p>
-      </div>
-      <Link
-        href="/checkout"
-        className="inline-block bg-walnut text-cream px-6 py-3 rounded-sm hover:bg-charcoal transition-colors"
-      >
-        Proceed to checkout
-      </Link>
->>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
     </main>
   );
 }
