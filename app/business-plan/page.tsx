@@ -43,49 +43,67 @@ export default function BusinessPlanPage() {
 
   const ranks = [
     {
-      rank: "Associate",
-      personalBV: "2,000 BV",
-      teamBV: "—",
-      directs: "1 Active",
-      binaryRate: "8%",
-      matchingBonus: "—",
-      rewards: "Wholesale Margin Access & Back-Office CRM",
+      rank: "Star Associate",
+      packageReq: "Active ₹15,000 ID",
+      pairs: "1 Matched Pair (A + B)",
+      directs: "2 Directs (₹10,000 Bonus)",
+      pairingIncome: "₹3,000",
+      rewards: "Bio-Magnetic Kit + Official IBO Welcome Pin & CRM Access",
+      badgeColor: "text-slate-300",
+    },
+    {
+      rank: "Bronze Star Leader",
+      packageReq: "Active ₹15,000 ID",
+      pairs: "5 Matched Pairs",
+      directs: "4 Directs (₹20,000 Bonus)",
+      pairingIncome: "₹15,000",
+      rewards: "Smart Kitchen Suite / Android Tablet + Bronze Trophy",
+      badgeColor: "text-amber-500",
     },
     {
       rank: "Silver Executive",
-      personalBV: "5,000 BV",
-      teamBV: "50,000 BV",
-      directs: "2 Active",
-      binaryRate: "10%",
-      matchingBonus: "Gen 1 (5%)",
-      rewards: "Silver Trophy & ₹10,000 Tech Gadget Grant",
+      packageReq: "Active ₹15,000 ID",
+      pairs: "15 Matched Pairs",
+      directs: "6 Directs (₹30,000 Bonus)",
+      pairingIncome: "₹45,000",
+      rewards: "50-inch 4K Smart TV / Luxury Sofa Voucher + Goa 3N/4D Flight Tour",
+      badgeColor: "text-slate-200",
     },
     {
-      rank: "Gold Leader",
-      personalBV: "10,000 BV",
-      teamBV: "1,50,000 BV",
-      directs: "4 Active",
-      binaryRate: "11%",
-      matchingBonus: "Gen 1-2 (5%)",
-      rewards: "Goa 3N/4D Leadership Summit & ₹25,000 Cash",
+      rank: "Gold Director",
+      packageReq: "Active ₹15,000 ID",
+      pairs: "40 Matched Pairs",
+      directs: "8 Directs (₹40,000 Bonus)",
+      pairingIncome: "₹1,20,000",
+      rewards: "Thailand / Malaysia International Flight Tour + 1.5 Ton Inverter AC",
+      badgeColor: "text-yellow-400",
     },
     {
       rank: "Diamond Director",
-      personalBV: "20,000 BV",
-      teamBV: "4,00,000 BV",
-      directs: "6 Active",
-      binaryRate: "12%",
-      matchingBonus: "Gen 1-3 (5%, 4%, 3%)",
-      rewards: "Dubai 5-Star International Tour + Luxury Car Fund",
+      packageReq: "Active ₹15,000 ID",
+      pairs: "100 Matched Pairs",
+      directs: "12 Directs (₹60,000 Bonus)",
+      pairingIncome: "₹3,00,000",
+      rewards: "Dubai 5-Star Luxury Couple Tour + Royal Teak Master Suite + ₹50k Car Fund",
+      badgeColor: "text-cyan-400",
+    },
+    {
+      rank: "Blue Diamond",
+      packageReq: "Active ₹15,000 ID",
+      pairs: "250 Matched Pairs",
+      directs: "15 Directs (₹75,000 Bonus)",
+      pairingIncome: "₹7,50,000",
+      rewards: "Kia Seltos / Hyundai Creta SUV Downpayment + European Luxury Tour",
+      badgeColor: "text-blue-400",
     },
     {
       rank: "Crown Ambassador",
-      personalBV: "35,000 BV",
-      teamBV: "10,00,000 BV",
-      directs: "10 Active",
-      binaryRate: "12%",
-      matchingBonus: "Gen 1-5 (Full Deep Match)",
-      rewards: "BMW Luxury Sedan + ₹1,00,000/mo Royal Villa Allowance",
+      packageReq: "Active ₹15,000 ID",
+      pairs: "600+ Matched Pairs",
+      directs: "20 Directs (₹1,00,000 Bonus)",
+      pairingIncome: "₹18,00,000+",
+      rewards: "Mercedes-Benz / BMW Luxury Car + ₹1,00,000/mo Dream Villa Home Allowance",
+      badgeColor: "text-amber-300",
     },
   ];
 
@@ -318,15 +336,15 @@ export default function BusinessPlanPage() {
           </div>
 
           <div className="glass-card rounded-2xl border border-navy-700 overflow-x-auto shadow-2xl">
-            <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[700px]">
+            <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[760px]">
               <thead>
                 <tr className="bg-navy-950/80 border-b border-navy-700 text-gold font-display">
                   <th className="py-4 px-5 font-bold">Rank Title</th>
-                  <th className="py-4 px-4 font-bold">Personal BV</th>
-                  <th className="py-4 px-4 font-bold">Lesser Team BV</th>
+                  <th className="py-4 px-4 font-bold">Qualification</th>
+                  <th className="py-4 px-4 font-bold">Matched Pairs (A+B)</th>
                   <th className="py-4 px-4 font-bold">Direct Sponsors</th>
-                  <th className="py-4 px-4 font-bold">Binary %</th>
-                  <th className="py-4 px-5 font-bold">Elite Rewards & Allowances</th>
+                  <th className="py-4 px-4 font-bold">Pair Matching Income</th>
+                  <th className="py-4 px-5 font-bold">Elite Rewards & Luxury Allowances</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-navy-700/60 text-slate-300">
@@ -334,17 +352,27 @@ export default function BusinessPlanPage() {
                   <tr
                     key={r.rank}
                     className={`hover:bg-navy-800/40 transition-colors ${
-                      i === ranks.length - 1 ? "bg-gold/5 font-semibold" : ""
+                      i === ranks.length - 1 ? "bg-gold/10 font-semibold border-t-2 border-gold/40" : ""
                     }`}
                   >
                     <td className="py-4 px-5 text-sand-100 font-bold flex items-center gap-2">
-                      <span className="text-gold">★</span>
-                      <span>{r.rank}</span>
+                      <span className={r.badgeColor || "text-gold"}>★</span>
+                      <span className="font-semibold text-sand-100">{r.rank}</span>
                     </td>
-                    <td className="py-4 px-4">{r.personalBV}</td>
-                    <td className="py-4 px-4 text-emerald-400 font-mono">{r.teamBV}</td>
-                    <td className="py-4 px-4">{r.directs}</td>
-                    <td className="py-4 px-4 font-bold text-gold">{r.binaryRate}</td>
+                    <td className="py-4 px-4 text-xs font-mono text-slate-300">
+                      <span className="px-2.5 py-1 rounded-md bg-gold/15 text-gold border border-gold/30">
+                        {r.packageReq}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 font-bold text-sand-100">
+                      {r.pairs}
+                    </td>
+                    <td className="py-4 px-4 text-emerald-400 font-medium">
+                      {r.directs}
+                    </td>
+                    <td className="py-4 px-4 font-bold text-gold font-mono text-sm">
+                      {r.pairingIncome}
+                    </td>
                     <td className="py-4 px-5 text-sand-100 font-medium">
                       {r.rewards}
                     </td>
@@ -352,6 +380,15 @@ export default function BusinessPlanPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-navy-950/70 border border-gold/20 text-xs sm:text-sm text-slate-300">
+            <div className="flex items-center gap-2">
+              <span className="text-gold font-bold">⚡ Rule Reminder:</span>
+              <span>Direct Referral = <strong className="text-sand-100">₹5,000</strong> per ID | Pair Matching (A + B) = <strong className="text-gold">₹3,000</strong> per pair</span>
+            </div>
+            <div className="text-slate-400 text-xs">
+              All ranks cumulative lifetime volume & zero demotions • Contact Pranay: <span className="text-gold font-semibold">+91 99594 27831</span>
+            </div>
           </div>
         </div>
 
