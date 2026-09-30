@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-navy: #0F172A;
+  --primary-gold: #D97706;
+  --gold-accent: #EAB308;
+  --teak-wood: #78350F;
+  --sand-bg: #F8FAFC;
+}
+
+body {
+  background-color: #0F172A;
+  color: #F8FAFC;
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Luxury custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #090E1A;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D97706;
+}
+
+/* Gold Gradient utilities */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FDE68A 0%, #D97706 50%, #B45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-gradient-bg {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #B45309 100%);
+}
+
+.gold-glow {
+  box-shadow: 0 0 25px -5px rgba(217, 119, 6, 0.35);
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.glass-card-hover:hover {
+  border-color: rgba(234, 179, 8, 0.45);
+  box-shadow: 0 10px 30px -10px rgba(217, 119, 6, 0.25);
+}
+
+.swatch-strip {
+  background: linear-gradient(
+    90deg,
+    #0F172A 0%,
+    #78350F 25%,
+    #D97706 50%,
+    #EAB308 75%,
+    #0F172A 100%
+  );
+  height: 3px;
+}
+
+::selection {
+  background: #D97706;
+  color: #FFFFFF;
+}

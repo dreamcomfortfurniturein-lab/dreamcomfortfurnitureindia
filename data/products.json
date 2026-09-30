@@ -1,0 +1,151 @@
+[
+  {
+    "slug": "royal-sheesham-maharaja-sofa-set",
+    "name": "Royal Sheesham Maharaja 7-Seater Sofa Suite",
+    "category": "Living Room",
+    "material": "Grade-A Sheesham Wood & Velvet Upholstery",
+    "price": 68500,
+    "mrp": 89999,
+    "memberPrice": 54800,
+    "bv": 27400,
+    "pv": 274,
+    "stock": 8,
+    "featured": true,
+    "badge": "Best Seller",
+    "description": "Hand-carved royal Sheesham wood luxury sofa set with brass floral inlays, high-density feather cushions, and stain-resistant velvet fabric. Backed by a 10-year termite warranty.",
+    "images": [
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "heritage-teakwood-king-bed",
+    "name": "Heritage Handcrafted Teakwood King Bed with Hydraulic Storage",
+    "category": "Bedroom Sets",
+    "material": "100% Solid Indian Teak (Sagwan)",
+    "price": 54900,
+    "mrp": 72500,
+    "memberPrice": 43920,
+    "bv": 21960,
+    "pv": 220,
+    "stock": 5,
+    "featured": true,
+    "badge": "Luxury Choice",
+    "description": "Exquisite solid teakwood king-size bed engineered with German gas-lift hydraulic storage, cushioned headboard with diamond tufting, and warm walnut hand-rubbed oil finish.",
+    "images": [
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1540518614846-7ede433c4ef2?auto=format&fit=crop&w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "emperors-8-seater-teak-dining-suite",
+    "name": "Emperor's 8-Seater Hand-Carved Teak Dining Suite",
+    "category": "Handcrafted Solid Teak",
+    "material": "Reclaimed CP Teak & Italian Marble Inlay",
+    "price": 82000,
+    "mrp": 105000,
+    "memberPrice": 65600,
+    "bv": 32800,
+    "pv": 328,
+    "stock": 4,
+    "featured": true,
+    "badge": "Signature Line",
+    "description": "Mastercrafted 96-inch solid teak dining table adorned with micro-inlaid Italian Carrara marble center and 8 high-back upholstered chairs with ergonomic lumber support.",
+    "images": [
+      "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "aeroflex-executive-ergonomic-desk-chair",
+    "name": "AeroFlex Executive President Leatherette & Walnut Desk Suite",
+    "category": "Ergonomic Office",
+    "material": "Top-Grain Leatherette, Walnut Veneer & Steel Base",
+    "price": 38900,
+    "mrp": 49999,
+    "memberPrice": 31120,
+    "bv": 15560,
+    "pv": 156,
+    "stock": 14,
+    "featured": true,
+    "badge": "Ergonomic Pro",
+    "description": "Executive high-back office chair with multi-angle synchro-tilt mechanism, 4D adjustable armrests, and matching solid walnut executive study table with wire-management ports.",
+    "images": [
+      "https://images.unsplash.com/photo-1580481077195-c328ad017599?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "royal-grandeur-modular-island-kitchen",
+    "name": "Grandeur Acrylic & Teak Modular Kitchen System",
+    "category": "Modular Kitchens",
+    "material": "Marine Grade BWP Plywood with Anti-Scratch Acrylic Finish",
+    "price": 145000,
+    "mrp": 195000,
+    "memberPrice": 116000,
+    "bv": 58000,
+    "pv": 580,
+    "stock": 6,
+    "featured": true,
+    "badge": "Turnkey Interior",
+    "description": "Turnkey modular kitchen island with Blum soft-close hinges, quartz countertop finish, built-in chimney spacing, and customizable modular pull-out pantry baskets.",
+    "images": [
+      "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "jaipur-sheesham-accent-credenza",
+    "name": "Jaipur Hand-Carved Sheesham 4-Door Sideboard Credenza",
+    "category": "Living Room",
+    "material": "Indian Sheesham Wood with Brass Accents",
+    "price": 28900,
+    "mrp": 38000,
+    "memberPrice": 23120,
+    "bv": 11560,
+    "pv": 116,
+    "stock": 11,
+    "featured": false,
+    "badge": "Artisanal",
+    "description": "Intricate lattice jali design inspired by Rajasthani palace architecture. Spacious internal shelving with brass ring pulls and magnetic door catches.",
+    "images": [
+      "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "haveli-brass-inlay-coffee-table",
+    "name": "Haveli Solid Teak Coffee Table with Brass Filigree",
+    "category": "Handcrafted Solid Teak",
+    "material": "Seasoned Teak Wood & Brushed Brass",
+    "price": 19500,
+    "mrp": 26000,
+    "memberPrice": 15600,
+    "bv": 7800,
+    "pv": 78,
+    "stock": 18,
+    "featured": false,
+    "badge": "Handmade",
+    "description": "Hand-polished centre coffee table with subtle geometric brass inlay, lower open magazine shelf, and hand-beveled edges.",
+    "images": [
+      "https://images.unsplash.com/photo-1533090161767-e6ffed986b88?auto=format&fit=crop&w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "zenith-dual-motor-height-adjustable-desk",
+    "name": "Zenith Solid Teak Smart Dual-Motor Standing Desk",
+    "category": "Ergonomic Office",
+    "material": "Solid Teak Top with Dual German Motors",
+    "price": 42000,
+    "mrp": 55000,
+    "memberPrice": 33600,
+    "bv": 16800,
+    "pv": 168,
+    "stock": 9,
+    "featured": false,
+    "badge": "Smart Tech",
+    "description": "Ergonomic motorized sit-to-stand desk with 4 memory presets, digital height LED display, anti-collision sensor, and genuine solid teak wood tabletop.",
+    "images": [
+      "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=1200&q=80"
+    ]
+  }
+]
