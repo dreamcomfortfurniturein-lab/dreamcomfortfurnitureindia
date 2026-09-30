@@ -6,6 +6,7 @@ import { CartProvider } from "@/lib/cart-context";
 import CartButton from "./cart-button";
 import CartDrawer from "./cart-drawer";
 import NavAuth from "./nav-auth";
+import HeaderSearch from "./header-search";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -30,21 +31,21 @@ export default function RootLayout({
       <body className={`${fraunces.variable} ${inter.variable} font-body bg-navy-900 text-sand-100 min-h-screen flex flex-col antialiased`}>
         <CartProvider>
           {/* Top Announcement Bar */}
-          <div className="bg-gradient-to-r from-navy-900 via-teak-dark to-navy-900 border-b border-gold/30 text-xs py-2 px-4 sm:px-8 text-center text-slate-200 flex flex-wrap items-center justify-between gap-2">
+          <div className="bg-gradient-to-r from-navy-950 via-teak-dark to-navy-950 border-b border-gold/30 text-xs py-2 px-4 sm:px-8 text-center text-slate-200 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 mx-auto sm:mx-0">
               <span className="inline-block w-2 h-2 rounded-full bg-gold animate-ping" />
               <span>
-                ✨ <strong>Join Dream Comfort Direct Sales Network:</strong> Earn up to 25% Direct Bonus + Leadership Rewards & Luxury Car Pool
+                ✨ <strong>Special Hybrid Offer:</strong> Register ID for <strong>₹15,000</strong> → Get <strong>Physical Bio-Magnetic Wellness Kit</strong> + <strong>100% ₹15,000 Furniture Credit Redemption</strong>!
               </span>
             </div>
             <div className="flex items-center gap-4 text-xs font-medium mx-auto sm:mx-0">
-              <span className="text-gold flex items-center gap-1">
-                <span className="font-bold">₹ INR</span> (Official Direct Selling Member Rates)
+              <span className="text-gold flex items-center gap-1 font-semibold">
+                Founder: Pranay
               </span>
               <span className="text-slate-500">|</span>
               <a href="https://wa.me/919959427831" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors flex items-center gap-1">
-                <span>💬 WhatsApp:</span>
-                <span>+91 99594 27831 (Peela Pranay Tej)</span>
+                <span>💬 Call / WhatsApp:</span>
+                <span>+91 99594 27831</span>
               </a>
             </div>
           </div>
@@ -94,6 +95,7 @@ export default function RootLayout({
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3">
+                <HeaderSearch />
                 <CartButton />
 
                 <div className="hidden sm:flex items-center">
@@ -193,12 +195,12 @@ export default function RootLayout({
                     </p>
                     <p className="flex items-center gap-2">
                       <span className="text-gold">👤</span>
-                      <span>Founder / Director: <strong>Peela Pranay Tej</strong></span>
+                      <span>Founder & Director: <strong>Pranay</strong></span>
                     </p>
                     <p className="flex items-center gap-2">
                       <span className="text-emerald-400">💬</span>
                       <a href="https://wa.me/919959427831" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">
-                        WhatsApp & Call: +91 99594 27831
+                        Call & WhatsApp: +91 99594 27831
                       </a>
                     </p>
                     <p className="flex items-center gap-2">

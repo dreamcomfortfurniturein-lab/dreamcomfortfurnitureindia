@@ -2,6 +2,7 @@ import Link from "next/link";
 import products from "@/data/products.json";
 import EarningsCalculator from "./earnings-calculator";
 import TestimonialShowcase from "./testimonial-showcase";
+import GiftRedemptionSelector from "./gift-redemption-selector";
 
 export default function Home() {
   const featured = products.slice(0, 4);
@@ -137,39 +138,73 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Quick Opportunity Card */}
+          {/* Quick Opportunity Card - ₹15,000 Hybrid Model */}
           <div className="lg:col-span-4 hidden lg:block">
-            <div className="glass-card rounded-2xl p-6 border border-gold/30 shadow-2xl space-y-4">
+            <div className="glass-card rounded-2xl p-6 border-2 border-gold/50 shadow-2xl space-y-4 relative overflow-hidden bg-gradient-to-b from-navy-900/90 to-navy-950/95">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-2xl pointer-events-none" />
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-gold">
-                  Exclusive Starter Pack
+                <span className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1">
+                  ⭐ Flagship Hybrid ID
                 </span>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
-                  High BV Yield
+                <span className="px-2 py-0.5 rounded bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-[10px] font-bold">
+                  100% Value Backed
                 </span>
               </div>
-              <h3 className="font-display font-bold text-lg text-sand-100">
-                Independent Distributor Starter Kit
-              </h3>
-              <p className="text-xs text-slate-300">
-                Includes sample wood catalog, high-res 3D digital room planner app access, distributor ID, and immediate wholesale member pricing.
-              </p>
-              <div className="p-3 bg-navy-900/80 rounded-xl border border-slate-700 space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Membership Fee:</span>
-                  <span className="text-emerald-400 font-bold">Zero ₹ (Purchase Only)</span>
+
+              <div>
+                <h3 className="font-display font-bold text-xl text-sand-100">
+                  ₹15,000 ID Registration
+                </h3>
+                <p className="text-xs text-amber-300 font-medium mt-0.5">
+                  Bio-Magnetic Kit + 100% Retail Furniture Redemption
+                </p>
+              </div>
+
+              <div className="space-y-2 text-xs text-slate-300">
+                <div className="flex items-start gap-2 bg-navy-950/80 p-2.5 rounded-lg border border-slate-700/80">
+                  <span className="text-emerald-400 font-bold text-sm">🧲</span>
+                  <div>
+                    <strong className="text-sand-100">Instant Wellness Benefit:</strong>
+                    <p className="text-[11px] text-slate-400">Receive physical Bio-Magnetic Kit (sleep & circulation therapy system).</p>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Commission Payout:</span>
-                  <span className="text-gold font-bold">Weekly via NEFT</span>
+
+                <div className="flex items-start gap-2 bg-navy-950/80 p-2.5 rounded-lg border border-slate-700/80">
+                  <span className="text-gold font-bold text-sm">🛋️</span>
+                  <div>
+                    <strong className="text-sand-100">Full Retail Redemption:</strong>
+                    <p className="text-[11px] text-slate-400">₹15,000 fully redeemable against luxury furniture & interior decor at physical outlets.</p>
+                  </div>
                 </div>
               </div>
-              <Link
-                href="/register"
-                className="block w-full py-2.5 rounded-lg bg-gold hover:bg-gold-dark text-navy-900 text-center text-xs font-bold transition-all shadow-md"
-              >
-                Register & KYC Instantly →
-              </Link>
+
+              <div className="p-3 bg-navy-950/90 rounded-xl border border-gold/30 space-y-1 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Registration ID Fee:</span>
+                  <span className="text-gold font-extrabold text-sm font-mono">₹15,000</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400">Store Furniture Credit:</span>
+                  <span className="text-emerald-400 font-bold">₹15,000 (100%)</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Link
+                  href="/business-plan#hybrid-model"
+                  className="block w-full py-2.5 rounded-lg bg-gold hover:bg-gold-dark text-navy-900 text-center text-xs font-bold transition-all shadow-md"
+                >
+                  Explore Plan of Action →
+                </Link>
+                <a
+                  href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20want%20to%20register%20the%2015000%20ID%20for%20the%20Bio-Magnetic%20Kit%20and%20Furniture%20Credit."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full py-2 rounded-lg bg-emerald-600/90 hover:bg-emerald-600 text-white text-center text-xs font-semibold transition-all border border-emerald-500/40"
+                >
+                  💬 Register via Pranay (9959427831)
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -231,6 +266,130 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* 2.5 SPECIAL HYBRID ADVANCE RETAIL & WELLNESS MODEL */}
+      <section className="py-16 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto" id="hybrid-model">
+        <div className="rounded-3xl p-8 sm:p-12 bg-gradient-to-b from-navy-950 via-navy-900 to-navy-950 border-2 border-gold/40 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="text-center max-w-3xl mx-auto space-y-3 mb-12">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 border border-gold/40 text-gold text-xs font-bold uppercase tracking-wider">
+              ⭐ Breakthrough Business Innovation
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-sand-100">
+              The ₹15,000 <span className="gold-gradient-text">Hybrid Advance Retail Model</span>
+            </h2>
+            <p className="text-sm sm:text-base text-slate-300">
+              Zero-Risk Direct Selling backed by 100% Tangible Value. Your registration is not an expenditure—it is an advance furniture investment with instant wellness therapy.
+            </p>
+          </div>
+
+          {/* 3 Step Plan of Action Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 mb-10">
+            {/* Step 1 */}
+            <div className="glass-card p-6 rounded-2xl border border-gold/30 bg-navy-950/80 hover:border-gold transition-all flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="w-10 h-10 rounded-xl bg-gold/20 text-gold border border-gold/40 flex items-center justify-center font-bold text-base font-display">
+                    01
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-navy-900 text-gold text-[11px] font-bold border border-gold/30">
+                    Step 1: Registration
+                  </span>
+                </div>
+                <h3 className="font-display font-bold text-xl text-sand-100 mb-2">
+                  Register ID for ₹15,000
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Join Dream Comfort Furniture with an official member ID cost of ₹15,000. Immediately activate your independent distributor business position.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-amber-300 font-semibold">
+                ✓ Instant ID activation & back-office CRM portal
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="glass-card p-6 rounded-2xl border border-emerald-500/40 bg-navy-950/80 hover:border-emerald-400 transition-all flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-bold text-base font-display">
+                    02
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-navy-900 text-emerald-400 text-[11px] font-bold border border-emerald-500/30">
+                    Step 2: Instant Wellness
+                  </span>
+                </div>
+                <h3 className="font-display font-bold text-xl text-sand-100 mb-2">
+                  Receive Bio-Magnetic Kit
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Every registered member gets a physical, high-grade Bio-Magnetic Wellness & Sleep Therapy Set delivered to their hands. Improves blood flow, oxygenation, and restful sleep.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-emerald-400 font-semibold">
+                ✓ Tangible physical health benefit from Day 1
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="glass-card p-6 rounded-2xl border border-gold/30 bg-navy-950/80 hover:border-gold transition-all flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="w-10 h-10 rounded-xl bg-gold/20 text-gold border border-gold/40 flex items-center justify-center font-bold text-base font-display">
+                    03
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-navy-900 text-gold text-[11px] font-bold border border-gold/30">
+                    Step 3: 100% Redemption
+                  </span>
+                </div>
+                <h3 className="font-display font-bold text-xl text-sand-100 mb-2">
+                  100% ₹15,000 Retail Credit
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Your complete ₹15,000 ID fee is 100% redeemable as a single exclusive gift choice for <strong>Furniture</strong>, <strong>Home Needs & Appliances (TV, AC, Fridge, Washing Machine, Fans)</strong>, or <strong>Interior Designs</strong> at Pranay&apos;s physical outlets!
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-emerald-400 font-semibold">
+                ✓ Zero risk: You lose ₹0, get wellness kit + 100% retail product value
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Gift Box: Furniture Products, Home Needs, Interior Designs (Only one opened) */}
+          <div className="pt-4 pb-8 border-t border-slate-800">
+            <GiftRedemptionSelector />
+          </div>
+
+          {/* Action Callout Bar */}
+          <div className="bg-navy-950/90 border border-gold/40 rounded-2xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div className="space-y-1 text-center lg:text-left">
+              <h4 className="font-display text-xl font-bold text-sand-100">
+                Want to Activate Your ₹15,000 ID or Visit our Outlets?
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-400">
+                Directly connect with <strong>Founder Pranay</strong> for registration guidance, outlet locations, and kit dispatch.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-4 shrink-0">
+              <a
+                href="https://wa.me/919959427831?text=Hello%20Pranay,%20I%20am%20interested%20in%20joining%20the%2015000%20Hybrid%20Model%20for%20the%20Bio-Magnetic%20Kit%20and%20Furniture%20Credit."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2"
+              >
+                <span>💬 WhatsApp Pranay: +91 99594 27831</span>
+              </a>
+              <a
+                href="tel:9959427831"
+                className="px-6 py-3.5 rounded-xl bg-gold hover:bg-gold-dark text-navy-900 font-bold text-xs sm:text-sm transition-all shadow-lg shadow-gold/20 flex items-center gap-2"
+              >
+                <span>📞 Call Pranay (9959427831)</span>
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -410,22 +569,22 @@ export default function Home() {
               href="/register"
               className="px-8 py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-sm sm:text-base hover:brightness-110 transition-all shadow-xl shadow-gold/25"
             >
-              Register As Distributor Now →
+              Register ₹15,000 Hybrid ID Now →
             </Link>
             <a
-              href="https://wa.me/919959427831?text=Hi%20Peela%20Pranay%20Tej,%20I%20am%20interested%20in%20Dream%20Comfort%20Furniture%20and%20the%20business%20opportunity."
+              href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20am%20interested%20in%20the%2015000%20Hybrid%20Model%20with%20Bio-Magnetic%20Kit%20and%20Furniture%20Credit."
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base transition-all shadow-lg flex items-center justify-center gap-2"
             >
               <span>💬</span>
-              <span>Chat with Peela Pranay Tej on WhatsApp (+91 99594 27831)</span>
+              <span>Chat with Pranay on WhatsApp (+91 99594 27831)</span>
             </a>
             <Link
-              href="/business-plan"
+              href="/business-plan#hybrid-model"
               className="px-8 py-3.5 rounded-xl bg-navy-900/90 border border-gold/40 text-sand-100 font-semibold text-sm sm:text-base hover:border-gold transition-all"
             >
-              Read Compensation Plan
+              View Plan of Action
             </Link>
           </div>
         </div>

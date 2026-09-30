@@ -41,13 +41,36 @@ export default function StoresPage() {
     <main className="bg-navy-900 text-sand-100 min-h-screen py-16 px-4 sm:px-8 lg:px-12">
       <div className="max-w-6xl mx-auto space-y-12">
         <div className="text-center space-y-3">
-          <span className="text-xs font-bold text-gold uppercase tracking-wider">Nationwide Presence</span>
+          <span className="text-xs font-bold text-gold uppercase tracking-wider">Nationwide Presence & Retail Outlets</span>
           <h1 className="font-display text-4xl sm:text-5xl font-extrabold text-sand-100">
-            Experience Centers & Franchise Galleries
+            Experience Centers & Furniture Outlets
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
-            Touch and feel our genuine Sheesham, Teakwood grains, and ergonomic setups in person. Distributors can bring prospective clients for live demonstrations.
+            Touch and feel our genuine Sheesham, Teakwood grains, and ergonomic setups in person. Distributors and members can visit to inspect products and redeem their advance furniture credits.
           </p>
+        </div>
+
+        {/* 15,000 Retail Redemption Notice */}
+        <div className="glass-card p-6 sm:p-8 rounded-2xl border-2 border-gold/50 bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+          <div className="space-y-2">
+            <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+              🎁 100% Retail Redemption (Choice of 1 Gift Category)
+            </span>
+            <h3 className="font-display font-bold text-xl text-sand-100">
+              Have a ₹15,000 Registered ID?
+            </h3>
+            <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+              Your ₹15,000 ID fee can be unlocked as an exclusive gift voucher for any <strong>ONE</strong> of three choices: <strong>(1) Luxury Solid Wood Furniture</strong>, <strong>(2) Essential Home Needs & Appliances</strong> (Smart TVs, Inverter ACs, Refrigerators, Washing Machines, BLDC Fans & Gadgets), or <strong>(3) Turnkey Interior Design Services</strong> at our physical outlets.
+            </p>
+          </div>
+          <a
+            href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20want%20to%20visit%20a%20Dream%20Comfort%20store%20and%20redeem%20my%2015000%20credit."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm whitespace-nowrap shadow-lg transition-all shrink-0 flex items-center gap-2"
+          >
+            <span>💬 Coordinate with Pranay (+91 99594 27831)</span>
+          </a>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

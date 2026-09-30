@@ -1,18 +1,28 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import products from "@/data/products.json";
 import { useCart } from "@/lib/cart-context";
 
-export default function ProductsPage() {
+function ProductsContent() {
+  const searchParams = useSearchParams();
+  const urlSearch = searchParams.get("search") || "";
+  const urlCategory = searchParams.get("category") || "All";
+
   const { addItem, isMemberPricing, setIsMemberPricing } = useCart();
 
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
   const [selectedMaterial, setSelectedMaterial] = useState<string>("All");
   const [maxPrice, setMaxPrice] = useState<number>(150000);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(urlSearch);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (urlSearch) setSearchQuery(urlSearch);
+    if (urlCategory && urlCategory !== "All") setSelectedCategory(urlCategory);
+  }, [urlSearch, urlCategory]);
 
   const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
   const materials = ["All", "Sheesham", "Teak", "Leatherette", "Acrylic"];
@@ -80,16 +90,31 @@ export default function ProductsPage() {
         {/* Filter Controls Bar */}
         <div className="glass-card p-5 rounded-2xl border border-slate-700 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Search Input */}
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">Search Furniture</label>
-              <input
-                type="text"
-                placeholder="Search sofa, teak bed, desk..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-navy-950 border border-slate-700 rounded-lg px-3.5 py-2 text-xs text-sand-100 focus:border-gold outline-none"
-              />
+            {/* Search Input with Icon and Clear button */}
+            <div className="relative">
+              <label className="block text-xs font-semibold text-gold mb-1.5 flex items-center justify-between">
+                <span>🔍 Search Furniture Catalog</span>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="text-[10px] text-amber-300 hover:text-white underline cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search sofa, teak bed, dining, desk..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-navy-950/95 border-2 border-slate-700 hover:border-gold/50 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-slate-400 focus:border-gold outline-none shadow-inner transition-colors font-medium"
+                />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
+                  🔍
+                </span>
+              </div>
             </div>
 
             {/* Category Dropdown */}
@@ -267,5 +292,18 @@ export default function ProductsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <main className="bg-navy-900 text-sand-100 min-h-screen py-20 text-center">
+        <div className="inline-block animate-spin text-gold text-3xl">⏳</div>
+        <p className="text-xs text-slate-400 mt-2">Loading Furniture Catalog...</p>
+      </main>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }

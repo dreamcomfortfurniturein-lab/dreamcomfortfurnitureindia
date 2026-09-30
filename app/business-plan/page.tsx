@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import EarningsCalculator from "@/app/earnings-calculator";
+import GiftRedemptionSelector from "@/app/gift-redemption-selector";
 
 export default function BusinessPlanPage() {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -15,16 +16,16 @@ export default function BusinessPlanPage() {
       highlight: "₹10,000 – ₹30,000 profit per luxury bedroom/living set",
     },
     {
-      title: "2. Direct Referral Sponsor Bonus (10%)",
-      desc: "Whenever you sponsor a new distributor who joins with an Essential or Luxury starter package, receive a direct sponsor commission.",
-      payout: "Credited instantly to Distributor e-Wallet",
-      highlight: "Flat ₹4,000 to ₹12,000 per sponsored business partner",
+      title: "2. Direct Referral Bonus (₹5,000 / ID)",
+      desc: "When a new member joins with a ₹15,000 package through your direct referral, you immediately receive a flat ₹5,000 direct commission.",
+      payout: "Credited instantly to Distributor e-Wallet / Bank NEFT",
+      highlight: "Flat ₹5,000 cash bonus for every ₹15,000 ID registered",
     },
     {
-      title: "3. Dual-Team Binary Commission (10% – 12%)",
-      desc: "Build a Left and Right distribution leg. Earn 10% to 12% matching volume on the balanced BV of your lesser-producing team, with overflow spillover.",
+      title: "3. Dual-Team Matching Pairing Bonus (₹3,000 / Pair)",
+      desc: "When both Person A (Left Leg) and Person B (Right Leg) join and their figures match, you receive an additional ₹3,000 pairing bonus.",
       payout: "Calculated weekly with auto-flush carryover on greater leg",
-      highlight: "Up to ₹5,00,000 weekly binary cap for Crown Ambassadors",
+      highlight: "₹3,000 per matched pair (Person A + Person B)",
     },
     {
       title: "4. Generational Leadership Matching Bonus",
@@ -132,6 +133,135 @@ export default function BusinessPlanPage() {
             >
               Register as Distributor Today →
             </Link>
+            <a
+              href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20want%20to%20know%20more%20about%20the%2015000%20Hybrid%20Plan%20of%20Action."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg flex items-center gap-1.5"
+            >
+              <span>💬 Contact Pranay (9959427831)</span>
+            </a>
+          </div>
+        </div>
+
+        {/* PROMINENT ₹15,000 HYBRID MODEL & PLAN OF ACTION SHOWCASE */}
+        <div id="hybrid-model" className="glass-card p-8 sm:p-10 rounded-3xl border-2 border-gold/60 shadow-2xl bg-gradient-to-b from-navy-950 via-navy-900 to-navy-950 space-y-8">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="px-3 py-1 rounded-full bg-gold/20 text-gold text-xs font-bold border border-gold/40 uppercase tracking-widest">
+              Core Hybrid Mechanism
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-sand-100">
+              The ₹15,000 ID <span className="gold-gradient-text">Hybrid Advance Retail Model</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Founded & managed by <strong>Pranay</strong> (+91 99594 27831). We have removed all risk associated with conventional direct selling. Every single rupee of your registration fee is anchored in physical wellness products and 100% redeemable furniture value.
+            </p>
+          </div>
+
+          {/* Key Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-2xl bg-navy-900/80 border border-gold/30 space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-gold/20 text-gold flex items-center justify-center font-bold text-xl border border-gold/40">
+                ₹15k
+              </div>
+              <h3 className="font-display font-bold text-lg text-sand-100">1. ID Registration Cost</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                One-time registration of ₹15,000 establishes your legal Independent Business Owner (IBO) position, back-office access, and dual-team binary placement in our national network.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-navy-900/80 border border-emerald-500/40 space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xl border border-emerald-500/40">
+                🧲
+              </div>
+              <h3 className="font-display font-bold text-lg text-sand-100">2. Bio-Magnetic Kit</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Every member who registers an ID immediately receives a premium physical <strong>Bio-Magnetic Wellness & Sleep Therapy Set</strong>. Provides everyday circulation support, muscular relaxation, and restorative sleep.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-navy-900/80 border border-gold/30 space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-gold/20 text-gold flex items-center justify-center font-bold text-xl border border-gold/40">
+                🛋️
+              </div>
+              <h3 className="font-display font-bold text-lg text-sand-100">3. 100% Retail Redemption</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Your ₹15,000 ID fee is <strong>100% fully redeemable</strong> as a single exclusive gift choice for <strong>Solid Wood Furniture</strong>, <strong>Essential Home Needs & Appliances (TV, AC, Fridge, Washing Machine, Fans)</strong>, OR <strong>Turnkey Interior Design</strong> at Pranay&apos;s outlets.
+              </p>
+            </div>
+          </div>
+
+          {/* Interactive Gift Box Choice */}
+          <div className="pt-4 border-t border-slate-800">
+            <GiftRedemptionSelector />
+          </div>
+
+          {/* Strategic Plan of Action */}
+          <div className="bg-navy-950 rounded-2xl p-6 sm:p-8 border border-slate-700/80 space-y-6">
+            <div className="border-b border-slate-800 pb-3">
+              <span className="text-xs font-bold text-gold uppercase tracking-wider">Step-by-Step Execution</span>
+              <h3 className="font-display text-2xl font-bold text-sand-100 mt-1">
+                Distributor Plan of Action: How to Win with ₹15,000 ID
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-navy-900 border border-slate-800 space-y-2">
+                <span className="text-xs font-bold text-gold">PHASE 1</span>
+                <h4 className="font-bold text-sm text-sand-100">Connect & Register</h4>
+                <p className="text-xs text-slate-400">
+                  Call Pranay at 9959427831 to register your ₹15,000 ID. Receive your distributor credentials and back-office tracking portal.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-navy-900 border border-slate-800 space-y-2">
+                <span className="text-xs font-bold text-emerald-400">PHASE 2</span>
+                <h4 className="font-bold text-sm text-sand-100">Receive Wellness Kit</h4>
+                <p className="text-xs text-slate-400">
+                  Take delivery of the physical Bio-Magnetic Kit. Experience the health benefits firsthand or demonstrate to friends and family.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-navy-900 border border-slate-800 space-y-2">
+                <span className="text-xs font-bold text-gold">PHASE 3</span>
+                <h4 className="font-bold text-sm text-sand-100">Redeem on Furniture</h4>
+                <p className="text-xs text-slate-400">
+                  Visit our physical furniture stores. Deduct your full ₹15,000 fee when purchasing sofas, beds, dining, or interior design projects.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-navy-900 border border-slate-800 space-y-2">
+                <span className="text-xs font-bold text-emerald-400">PHASE 4</span>
+                <h4 className="font-bold text-sm text-sand-100">Scale Pairing Bonuses</h4>
+                <p className="text-xs text-slate-400">
+                  Earn <strong>₹5,000 Direct Referral Bonus</strong> on every ₹15,000 ID + <strong>₹3,000 Matching Bonus</strong> when Person A & Person B match on your Left and Right legs!
+                </p>
+              </div>
+            </div>
+
+            {/* Direct Connect Callout */}
+            <div className="p-4 rounded-xl bg-gold/10 border border-gold/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-slate-300">
+                <span className="text-gold font-bold text-sm block">Ready to discuss your registration or showroom visit?</span>
+                Speak directly with Founder Pranay for personalized onboarding and team placements.
+              </div>
+              <div className="flex gap-2">
+                <a
+                  href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20want%20to%20register%20my%2015000%20ID."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs whitespace-nowrap"
+                >
+                  💬 WhatsApp: 9959427831
+                </a>
+                <a
+                  href="tel:9959427831"
+                  className="px-4 py-2 rounded-lg bg-gold hover:bg-gold-dark text-navy-900 font-bold text-xs whitespace-nowrap"
+                >
+                  📞 Call Pranay
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 

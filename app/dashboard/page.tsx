@@ -26,7 +26,7 @@ export default function DashboardPage() {
   // Mock Genealogy Tree Data
   const downlineTree: DownlineNode = {
     id: "DC109283",
-    name: "Peela Pranay Tej (You)",
+    name: "Pranay (Founder & Director)",
     rank: "Crown Ambassador",
     leg: "Root",
     bv: 420000,
@@ -98,15 +98,15 @@ export default function DashboardPage() {
     {
       id: "TXN-9021",
       date: "23 Sep 2026",
-      type: "Binary Matching Bonus (12%)",
-      amount: 28400,
+      type: "Pair Matching Bonus (Person A + Person B Matched)",
+      amount: 3000,
       status: "Settled to Bank",
     },
     {
       id: "TXN-8944",
       date: "16 Sep 2026",
-      type: "Direct Referral Bonus (Sponsor DC419200)",
-      amount: 4000,
+      type: "Direct Referral Bonus (₹15,000 ID Sponsor DC419200)",
+      amount: 5000,
       status: "Settled to Bank",
     },
     {
@@ -154,7 +154,7 @@ export default function DashboardPage() {
               <span className="text-xs text-slate-400 font-mono">ID: DC109283</span>
             </div>
             <h1 className="font-display text-3xl font-bold text-sand-100 mt-1">
-              Welcome back, Peela Pranay Tej
+              Welcome back, Pranay
             </h1>
             <p className="text-xs sm:text-sm text-slate-400">
               Rank: <span className="text-gold font-bold">Crown Ambassador</span> | Left Leg: <span className="text-emerald-400">2,45,000 BV</span> | Right Leg: <span className="text-cyan-400">1,75,000 BV</span>

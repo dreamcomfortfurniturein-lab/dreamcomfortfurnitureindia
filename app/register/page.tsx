@@ -12,7 +12,7 @@ export default function RegisterPage() {
     aadhaarNumber: "",
     sponsorId: "DC109283",
     placementLeg: "Auto-Balance",
-    starterPackage: "essential",
+    starterPackage: "hybrid-15k",
   });
 
   const [otpSent, setOtpSent] = useState(false);
@@ -22,6 +22,21 @@ export default function RegisterPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const packages = [
+    {
+      id: "hybrid-15k",
+      name: "Flagship Hybrid Advance Retail ID (Recommended)",
+      price: 15000,
+      bv: 7500,
+      pv: 75,
+      features: [
+        "Physical Bio-Magnetic Wellness & Sleep Therapy Kit included",
+        "100% ₹15,000 fully redeemable as 1 Gift Choice: Furniture, Home Needs (TV, AC, Fridge, Washing Machine, Fans), OR Interior Design",
+        "Active Independent Distributor ID + Back-Office Portal",
+        "₹5,000 Direct Referral Bonus + ₹3,000 Pairing Bonus",
+        "Personal Guidance & Placement by Founder Pranay (9959427831)",
+      ],
+      recommended: true,
+    },
     {
       id: "essential",
       name: "Essential Home Furniture Kit",
@@ -157,6 +172,31 @@ export default function RegisterPage() {
           <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
             100% compliant with Indian Direct Selling Rules 2021. Provide mandatory KYC details to activate commission payouts.
           </p>
+        </div>
+
+        {/* Highlighted Banner for ₹15,000 Hybrid Registration */}
+        <div className="glass-card p-5 rounded-2xl border border-gold/50 bg-gradient-to-r from-navy-950 via-teak-dark/40 to-navy-950 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gold/20 text-gold flex items-center justify-center font-bold text-2xl border border-gold/40 shrink-0">
+              💎
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-sm sm:text-base text-sand-100">
+                Registering for the ₹15,000 Hybrid ID?
+              </h4>
+              <p className="text-xs text-slate-300">
+                Receive the physical Bio-Magnetic Wellness Kit + 100% ₹15,000 retail credit for future furniture shopping.
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20am%20filling%20the%20registration%20form%20for%20the%2015000%20ID%20and%20need%20assistance."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs whitespace-nowrap shadow transition-all shrink-0 flex items-center gap-1.5"
+          >
+            <span>💬 Founder Pranay: +91 99594 27831</span>
+          </a>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
