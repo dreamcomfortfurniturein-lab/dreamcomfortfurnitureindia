@@ -12,13 +12,19 @@ declare global {
 }
 
 export default function CheckoutPage() {
+<<<<<<< HEAD
   const { items, subtotal, memberSubtotal, isMemberPricing, totalBV, clear } = useCart();
   const router = useRouter();
 
+=======
+  const { items, subtotal, clear } = useCart();
+  const router = useRouter();
+>>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+<<<<<<< HEAD
   const [city, setCity] = useState("");
   const [state, setState] = useState("Telangana");
   const [pincode, setPincode] = useState("");
@@ -36,11 +42,23 @@ export default function CheckoutPage() {
       return;
     }
 
+=======
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handlePay() {
+    setError("");
+    if (!name || !phone || !address) {
+      setError("Please fill in your name, phone and delivery address.");
+      return;
+    }
+>>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
     setLoading(true);
     try {
       const res = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+<<<<<<< HEAD
         body: JSON.stringify({ amountInRupees: finalAmount }),
       });
 
@@ -70,12 +88,29 @@ export default function CheckoutPage() {
         order_id: order.id,
         prefill: { name, email, contact: phone },
         theme: { color: "#D97706" },
+=======
+        body: JSON.stringify({ amountInRupees: subtotal }),
+      });
+      const order = await res.json();
+      if (!res.ok) throw new Error(order.error || "Could not start payment");
+
+      const razorpay = new window.Razorpay({
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: "DreamComfortFurnitureIndia",
+        description: "Furniture order",
+        order_id: order.id,
+        prefill: { name, email, contact: phone },
+        theme: { color: "#2B1D14" },
+>>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
         handler: function () {
           clear();
           router.push("/checkout/success");
         },
       });
       razorpay.on("payment.failed", function () {
+<<<<<<< HEAD
         setError("Payment verification failed. Please retry.");
       });
       razorpay.open();
@@ -83,11 +118,19 @@ export default function CheckoutPage() {
       // In case test keys are missing, simulate smooth successful demo checkout
       clear();
       setIsTestSuccess(true);
+=======
+        setError("Payment failed. Please try again.");
+      });
+      razorpay.open();
+    } catch (e: any) {
+      setError(e.message || "Something went wrong.");
+>>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
     } finally {
       setLoading(false);
     }
   }
 
+<<<<<<< HEAD
   if (isTestSuccess) {
     return (
       <main className="bg-navy-900 text-sand-100 min-h-screen py-20 px-4 sm:px-8">
@@ -150,11 +193,18 @@ export default function CheckoutPage() {
           <h1 className="font-display text-2xl font-bold text-sand-100">Your Cart is Empty</h1>
           <p className="text-xs text-slate-400">Add products to your cart before proceeding to checkout.</p>
         </div>
+=======
+  if (items.length === 0) {
+    return (
+      <main className="px-6 md:px-12 py-16 text-center">
+        <h1 className="font-display text-2xl text-walnut">Your cart is empty</h1>
+>>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
       </main>
     );
   }
 
   return (
+<<<<<<< HEAD
     <main className="bg-navy-900 text-sand-100 min-h-screen py-12 px-4 sm:px-8 lg:px-12">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
 
@@ -318,6 +368,59 @@ export default function CheckoutPage() {
               </div>
             </div>
           </div>
+=======
+    <main className="px-6 md:px-12 py-12 grid md:grid-cols-2 gap-12">
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      <div>
+        <h1 className="font-display text-3xl text-walnut mb-8">Checkout</h1>
+        <div className="space-y-4">
+          <input
+            className="w-full border border-walnut/20 rounded-sm px-4 py-3"
+            placeholder="Full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            className="w-full border border-walnut/20 rounded-sm px-4 py-3"
+            placeholder="Email (for order confirmation)"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="w-full border border-walnut/20 rounded-sm px-4 py-3"
+            placeholder="Phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          <textarea
+            className="w-full border border-walnut/20 rounded-sm px-4 py-3"
+            placeholder="Delivery address"
+            rows={4}
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+          {error && <p className="text-red-700 text-sm">{error}</p>}
+          <button
+            onClick={handlePay}
+            disabled={loading}
+            className="w-full bg-walnut text-cream px-6 py-3 rounded-sm hover:bg-charcoal transition-colors disabled:opacity-50"
+          >
+            {loading ? "Starting payment..." : `Pay ₹${subtotal.toLocaleString("en-IN")}`}
+          </button>
+        </div>
+      </div>
+      <div>
+        <h2 className="font-display text-xl text-walnut mb-4">Order summary</h2>
+        {items.map((i) => (
+          <div key={i.slug} className="flex justify-between text-sm py-2 border-b border-walnut/10">
+            <span>{i.name} × {i.qty}</span>
+            <span>₹{(i.price * i.qty).toLocaleString("en-IN")}</span>
+          </div>
+        ))}
+        <div className="flex justify-between pt-4 font-medium text-walnut">
+          <span>Total</span>
+          <span>₹{subtotal.toLocaleString("en-IN")}</span>
+>>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
         </div>
       </div>
     </main>

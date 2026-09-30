@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import Link from "next/link";
+=======
+>>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
 import products from "@/data/products.json";
 import { notFound } from "next/navigation";
 import AddToCartButton from "./add-to-cart-button";
@@ -12,6 +15,7 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
   if (!product) return notFound();
 
   return (
+<<<<<<< HEAD
     <main className="bg-navy-900 text-sand-100 min-h-screen py-12 px-4 sm:px-8 lg:px-12">
       <div className="max-w-6xl mx-auto space-y-10">
         {/* Breadcrumb */}
@@ -153,6 +157,37 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
             </div>
           </div>
         </div>
+=======
+    <main className="px-6 md:px-12 py-12 grid md:grid-cols-2 gap-12">
+      <div className="aspect-square bg-linen rounded-sm flex items-center justify-center overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div>
+        <p className="text-xs uppercase tracking-wide text-brass mb-2">
+          {product.category}
+        </p>
+        <h1 className="font-display text-3xl text-walnut mb-3">{product.name}</h1>
+        <p className="text-2xl text-charcoal mb-1">
+          ₹{product.price.toLocaleString("en-IN")}
+          {product.mrp > product.price && (
+            <span className="line-through text-charcoal/30 text-base ml-3">
+              ₹{product.mrp.toLocaleString("en-IN")}
+            </span>
+          )}
+        </p>
+        <p className="text-sm text-charcoal/60 mb-6">
+          {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+        </p>
+        <p className="text-charcoal/80 mb-2">{product.description}</p>
+        <p className="text-sm text-charcoal/60 mb-8">Material: {product.material}</p>
+
+        <AddToCartButton product={product} />
+>>>>>>> 93c68c8f6ca2074aa2a21e81f297c62136768a2e
       </div>
     </main>
   );
