@@ -42,8 +42,9 @@ export default function RootLayout({
                 <span className="font-bold">₹ INR</span> (Official Direct Selling Member Rates)
               </span>
               <span className="text-slate-500">|</span>
-              <a href="tel:+919876543210" className="text-slate-300 hover:text-gold transition-colors">
-                Support: +91 98765 43210
+              <a href="https://wa.me/919959427831" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors flex items-center gap-1">
+                <span>💬 WhatsApp:</span>
+                <span>+91 99594 27831 (Peela Pranay Tej)</span>
               </a>
             </div>
           </div>
@@ -191,8 +192,14 @@ export default function RootLayout({
                       <span>Plot 42, Furniture Hub, Visakhapatnam & Hyderabad, India</span>
                     </p>
                     <p className="flex items-center gap-2">
-                      <span className="text-gold">📞</span>
-                      <span>+91 98765 43210</span>
+                      <span className="text-gold">👤</span>
+                      <span>Founder / Director: <strong>Peela Pranay Tej</strong></span>
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="text-emerald-400">💬</span>
+                      <a href="https://wa.me/919959427831" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">
+                        WhatsApp & Call: +91 99594 27831
+                      </a>
                     </p>
                     <p className="flex items-center gap-2">
                       <span className="text-gold">✉️</span>

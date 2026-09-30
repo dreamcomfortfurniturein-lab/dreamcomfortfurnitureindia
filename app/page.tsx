@@ -31,7 +31,7 @@ export default function Home() {
     {
       name: "Ergonomic Office",
       desc: "Executive Desk Suites & Ergonomic Chairs",
-      img: "https://images.unsplash.com/photo-1580481077195-c328ad017599?auto=format&fit=crop&w=600&q=80",
+      img: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=800&q=80",
       count: "Corporate Grade",
       link: "/products?category=Ergonomic Office",
     },
@@ -71,33 +71,33 @@ export default function Home() {
     <main className="bg-navy-900 text-sand-100">
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-gold/20 py-20 lg:py-28">
-        {/* Luxury Background Image with Navy Gradient Overlay */}
+        {/* Luxury Background Image with Darker High-Contrast Gradient Overlay */}
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=2000&q=90"
             alt="Modern Indian Luxury Living Room with Teakwood Furniture and Gold Accents"
-            className="w-full h-full object-cover object-center filter brightness-40 scale-105 transform animate-fade-in"
+            className="w-full h-full object-cover object-center filter brightness-[0.25] contrast-125 scale-105 transform animate-fade-in"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/90 to-navy-900/60" />
-          <div className="absolute inset-0 bg-radial-gradient from-transparent to-navy-950/80" />
+          <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/95 to-navy-950/80" />
+          <div className="absolute inset-0 bg-radial-gradient from-transparent to-navy-950/90" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Hero Copy */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-navy-800/90 border border-gold/40 text-gold text-xs font-semibold backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-navy-950/90 border border-gold/60 text-gold text-xs font-semibold backdrop-blur-md shadow-lg">
               <span className="w-2 h-2 rounded-full bg-gold animate-ping" />
               <span>India&apos;s Leading Direct Selling Furniture Enterprise</span>
             </div>
 
-            <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-sand-100 leading-tight">
+            <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white drop-shadow-md leading-tight">
               Luxury Comfort for Your Home.{" "}
-              <span className="gold-gradient-text block">
+              <span className="text-amber-400 drop-shadow-[0_2px_12px_rgba(251,191,36,0.35)] block">
                 Financial Freedom for Your Life.
               </span>
             </h1>
 
-            <p className="text-slate-300 text-base sm:text-xl max-w-2xl font-light leading-relaxed">
+            <p className="text-slate-100 text-base sm:text-xl max-w-2xl font-normal leading-relaxed drop-shadow">
               India&apos;s premier direct selling brand offering solid wood handcrafted furniture, 
               ergonomic luxury office solutions, and lucrative business opportunities with zero inventory risk.
             </p>
@@ -200,24 +200,34 @@ export default function Home() {
             <Link
               key={cat.name}
               href={cat.link}
-              className="group relative rounded-2xl overflow-hidden glass-card border border-navy-700 hover:border-gold/50 transition-all duration-300 flex flex-col justify-end min-h-[300px] shadow-lg"
+              className="group rounded-2xl overflow-hidden bg-navy-950/90 border border-slate-700/80 hover:border-gold transition-all duration-300 flex flex-col shadow-xl hover:-translate-y-1.5"
             >
-              <img
-                src={cat.img}
-                alt={cat.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/60 to-transparent" />
-              <div className="relative p-5 z-10">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-gold px-2 py-0.5 rounded bg-navy-900/80 border border-gold/30 inline-block mb-2">
+              {/* Card Image */}
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-navy-900">
+                <img
+                  src={cat.img}
+                  alt={cat.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <span className="absolute top-2.5 right-2.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 px-2 py-0.5 rounded-md bg-navy-950/95 border border-gold/40 shadow-md">
                   {cat.count}
                 </span>
-                <h3 className="font-display text-lg font-bold text-sand-100 group-hover:text-gold transition-colors">
-                  {cat.name}
-                </h3>
-                <p className="text-xs text-slate-300 mt-1 line-clamp-1">
-                  {cat.desc}
-                </p>
+              </div>
+
+              {/* Dedicated Text Box - 100% Crisp & High Contrast */}
+              <div className="p-4 flex-1 flex flex-col justify-between bg-gradient-to-b from-navy-900 to-navy-950 border-t border-slate-800">
+                <div>
+                  <h3 className="font-display text-base font-bold text-white group-hover:text-amber-400 transition-colors">
+                    {cat.name}
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                    {cat.desc}
+                  </p>
+                </div>
+                <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-amber-400 font-semibold group-hover:translate-x-0.5 transition-transform">
+                  <span>Explore Collection</span>
+                  <span>→</span>
+                </div>
               </div>
             </Link>
           ))}
@@ -402,11 +412,20 @@ export default function Home() {
             >
               Register As Distributor Now →
             </Link>
+            <a
+              href="https://wa.me/919959427831?text=Hi%20Peela%20Pranay%20Tej,%20I%20am%20interested%20in%20Dream%20Comfort%20Furniture%20and%20the%20business%20opportunity."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base transition-all shadow-lg flex items-center justify-center gap-2"
+            >
+              <span>💬</span>
+              <span>Chat with Peela Pranay Tej on WhatsApp (+91 99594 27831)</span>
+            </a>
             <Link
               href="/business-plan"
               className="px-8 py-3.5 rounded-xl bg-navy-900/90 border border-gold/40 text-sand-100 font-semibold text-sm sm:text-base hover:border-gold transition-all"
             >
-              Read Detailed Compensation Plan
+              Read Compensation Plan
             </Link>
           </div>
         </div>

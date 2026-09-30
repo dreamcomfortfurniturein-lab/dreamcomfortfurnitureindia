@@ -26,8 +26,8 @@ export default function DashboardPage() {
   // Mock Genealogy Tree Data
   const downlineTree: DownlineNode = {
     id: "DC109283",
-    name: "Vikramaditya Varma (You)",
-    rank: "Diamond Director",
+    name: "Peela Pranay Tej (You)",
+    rank: "Crown Ambassador",
     leg: "Root",
     bv: 420000,
     status: "Active",
@@ -154,10 +154,10 @@ export default function DashboardPage() {
               <span className="text-xs text-slate-400 font-mono">ID: DC109283</span>
             </div>
             <h1 className="font-display text-3xl font-bold text-sand-100 mt-1">
-              Welcome back, Vikramaditya Varma
+              Welcome back, Peela Pranay Tej
             </h1>
             <p className="text-xs sm:text-sm text-slate-400">
-              Rank: <span className="text-gold font-bold">Diamond Director</span> | Left Leg: <span className="text-emerald-400">2,45,000 BV</span> | Right Leg: <span className="text-cyan-400">1,75,000 BV</span>
+              Rank: <span className="text-gold font-bold">Crown Ambassador</span> | Left Leg: <span className="text-emerald-400">2,45,000 BV</span> | Right Leg: <span className="text-cyan-400">1,75,000 BV</span>
             </p>
           </div>
 

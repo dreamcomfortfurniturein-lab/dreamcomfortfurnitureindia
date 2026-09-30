@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 
 const testimonials = [
   {
-    name: "Rajeshwar Rao",
-    role: "Crown Ambassador • Hyderabad",
-    earnings: "₹4,85,000 / month",
-    reward: "BMW X1 Luxury Car Achiever",
+    name: "Peela Pranay Tej",
+    role: "Managing Director & Founder • Visakhapatnam",
+    earnings: "₹6,50,000 / month",
+    reward: "Nationwide Furniture Network Visionary",
     quote:
-      "Transforming my traditional retail business into the Dream Comfort Direct Selling model was the best decision of my life. The high ticket value of solid wood furniture means our BV points accumulate fast!",
+      "At Dream Comfort Furniture, our mission is simple: provide homeowners with genuine, lifetime seasoned teak & sheesham furniture directly from the factory, while unlocking life-changing financial freedom for our distributor partners.",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
     furnitureImage: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80",
   },
