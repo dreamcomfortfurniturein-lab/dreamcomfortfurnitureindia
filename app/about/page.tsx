@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "About Us | Dream Comfort Furniture India",
+  title: "About Us | dreamcomfortfurnitureindia",
   description: "Crafting timeless solid wood furniture and empowering entrepreneurs across India.",
 };
 
@@ -15,7 +15,7 @@ export default function AboutPage() {
             Craftsmanship Meets Financial Empowerment
           </h1>
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Dream Comfort Furniture India was founded to democratize luxury living. We unite master woodworkers, sustainable forestry, and direct selling entrepreneurship under one visionary roof.
+            dreamcomfortfurnitureindia was founded to democratize luxury living. We unite master woodworkers, sustainable forestry, and direct selling entrepreneurship under one visionary roof.
           </p>
         </div>
 

@@ -46,10 +46,10 @@ export default function CartPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-navy-700/80 pb-6">
           <div>
             <h1 className="font-display text-3xl sm:text-4xl font-bold text-sand-100">
-              Shopping Cart & Order Volume
+              Shopping Cart
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Review your selected luxury furniture pieces and PV/BV rewards calculation.
+              Review your selected handcrafted luxury furniture pieces.
             </p>
           </div>
 
@@ -65,10 +65,8 @@ export default function CartPage() {
           {/* Items List */}
           <div className="lg:col-span-8 space-y-4">
             {items.map((item) => {
-              const unitPrice = isMemberPricing ? (item.memberPrice || item.price * 0.8) : item.price;
+              const unitPrice = item.price;
               const lineTotal = unitPrice * item.qty;
-              const lineBV = (item.bv || Math.round(item.price * 0.4)) * item.qty;
-              const linePV = (item.pv || Math.round(item.price * 0.004)) * item.qty;
 
               return (
                 <div
@@ -92,17 +90,6 @@ export default function CartPage() {
                     <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs">
                       <span className="text-gold font-bold text-sm">
                         ₹{unitPrice.toLocaleString("en-IN")}
-                      </span>
-                      {isMemberPricing && (
-                        <span className="line-through text-slate-500">
-                          ₹{item.price.toLocaleString("en-IN")}
-                        </span>
-                      )}
-                      <span className="px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 text-[10px] font-mono">
-                        +{lineBV.toLocaleString("en-IN")} BV
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-purple-950/60 text-purple-300 border border-purple-800/40 text-[10px] font-mono">
-                        +{linePV} PV
                       </span>
                     </div>
 
@@ -145,62 +132,25 @@ export default function CartPage() {
             })}
           </div>
 
-          {/* Cart Summary & MLM Commission Box */}
+          {/* Cart Summary */}
           <div className="lg:col-span-4 space-y-6">
             <div className="glass-card p-6 rounded-2xl border border-gold/30 space-y-5">
               <h2 className="font-display font-bold text-lg text-sand-100 border-b border-slate-700/60 pb-3">
                 Order Summary
               </h2>
 
-              {/* Member toggle in summary */}
-              <div className="p-3 rounded-xl bg-navy-950 border border-gold/30 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-semibold text-sand-100 block">Distributor Rates</span>
-                  <span className="text-[10px] text-gold">20% Wholesale Privilege</span>
-                </div>
-                <button
-                  onClick={() => setIsMemberPricing(!isMemberPricing)}
-                  className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors ${
-                    isMemberPricing ? "bg-gold" : "bg-slate-700"
-                  }`}
-                >
-                  <div
-                    className={`bg-navy-950 w-4 h-4 rounded-full shadow-md transform transition-transform ${
-                      isMemberPricing ? "translate-x-5" : "translate-x-0"
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Volume metrics */}
-              <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-xs space-y-1.5 font-mono">
-                <div className="flex justify-between text-emerald-400">
-                  <span>Credited Business Volume (BV):</span>
-                  <span className="font-bold">{totalBV.toLocaleString("en-IN")} BV</span>
-                </div>
-                <div className="flex justify-between text-purple-300">
-                  <span>Credited Personal Volume (PV):</span>
-                  <span className="font-bold">{totalPV} PV</span>
-                </div>
-                <p className="text-[10px] text-slate-400 pt-1 font-sans">
-                  Volume is automatically synced with your binary tree upon confirmed delivery.
-                </p>
-              </div>
-
-              <div className="space-y-2.5 text-xs text-slate-300 border-t border-slate-700/60 pt-4">
+              <div className="space-y-2.5 text-xs text-slate-300 pt-2">
                 <div className="flex justify-between">
-                  <span>Retail Price:</span>
+                  <span>Subtotal:</span>
                   <span>₹{subtotal.toLocaleString("en-IN")}</span>
                 </div>
-                {isMemberPricing && (
-                  <div className="flex justify-between text-emerald-400 font-semibold">
-                    <span>Distributor Direct Savings:</span>
-                    <span>-₹{savings.toLocaleString("en-IN")}</span>
-                  </div>
-                )}
                 <div className="flex justify-between">
                   <span>White-Glove Shipping & Assembly:</span>
                   <span className="text-emerald-400 font-semibold">FREE (Pan-India)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>10-Year Anti-Termite Warranty:</span>
+                  <span className="text-emerald-400 font-semibold">Included</span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-sand-100 pt-2 border-t border-slate-700">
                   <span>Total Amount</span>

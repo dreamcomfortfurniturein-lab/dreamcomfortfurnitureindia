@@ -22,7 +22,7 @@ export default function SocialLinks() {
     },
     {
       name: "Email",
-      href: "mailto:dreamcomfortfurniture.in@gmail.com",
+      href: "mailto:dreamcomfortfurnitureindia@gmail.com",
       icon: "https://cdn.simpleicons.org/gmail/2B1D14",
     },
   ];

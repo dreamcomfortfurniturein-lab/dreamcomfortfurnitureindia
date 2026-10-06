@@ -117,7 +117,7 @@ export default function RegisterPage() {
             KYC Verification Submitted
           </span>
           <h1 className="font-display text-3xl font-bold text-sand-100">
-            Welcome to Dream Comfort, {formData.fullName}!
+            Welcome to DreamComfortFurnitureIndia, {formData.fullName}!
           </h1>
           <div className="p-4 bg-navy-950 rounded-xl border border-slate-700 text-xs text-left space-y-2">
             <div className="flex justify-between">

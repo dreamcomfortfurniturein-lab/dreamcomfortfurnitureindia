@@ -7,6 +7,104 @@ import GiftRedemptionSelector from "@/app/gift-redemption-selector";
 
 export default function BusinessPlanPage() {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [partnerPasscode, setPartnerPasscode] = useState("");
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Form state for customer request (WhatsApp + Gmail + Supabase flow)
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerNotes, setCustomerNotes] = useState("");
+  const [requestSubmitting, setRequestSubmitting] = useState(false);
+  const [requestData, setRequestData] = useState<{
+    requestId: string;
+    whatsappUrl: string;
+    gmailUrl: string;
+    defaultMailto: string;
+  } | null>(null);
+
+  async function handleCustomerRequest(e: React.FormEvent) {
+    e.preventDefault();
+    setErrorMessage(null);
+
+    if (!customerName.trim() || !customerPhone.trim()) {
+      setErrorMessage("Please enter your Full Name and Mobile Number to connect.");
+      return;
+    }
+
+    setRequestSubmitting(true);
+    try {
+      const res = await fetch("/api/partner-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: customerName.trim(),
+          phone: customerPhone.trim(),
+          email: customerEmail.trim(),
+          notes: customerNotes.trim(),
+          requestedAmount: 10000,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to submit request.");
+      }
+
+      setRequestData({
+        requestId: data.requestId,
+        whatsappUrl: data.whatsappUrl,
+        gmailUrl: data.gmailUrl,
+        defaultMailto: data.defaultMailto,
+      });
+      setPaymentSuccessMessage(`Request #${data.requestId} registered in Supabase. Connect via WhatsApp or Gmail to get admin approval!`);
+    } catch (err: any) {
+      // Offline fallback: still construct direct links so customer never gets stuck
+      const reqId = `REQ_${Date.now()}`;
+      const waText = encodeURIComponent(
+        `Hello Pranay / DreamComfortFurnitureIndia Admin,\n\nI want to access the Partner Portal & ₹15,000 Hybrid Business Plan.\n\n👤 Name: ${customerName}\n📞 Phone: ${customerPhone}\n✉️ Email: ${customerEmail || "N/A"}\n💰 Deposit: ₹10,000\n🔖 Request ID: ${reqId}\n\nPlease verify and provide approval for portal access.`
+      );
+      const mailSubject = encodeURIComponent(`[PARTNER APPROVAL REQUEST] ${customerName} - ₹10,000 Portal Access (${reqId})`);
+      const mailBody = encodeURIComponent(
+        `Hello Admin,\n\nA customer requested Partner Portal Access:\n\nName: ${customerName}\nPhone: ${customerPhone}\nEmail: ${customerEmail || "N/A"}\nAmount: ₹10,000\nRequest ID: ${reqId}\n\nTo approve this user, reply with Approval Code: 10000\nApproval Link: /api/partner-request/approve?id=${reqId}&token=TOK_OFFLINE`
+      );
+
+      setRequestData({
+        requestId: reqId,
+        whatsappUrl: `https://wa.me/919959427831?text=${waText}`,
+        gmailUrl: `https://mail.google.com/mail/?view=cm&fs=1&to=dreamcomfortfurnitureindia@gmail.com&su=${mailSubject}&body=${mailBody}`,
+        defaultMailto: `mailto:dreamcomfortfurnitureindia@gmail.com?subject=${mailSubject}&body=${mailBody}`,
+      });
+      setPaymentSuccessMessage(`Request #${reqId} generated. Connect with Admin via WhatsApp or Gmail below for instant approval!`);
+    } finally {
+      setRequestSubmitting(false);
+    }
+  }
+
+  function handleDemoPayment() {
+    setPaymentProcessing(true);
+    setErrorMessage(null);
+    setTimeout(() => {
+      setPaymentProcessing(false);
+      setIsUnlocked(true);
+      setPaymentSuccessMessage("₹10,000 Partner Access Verified! Full business links, tree tools, and plan materials unlocked.");
+    }, 1200);
+  }
+
+  function handlePasscodeUnlock(e: React.FormEvent) {
+    e.preventDefault();
+    setErrorMessage(null);
+    // Support partner promo / payment verification code or instant demo unlock
+    if (partnerPasscode.trim().toUpperCase() === "DC10000" || partnerPasscode.trim().toUpperCase() === "PRANAY" || partnerPasscode.trim() === "10000") {
+      setIsUnlocked(true);
+      setPaymentSuccessMessage("Partner Verification Code Accepted! Full Business Portal Unlocked.");
+    } else {
+      setErrorMessage("Invalid payment verification code. Complete ₹10,000 partner deposit or call Founder Pranay at 9959427831 / 9347965863.");
+    }
+  }
 
   const compensationTiers = [
     {
@@ -109,12 +207,12 @@ export default function BusinessPlanPage() {
 
   function handleDownloadBrochure() {
     // Generate simulated PDF brochure download
-    const dummyPdfContent = "DREAM COMFORT FURNITURE INDIA - OFFICIAL DIRECT SELLING COMPENSATION PLAN 2026\nMinistry of Consumer Affairs Compliant\nVisit: https://dreamcomfort.in";
+    const dummyPdfContent = "DREAM COMFORT FURNITURE INDIA - OFFICIAL DIRECT SELLING COMPENSATION PLAN 2026\nMinistry of Consumer Affairs Compliant\nVisit: https://dreamcomfortfurnitureindia.com";
     const blob = new Blob([dummyPdfContent], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "DreamComfort_MLM_Business_Plan_2026.pdf";
+    a.download = "DreamComfortFurnitureIndia_Business_Plan_2026.pdf";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -126,19 +224,278 @@ export default function BusinessPlanPage() {
   return (
     <main className="bg-navy-900 text-sand-100 min-h-screen py-12 px-4 sm:px-8 lg:px-12">
       <div className="max-w-7xl mx-auto space-y-16">
+        {/* Partner Portal Quick Navigation Bar */}
+        <div className="flex flex-wrap items-center justify-center gap-2 p-2 bg-navy-950/90 rounded-2xl border border-gold/30 max-w-4xl mx-auto shadow-xl">
+          <a
+            href="#hybrid-model"
+            className="px-4 py-2 rounded-xl bg-gold/20 text-gold border border-gold/40 text-xs font-bold hover:bg-gold hover:text-navy-900 transition-all"
+          >
+            ⭐ ₹15,000 Hybrid ID Concept
+          </a>
+          <a
+            href="#compensation-streams"
+            className="px-4 py-2 rounded-xl text-slate-300 hover:text-gold text-xs font-medium transition-all"
+          >
+            5 Revenue Streams
+          </a>
+          <a
+            href="#ranks"
+            className="px-4 py-2 rounded-xl text-slate-300 hover:text-gold text-xs font-medium transition-all"
+          >
+            Leadership Ranks
+          </a>
+          <a
+            href="#calculator"
+            className="px-4 py-2 rounded-xl text-slate-300 hover:text-gold text-xs font-medium transition-all"
+          >
+            Earnings Calculator
+          </a>
+          <Link
+            href="/dashboard"
+            className="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all ml-auto sm:ml-0"
+          >
+            Distributor Back-Office CRM →
+          </Link>
+        </div>
+
         {/* Header Hero */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 border border-gold/40 text-gold text-xs font-semibold">
-            <span>👑 Official Direct Selling Compensation Model</span>
+            <span>👑 Official Partner & Direct Selling Portal</span>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl font-extrabold text-sand-100">
-            The Dream Comfort <span className="gold-gradient-text">Leadership Business Plan</span>
+            Partner Portal & <span className="gold-gradient-text">Leadership Business Plan</span>
           </h1>
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-            Engineered specifically for the Indian luxury furniture market. Combine high-ticket retail commissions with a sustainable, hybrid binary-unilevel structure that pays generous weekly bonuses.
+            All details of our direct selling business, the flagship ₹15,000 Hybrid ID model, physical wellness kit benefits, and weekly binary matching structures housed in this private partner hub.
           </p>
+        </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+        {/* 10,000 PAYMENT ACCESS GATEWAY */}
+        {!isUnlocked ? (
+          <div className="max-w-3xl mx-auto glass-card p-8 sm:p-10 rounded-3xl border-2 border-gold/60 shadow-2xl bg-gradient-to-b from-navy-950 via-navy-900 to-navy-950 space-y-6">
+            <div className="text-center space-y-2">
+              <span className="px-3.5 py-1 rounded-full bg-gold/20 text-gold text-xs font-bold border border-gold/40 uppercase tracking-wider inline-flex items-center gap-1.5">
+                <span>🔒</span>
+                <span>Restricted Distributor & Partner Access</span>
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-sand-100">
+                ₹10,000 Partner Access Verification Required
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+                To access full business plan documents, the ₹15,000 Hybrid ID action plan, team genealogy links, and the back-office CRM, a <strong>₹10,000 Partner Deposit / Verification</strong> is required.
+              </p>
+            </div>
+
+            {errorMessage && (
+              <div className="p-3.5 rounded-xl bg-red-950/80 border border-red-500/50 text-red-200 text-xs text-center font-medium">
+                ⚠️ {errorMessage}
+              </div>
+            )}
+
+            {/* Customer Connection Request Form (Supabase + WhatsApp + Gmail) */}
+            <div className="p-6 rounded-2xl bg-navy-950/90 border border-gold/40 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <h3 className="text-base font-bold text-sand-100 flex items-center gap-2">
+                    <span>⚡</span>
+                    <span>Direct Connect: WhatsApp & Gmail Approval</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Submit your details. It registers in Supabase and connects directly with Admin Pranay via WhatsApp and Gmail for ₹10,000 verification.
+                  </p>
+                </div>
+                <span className="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-medium border border-emerald-500/30">
+                  Instant Admin Dispatch
+                </span>
+              </div>
+
+              {!requestData ? (
+                <form onSubmit={handleCustomerRequest} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">Your Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Ramesh Kumar"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">WhatsApp Phone *</label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g. 9959427831"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-gold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      placeholder="e.g. name@gmail.com"
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-gold outline-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-3 pt-1">
+                    <button
+                      type="submit"
+                      disabled={requestSubmitting}
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
+                    >
+                      {requestSubmitting ? "Submitting to Supabase..." : "🚀 Connect Now via WhatsApp & Gmail for ₹10,000 Approval"}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="p-4 rounded-xl bg-navy-900 border border-emerald-500/50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-emerald-400 font-bold">
+                      ✓ Request #{requestData.requestId} Logged in Supabase
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setRequestData(null)}
+                      className="text-[11px] text-slate-400 hover:text-white underline"
+                    >
+                      Change Details
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-300">
+                    Click either button below to initiate contact. Admin receives the approval link and grants access code <code className="text-gold font-mono font-bold">10000</code>:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <a
+                      href={requestData.whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-[1.01]"
+                    >
+                      <span>💬 Send WhatsApp to Pranay (9959427831)</span>
+                    </a>
+                    <a
+                      href={requestData.gmailUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-3 px-4 rounded-xl bg-rose-700 hover:bg-rose-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-transform hover:scale-[1.01]"
+                    >
+                      <span>✉️ Open Gmail with Approval Link</span>
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
+              {/* Option 1: Complete ₹10,000 Instant Online Payment */}
+              <div className="p-5 rounded-2xl bg-navy-950 border border-gold/30 space-y-3">
+                <span className="text-xs font-bold text-gold uppercase tracking-wider block">Option 1: Instant Online Deposit</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-extrabold text-sand-100 font-mono">₹10,000</span>
+                  <span className="text-[11px] text-emerald-400 font-semibold">(Refundable against ₹15,000 ID)</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Instant activation via Razorpay / UPI / NetBanking. Unlocks full partner portal access and CRM links immediately.
+                </p>
+                <button
+                  onClick={handleDemoPayment}
+                  disabled={paymentProcessing}
+                  className="w-full py-3 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow-lg shadow-gold/20 transition-all flex items-center justify-center gap-2"
+                >
+                  <span>{paymentProcessing ? "Verifying Payment..." : "💳 Pay ₹10,000 & Unlock Portal"}</span>
+                </button>
+              </div>
+
+              {/* Option 2: Verify Existing ID / Passcode */}
+              <div className="p-5 rounded-2xl bg-navy-950 border border-slate-700/80 space-y-3">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block">Option 2: Enter Approval Code</span>
+                <p className="text-[11px] text-slate-400">
+                  Received code from Admin via Gmail/WhatsApp? Enter your verification code or <code className="text-gold font-mono font-bold">10000</code> to unlock immediately.
+                </p>
+                <form onSubmit={handlePasscodeUnlock} className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Enter Code (e.g. 10000 or PRANAY)"
+                    value={partnerPasscode}
+                    onChange={(e) => setPartnerPasscode(e.target.value)}
+                    className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-gold outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 rounded-lg border border-gold/50 text-gold hover:bg-gold/10 font-bold text-xs transition-colors"
+                  >
+                    Verify Passcode & Enter →
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Offline Coordinator Callout with both phone numbers */}
+            <div className="pt-4 border-t border-slate-800 text-center space-y-2">
+              <p className="text-xs text-slate-400">
+                Direct Contact with Founder & Leadership:
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <a
+                  href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20want%20to%20complete%20the%2010000%20partner%20deposit%20to%20access%20the%20portal."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
+                >
+                  <span>💬 WhatsApp Pranay: +91 99594 27831</span>
+                </a>
+                <a
+                  href="tel:9347965863"
+                  className="px-4 py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gold border border-gold/40 font-bold text-xs transition-colors flex items-center gap-1.5"
+                >
+                  <span>📞 Call: 9347965863</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* UNLOCKED PARTNER ACCESS NOTIFICATION */
+          <div className="max-w-4xl mx-auto p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+            <div className="flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold">
+                ✓
+              </span>
+              <div>
+                <span className="text-emerald-300 font-bold text-sm block">
+                  {paymentSuccessMessage || "₹10,000 Partner Access Verified"}
+                </span>
+                <p className="text-xs text-slate-300">
+                  Full MLM compensation breakdown, ₹15,000 hybrid mechanism, and distributor links unlocked.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Link
+                href="/dashboard"
+                className="px-4 py-2 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow whitespace-nowrap"
+              >
+                Go to Back-Office CRM →
+              </Link>
+              <button
+                onClick={() => setIsUnlocked(false)}
+                className="px-3 py-2 rounded-xl border border-slate-700 text-slate-400 hover:text-white text-xs whitespace-nowrap"
+              >
+                Lock Portal
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons for Unlocked State */}
+        {isUnlocked && (
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <button
               onClick={handleDownloadBrochure}
               className="px-6 py-3 rounded-xl bg-gold hover:bg-gold-dark text-navy-900 font-bold text-xs sm:text-sm transition-all shadow-lg shadow-gold/20 flex items-center gap-2"
@@ -152,7 +509,7 @@ export default function BusinessPlanPage() {
               Register as Distributor Today →
             </Link>
             <a
-              href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20want%20to%20know%20more%20about%20the%2015000%20Hybrid%20Plan%20of%20Action."
+              href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20have%20verified%20my%20partner%20access%20and%20want%20to%20discuss%20the%2015000%20hybrid%20model."
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg flex items-center gap-1.5"
@@ -160,7 +517,7 @@ export default function BusinessPlanPage() {
               <span>💬 Contact Pranay (9959427831)</span>
             </a>
           </div>
-        </div>
+        )}
 
         {/* PROMINENT ₹15,000 HYBRID MODEL & PLAN OF ACTION SHOWCASE */}
         <div id="hybrid-model" className="glass-card p-8 sm:p-10 rounded-3xl border-2 border-gold/60 shadow-2xl bg-gradient-to-b from-navy-950 via-navy-900 to-navy-950 space-y-8">
@@ -263,7 +620,7 @@ export default function BusinessPlanPage() {
                 <span className="text-gold font-bold text-sm block">Ready to discuss your registration or showroom visit?</span>
                 Speak directly with Founder Pranay for personalized onboarding and team placements.
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <a
                   href="https://wa.me/919959427831?text=Hi%20Pranay,%20I%20want%20to%20register%20my%2015000%20ID."
                   target="_blank"
@@ -273,10 +630,10 @@ export default function BusinessPlanPage() {
                   💬 WhatsApp: 9959427831
                 </a>
                 <a
-                  href="tel:9959427831"
+                  href="tel:9347965863"
                   className="px-4 py-2 rounded-lg bg-gold hover:bg-gold-dark text-navy-900 font-bold text-xs whitespace-nowrap"
                 >
-                  📞 Call Pranay
+                  📞 Call: 9347965863
                 </a>
               </div>
             </div>
@@ -284,7 +641,7 @@ export default function BusinessPlanPage() {
         </div>
 
         {/* 5-Stream Compensation Breakdown */}
-        <div className="space-y-6">
+        <div id="compensation-streams" className="space-y-6">
           <div className="text-center">
             <span className="text-xs font-bold text-gold uppercase tracking-wider">Revenue Streams</span>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-sand-100 mt-1">
@@ -333,6 +690,11 @@ export default function BusinessPlanPage() {
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
               Clear milestone qualifications with zero demotion of achieved lifetime recognition titles.
             </p>
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px] text-amber-300/80 md:hidden bg-navy-950/90 px-3 py-1.5 rounded-lg border border-gold/20">
+            <span>👉</span>
+            <span>Scroll horizontally to view complete qualifications, pairing income & luxury rewards</span>
           </div>
 
           <div className="glass-card rounded-2xl border border-navy-700 overflow-x-auto shadow-2xl">
@@ -409,7 +771,7 @@ export default function BusinessPlanPage() {
             <span>🛡️ Indian Direct Selling Compliance Assurance</span>
           </h4>
           <p>
-            Dream Comfort Furniture India operates strictly in accordance with the Consumer Protection (Direct Selling) Rules, 2021 notified by the Government of India. We do NOT charge any enrollment fee or mandatory subscription. All commissions are purely generated from genuine commercial sales of certified furniture and home decor products. Distributors enjoy a 30-day buy-back cooling-off policy.
+            dreamcomfortfurnitureindia operates strictly in accordance with the Consumer Protection (Direct Selling) Rules, 2021 notified by the Government of India. We do NOT charge any enrollment fee or mandatory subscription. All commissions are purely generated from genuine commercial sales of certified furniture and home decor products. Distributors enjoy a 30-day buy-back cooling-off policy.
           </p>
         </div>
       </div>

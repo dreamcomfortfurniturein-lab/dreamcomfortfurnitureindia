@@ -50,31 +50,6 @@ export default function CartDrawer() {
             </button>
           </div>
 
-          {/* Member Pricing Banner */}
-          <div className="bg-navy-900/80 border-b border-navy-700/60 p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gold/20 text-gold border border-gold/30">
-                  MLM ID
-                </span>
-                <span className="text-xs text-slate-300">Apply Distributor Price (20% Off)</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsMemberPricing(!isMemberPricing)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  isMemberPricing ? "bg-gold" : "bg-slate-700"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    isMemberPricing ? "translate-x-6" : "translate-x-1"
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-
           {/* Cart Items list */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {items.length === 0 ? (
@@ -91,9 +66,7 @@ export default function CartDrawer() {
               </div>
             ) : (
               items.map((item) => {
-                const itemPrice = isMemberPricing
-                  ? (item.memberPrice || item.price * 0.8)
-                  : item.price;
+                const itemPrice = item.price;
 
                 return (
                   <div
@@ -111,16 +84,6 @@ export default function CartDrawer() {
                         <span className="text-sm font-bold text-gold">
                           ₹{itemPrice.toLocaleString("en-IN")}
                         </span>
-                        {isMemberPricing && (
-                          <span className="text-xs line-through text-slate-500">
-                            ₹{item.price.toLocaleString("en-IN")}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 mt-1 text-[11px] text-emerald-400">
-                        <span>BV: {((item.bv || Math.round(item.price * 0.4)) * item.qty).toLocaleString("en-IN")}</span>
-                        <span>•</span>
-                        <span>PV: {((item.pv || Math.round(item.price * 0.004)) * item.qty)}</span>
                       </div>
                     </div>
 
@@ -156,24 +119,6 @@ export default function CartDrawer() {
           {/* Footer calculation */}
           {items.length > 0 && (
             <div className="p-6 border-t border-navy-700 bg-navy-900/90 space-y-3">
-              {/* Business Points Summary */}
-              <div className="p-3 rounded-lg bg-gold/10 border border-gold/20 flex justify-between items-center text-xs">
-                <div>
-                  <span className="text-gold font-semibold">Distributor BV Earned:</span>
-                  <p className="text-[10px] text-slate-400">Counts toward Binary & Generational matching</p>
-                </div>
-                <div className="text-right">
-                  <span className="font-bold text-sm text-sand-100">{totalBV.toLocaleString("en-IN")} BV</span>
-                  <span className="block text-[10px] text-emerald-400">{totalPV} PV Points</span>
-                </div>
-              </div>
-
-              {isMemberPricing && savings > 0 && (
-                <div className="flex justify-between text-xs text-emerald-400">
-                  <span>Distributor Direct Discount:</span>
-                  <span>-₹{savings.toLocaleString("en-IN")}</span>
-                </div>
-              )}
 
               <div className="flex justify-between items-center text-base font-bold text-sand-100 pt-2 border-t border-navy-700">
                 <span>Total Amount</span>

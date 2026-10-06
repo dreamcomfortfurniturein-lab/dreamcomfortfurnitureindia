@@ -42,7 +42,7 @@ function ProductsContent() {
   }, [selectedCategory, selectedMaterial, maxPrice, searchQuery]);
 
   function handleShare(slug: string, productName: string) {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://dreamcomfort.in";
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://dreamcomfortfurnitureindia.com";
     const refUrl = `${origin}/products/${slug}?ref=DC109283`;
     navigator.clipboard.writeText(refUrl);
     setCopiedSlug(slug);
@@ -52,38 +52,18 @@ function ProductsContent() {
   return (
     <main className="bg-navy-900 text-sand-100 min-h-screen py-10 px-4 sm:px-8 lg:px-12">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header & Distributor Pricing Banner */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-navy-700/80 pb-6">
           <div>
             <span className="text-xs font-semibold text-gold tracking-widest uppercase">
-              Direct-from-Factory Catalog
+              Handcrafted Collection
             </span>
             <h1 className="font-display text-3xl sm:text-4xl font-bold text-sand-100 mt-1">
               Solid Wood Furniture & Office Suites
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Every purchase earns Business Volume (BV) and Personal Volume (PV) towards leadership bonuses.
+              Handcrafted from 100% seasoned CP Teak and Sheesham wood with 10-year warranty.
             </p>
-          </div>
-
-          {/* Member Toggle */}
-          <div className="glass-card p-3 rounded-xl border border-gold/30 flex items-center justify-between gap-4">
-            <div>
-              <span className="text-xs font-bold text-gold block">Distributor Member Pricing</span>
-              <span className="text-[11px] text-slate-400">Save up to 20% on retail price</span>
-            </div>
-            <button
-              onClick={() => setIsMemberPricing(!isMemberPricing)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                isMemberPricing ? "bg-gold" : "bg-slate-700"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isMemberPricing ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
           </div>
         </div>
 
@@ -197,12 +177,6 @@ function ProductsContent() {
                       {p.badge}
                     </span>
                   )}
-                  {/* BV/PV Tag */}
-                  <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-navy-950/85 backdrop-blur-sm border border-gold/40 text-[10px] text-emerald-400 font-mono">
-                    <span>{p.bv.toLocaleString("en-IN")} BV</span>
-                    <span>•</span>
-                    <span>{p.pv} PV</span>
-                  </div>
                 </div>
 
                 {/* Details */}
@@ -230,12 +204,12 @@ function ProductsContent() {
                   <div className="pt-3 border-t border-slate-700/60">
                     <div className="flex items-baseline justify-between mb-3">
                       <div>
-                        <span className="text-[10px] text-slate-400 block">Retail Price:</span>
+                        <span className="text-[10px] text-slate-400 block">Price:</span>
                         <div className="flex items-baseline gap-1.5">
-                          <span className={`text-base font-bold ${isMemberPricing ? "line-through text-slate-400 text-xs" : "text-sand-100"}`}>
+                          <span className="text-base font-bold text-sand-100">
                             ₹{p.price.toLocaleString("en-IN")}
                           </span>
-                          {p.mrp > p.price && !isMemberPricing && (
+                          {p.mrp > p.price && (
                             <span className="text-[10px] text-slate-500 line-through">
                               ₹{p.mrp.toLocaleString("en-IN")}
                             </span>
@@ -244,17 +218,17 @@ function ProductsContent() {
                       </div>
 
                       <div className="text-right">
-                        <span className="text-[10px] text-gold font-bold block">
-                          Member Distributor:
+                        <span className="text-[10px] text-emerald-400 font-bold block">
+                          In Stock
                         </span>
-                        <span className="text-base font-extrabold text-gold">
-                          ₹{p.memberPrice.toLocaleString("en-IN")}
+                        <span className="text-[11px] text-slate-400">
+                          Workshop Direct
                         </span>
                       </div>
                     </div>
 
-                    {/* Action buttons: Add to Cart & Share Referral Link */}
-                    <div className="grid grid-cols-2 gap-2">
+                    {/* Action button: Add to Cart */}
+                    <div>
                       <button
                         onClick={() =>
                           addItem({
@@ -267,21 +241,9 @@ function ProductsContent() {
                             image: p.images[0],
                           })
                         }
-                        className="py-2.5 rounded-lg gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 transition-all flex items-center justify-center gap-1 shadow"
+                        className="w-full py-2.5 rounded-lg gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 transition-all flex items-center justify-center gap-1.5 shadow"
                       >
                         <span>🛒 Add to Cart</span>
-                      </button>
-
-                      <button
-                        onClick={() => handleShare(p.slug, p.name)}
-                        className={`py-2.5 rounded-lg border text-xs font-semibold transition-all flex items-center justify-center gap-1 ${
-                          isCopied
-                            ? "border-emerald-500 text-emerald-400 bg-emerald-950/40"
-                            : "border-slate-600 text-slate-300 hover:border-gold hover:text-gold"
-                        }`}
-                        title="Copy distributor referral link to earn sponsor commission"
-                      >
-                        <span>{isCopied ? "✓ Link Copied!" : "🔗 Share Ref"}</span>
                       </button>
                     </div>
                   </div>

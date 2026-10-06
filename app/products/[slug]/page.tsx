@@ -108,22 +108,10 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[11px] text-gold font-semibold block">Distributor Member Price</span>
-                  <span className="text-xl font-bold text-gold">
-                    ₹{product.memberPrice.toLocaleString("en-IN")}
+                  <span className="text-[11px] text-emerald-400 font-semibold block">10-Year Guarantee</span>
+                  <span className="text-xs text-slate-400">
+                    White-Glove Delivery
                   </span>
-                </div>
-              </div>
-
-              {/* Commission Volume Box */}
-              <div className="p-3 rounded-xl bg-navy-950 border border-emerald-900/60 flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-semibold text-emerald-400 block">Leadership Volume Credit</span>
-                  <span className="text-[10px] text-slate-400">Qualifies for binary & generation match</span>
-                </div>
-                <div className="text-right">
-                  <span className="font-bold text-emerald-400 text-sm">{product.bv.toLocaleString("en-IN")} BV</span>
-                  <span className="block text-[10px] text-slate-400">{product.pv} PV</span>
                 </div>
               </div>
             </div>
@@ -136,20 +124,16 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
               </p>
             </div>
 
-            {/* Cart & Referral Action */}
+            {/* Cart & Order Action */}
             <div className="pt-2">
               <AddToCartButton product={product} />
             </div>
 
-            {/* Direct Selling Distributor Incentive Note */}
+            {/* Solid Wood Guarantee */}
             <div className="p-4 rounded-xl bg-navy-950/70 border border-slate-800 text-xs text-slate-400 space-y-1">
-              <span className="text-sand-100 font-semibold block">Independent Distributor Advantage:</span>
+              <span className="text-sand-100 font-semibold block">Master Artisan Guarantee:</span>
               <p>
-                Selling this unit directly yields an immediate retail profit of{" "}
-                <strong className="text-emerald-400">
-                  ₹{(product.price - product.memberPrice).toLocaleString("en-IN")}
-                </strong>{" "}
-                plus {product.bv.toLocaleString("en-IN")} BV credited into your weaker leg calculation.
+                100% seasoned solid Sheesham and CP Teak wood. Solar kiln dried to prevent warping, with German hardware joinery and free nationwide installation.
               </p>
             </div>
           </div>

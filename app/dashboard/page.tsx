@@ -21,7 +21,7 @@ export default function DashboardPage() {
   const [withdrawStatus, setWithdrawStatus] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<DownlineNode | null>(null);
 
-  const referralLink = "https://dreamcomfort.in/register?ref=DC109283";
+  const referralLink = "https://dreamcomfortfurnitureindia.com/register?ref=DC109283";
 
   // Mock Genealogy Tree Data
   const downlineTree: DownlineNode = {
@@ -291,10 +291,15 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Mobile Scroll Tip */}
+          <div className="flex items-center gap-2 text-[11px] text-amber-300/80 md:hidden bg-navy-950/90 px-3 py-1.5 rounded-lg border border-gold/20">
+            <span>👉</span>
+            <span>Swipe horizontally on mobile/tablet to explore entire Left & Right genealogy teams</span>
+          </div>
+
           {/* Interactive Tree Graph Container */}
-          <div className="p-6 bg-navy-950/80 rounded-xl border border-slate-800 overflow-x-auto min-w-[650px]">
-            {/* Root Node */}
-            <div className="flex flex-col items-center">
+          <div className="p-4 sm:p-6 bg-navy-950/80 rounded-xl border border-slate-800 overflow-x-auto min-w-full">
+            <div className="min-w-[680px] mx-auto py-2">
               <button
                 onClick={() => setSelectedNode(downlineTree)}
                 className={`p-4 rounded-xl border text-center transition-all w-60 shadow-lg ${

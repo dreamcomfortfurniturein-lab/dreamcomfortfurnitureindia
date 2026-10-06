@@ -65,8 +65,8 @@ export default function CheckoutPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_placeholder",
         amount: order.amount,
         currency: order.currency || "INR",
-        name: "Dream Comfort Furniture India",
-        description: `Order with ${totalBV} BV Points`,
+        name: "dreamcomfortfurnitureindia",
+        description: `Luxury Solid Wood Furniture Order`,
         order_id: order.id,
         prefill: { name, email, contact: phone },
         theme: { color: "#D97706" },
@@ -96,7 +96,7 @@ export default function CheckoutPage() {
             ✓
           </div>
           <span className="px-3 py-1 rounded-full bg-gold/20 text-gold text-xs font-bold border border-gold/30">
-            Order Confirmed & BV Credited
+            Order Confirmed
           </span>
           <h1 className="font-display text-3xl font-bold text-sand-100">
             Thank you, {name}!
@@ -111,12 +111,8 @@ export default function CheckoutPage() {
               <span className="text-gold font-bold">₹{finalAmount.toLocaleString("en-IN")}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Credited Business Volume:</span>
-              <span className="text-emerald-400 font-bold font-mono">{totalBV} BV</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Tracking Sponsor ID:</span>
-              <span className="text-sand-100 font-mono">{sponsorCode}</span>
+              <span className="text-slate-400">Delivery Status:</span>
+              <span className="text-emerald-400 font-bold">Preparing for White-Glove Dispatch</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-400">Delivery Address:</span>
@@ -126,16 +122,10 @@ export default function CheckoutPage() {
 
           <div className="flex gap-4 justify-center pt-2">
             <button
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/products")}
               className="px-6 py-2.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow"
             >
-              View Distributor Back-Office →
-            </button>
-            <button
-              onClick={() => router.push("/products")}
-              className="px-6 py-2.5 rounded-xl border border-slate-600 text-xs font-medium hover:bg-navy-800"
-            >
-              Continue Shopping
+              Continue Shopping →
             </button>
           </div>
         </div>
@@ -254,18 +244,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Sponsor ID tracking field */}
-              <div className="pt-2">
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Distributor Sponsor Code (for Commission & BV Credit)
-                </label>
-                <input
-                  className="w-full bg-navy-950 border border-slate-700 rounded-lg px-3.5 py-2 text-xs text-amber-300 font-mono outline-none focus:border-gold"
-                  value={sponsorCode}
-                  onChange={(e) => setSponsorCode(e.target.value)}
-                />
-              </div>
-
               {error && <p className="text-xs text-red-400 p-2 rounded bg-red-950/40 border border-red-800">{error}</p>}
 
               <button
@@ -286,7 +264,7 @@ export default function CheckoutPage() {
 
               <div className="divide-y divide-navy-700/60 text-xs">
                 {items.map((i) => {
-                  const pr = isMemberPricing ? (i.memberPrice || i.price * 0.8) : i.price;
+                  const pr = i.price;
                   return (
                     <div key={i.slug} className="py-3 flex justify-between items-center gap-4">
                       <div>
@@ -299,12 +277,6 @@ export default function CheckoutPage() {
                     </div>
                   );
                 })}
-              </div>
-
-              {/* Commission Volume Box */}
-              <div className="p-3.5 rounded-xl bg-gold/10 border border-gold/20 flex justify-between items-center text-xs">
-                <span className="text-gold font-semibold">Total Order BV:</span>
-                <span className="font-mono font-bold text-emerald-400">{totalBV.toLocaleString("en-IN")} BV</span>
               </div>
 
               <div className="pt-2 border-t border-slate-700/60 flex justify-between text-base font-bold text-sand-100">

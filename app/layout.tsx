@@ -16,9 +16,9 @@ const fraunces = Fraunces({
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Dream Comfort Furniture India | Luxury Furniture & Direct Selling Opportunity",
+  title: "dreamcomfortfurnitureindia | Handcrafted Solid Wood Luxury Furniture",
   description:
-    "India's premier direct selling furniture brand. Handcrafted solid Sheesham & Teak furniture, ergonomic luxury office solutions, and high-yield leadership MLM earnings.",
+    "India's premier solid Sheesham & CP Teak furniture workshop. Discover hand-carved maharaja sofas, solid teak hydraulic beds, dining suites, and ergonomic office furniture.",
 };
 
 export default function RootLayout({
@@ -30,17 +30,17 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${fraunces.variable} ${inter.variable} font-body bg-navy-900 text-sand-100 min-h-screen flex flex-col antialiased`}>
         <CartProvider>
-          {/* Top Announcement Bar */}
+          {/* Top Announcement Bar - Pure Premium Furniture Delivery & Showrooms */}
           <div className="bg-gradient-to-r from-navy-950 via-teak-dark to-navy-950 border-b border-gold/30 text-xs py-2 px-4 sm:px-8 text-center text-slate-200 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 mx-auto sm:mx-0">
               <span className="inline-block w-2 h-2 rounded-full bg-gold animate-ping" />
               <span>
-                ✨ <strong>Special Hybrid Offer:</strong> Register ID for <strong>₹15,000</strong> → Get <strong>Physical Bio-Magnetic Wellness Kit</strong> + <strong>100% ₹15,000 Furniture Credit Redemption</strong>!
+                ✨ <strong>Direct From Workshop:</strong> Authentic Solid Sheesham & Teak Wood • 10-Year Anti-Termite Guarantee • Nationwide Safe Delivery
               </span>
             </div>
             <div className="flex items-center gap-4 text-xs font-medium mx-auto sm:mx-0">
               <span className="text-gold flex items-center gap-1 font-semibold">
-                Founder: Pranay
+                Customer Care & Custom Orders
               </span>
               <span className="text-slate-500">|</span>
               <a href="https://wa.me/919959427831" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors flex items-center gap-1">
@@ -62,10 +62,10 @@ export default function RootLayout({
                 </div>
                 <div>
                   <div className="font-display font-bold text-lg sm:text-xl tracking-wide text-sand-100 flex items-center">
-                    DreamComfort<span className="gold-gradient-text ml-1">Furniture</span>
+                    DreamComfortFurnitureIndia
                   </div>
                   <span className="text-[10px] tracking-widest uppercase text-gold/80 block font-sans">
-                    India • Direct Selling Network
+                    Handcrafted Luxury Solid Wood Living
                   </span>
                 </div>
               </Link>
@@ -75,21 +75,20 @@ export default function RootLayout({
                 <Link href="/products" className="hover:text-gold transition-colors">
                   Furniture Catalog
                 </Link>
-                <Link href="/business-plan" className="hover:text-gold transition-colors flex items-center gap-1">
-                  <span>MLM Business Plan</span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-gold/20 text-gold border border-gold/30">
-                    High ROI
-                  </span>
+                <Link href="/stores" className="hover:text-gold transition-colors">
+                  Experience Centers
                 </Link>
                 <Link href="/about" className="hover:text-gold transition-colors">
-                  About Us
+                  Our Heritage
                 </Link>
-                <Link href="/stores" className="hover:text-gold transition-colors">
-                  Franchise & Stores
-                </Link>
-                <Link href="/dashboard" className="hover:text-gold transition-colors flex items-center gap-1.5 text-gold-accent font-semibold">
-                  <span>Distributor Back-Office</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                {/* Single Consolidated Partner Portal Menu Item */}
+                <Link
+                  href="/business-plan"
+                  className="px-3 py-1.5 rounded-lg border border-gold/30 hover:border-gold hover:text-gold text-slate-300 flex items-center gap-1.5 transition-all bg-navy-950/60"
+                  title="Distributor Network & ₹15,000 Hybrid Partner Program"
+                >
+                  <span className="text-gold text-xs">✨</span>
+                  <span>Partner Portal</span>
                 </Link>
               </nav>
 
@@ -103,21 +102,48 @@ export default function RootLayout({
                 </div>
 
                 <Link
-                  href="/register"
+                  href="/products"
                   className="px-3.5 sm:px-4 py-2 rounded-lg gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 transition-all shadow-md shadow-gold/20 flex items-center gap-1.5 whitespace-nowrap"
                 >
-                  <span>Become a Distributor</span>
+                  <span>Explore Catalog</span>
                   <span>→</span>
                 </Link>
               </div>
             </div>
 
-            {/* Mobile Nav sub-bar */}
-            <div className="flex lg:hidden items-center justify-around gap-2 pt-2.5 mt-2 border-t border-navy-800 text-xs text-slate-300">
-              <Link href="/products" className="hover:text-gold py-1">Catalog</Link>
-              <Link href="/business-plan" className="text-gold py-1">Business Plan</Link>
-              <Link href="/dashboard" className="text-emerald-400 py-1">Dashboard</Link>
-              <Link href="/register" className="text-gold-accent py-1">Join MLM</Link>
+            {/* Mobile & Tablet Quick-Access Navigation Bar */}
+            <div className="flex lg:hidden items-center justify-between gap-1 pt-2.5 mt-2 border-t border-navy-800 text-xs overflow-x-auto no-scrollbar py-0.5">
+              <Link
+                href="/products"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1"
+              >
+                <span>🛋️</span>
+                <span>Furniture</span>
+              </Link>
+              <Link
+                href="/stores"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1"
+              >
+                <span>📍</span>
+                <span>Stores</span>
+              </Link>
+              <Link
+                href="/about"
+                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1"
+              >
+                <span>🪵</span>
+                <span>Heritage</span>
+              </Link>
+              <Link
+                href="/business-plan"
+                className="px-2.5 py-1.5 rounded-lg text-gold bg-gold/10 border border-gold/30 font-semibold whitespace-nowrap transition-all flex items-center gap-1 hover:bg-gold hover:text-navy-900"
+              >
+                <span>✨</span>
+                <span>Partner Portal</span>
+              </Link>
+              <div className="sm:hidden flex items-center pl-1 border-l border-navy-800">
+                <NavAuth />
+              </div>
             </div>
           </header>
 
@@ -138,19 +164,19 @@ export default function RootLayout({
                       DC
                     </div>
                     <span className="font-display font-bold text-xl text-sand-100">
-                      DreamComfort<span className="text-gold">Furniture</span> India
+                      DreamComfortFurnitureIndia
                     </span>
                   </div>
                   <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
-                    Bridging timeless Indian craftsmanship with revolutionary direct-selling entrepreneurship. 
-                    Offering genuine Sheesham & CP Teak furniture, certified ergonomic suites, and financial freedom for our nationwide distributor partners.
+                    Handcrafting timeless solid Sheesham & CP Teak furniture for Indian homes and luxury corporate spaces. 
+                    Direct from certified solar-kiln workshops with a 10-year anti-termite guarantee and white-glove doorstep delivery.
                   </p>
                   <div className="p-3.5 rounded-xl bg-navy-900/90 border border-gold/20 text-xs text-slate-300 space-y-1">
                     <div className="text-gold font-semibold flex items-center gap-2">
-                      <span>✓ Direct Selling Guidelines 2021 Compliant</span>
+                      <span>✓ 100% Solid Seasoned Wood Certified</span>
                     </div>
                     <p className="text-slate-400 text-[11px]">
-                      Registered Corporate Entity | 100% Legal Binary & Hybrid Compensation Structure | Ministry of Consumer Affairs Compliant.
+                      Registered Indian Craft Enterprise • 10-Year Anti-Termite Guarantee • Direct Workshop Pricing.
                     </p>
                   </div>
                 </div>
@@ -169,29 +195,32 @@ export default function RootLayout({
                   </ul>
                 </div>
 
-                {/* Direct Selling Plan */}
+                {/* Partner & Trade Program */}
                 <div>
                   <h4 className="font-display text-sm font-semibold text-sand-100 tracking-wider uppercase mb-4">
-                    Direct Sales Network
+                    Partner & Trade
                   </h4>
                   <ul className="space-y-2.5 text-xs text-slate-400">
-                    <li><Link href="/business-plan" className="hover:text-gold transition-colors">Compensation Plan</Link></li>
-                    <li><Link href="/business-plan#ranks" className="hover:text-gold transition-colors">Leadership Rank Tiers</Link></li>
+                    <li><Link href="/business-plan" className="hover:text-gold transition-colors">Partner Portal (₹15,000 Model)</Link></li>
+                    <li><Link href="/business-plan#hybrid-model" className="hover:text-gold transition-colors">Advance Retail & Wellness Kit</Link></li>
+                    <li><Link href="/business-plan#ranks" className="hover:text-gold transition-colors">Leadership Tiers</Link></li>
                     <li><Link href="/dashboard" className="hover:text-gold transition-colors">Distributor Back-Office</Link></li>
-                    <li><Link href="/register" className="hover:text-gold transition-colors">Online Distributor KYC</Link></li>
-                    <li><Link href="/business-plan#calculator" className="hover:text-gold transition-colors">MLM Earnings Calculator</Link></li>
+                    <li><Link href="/register" className="hover:text-gold transition-colors">Partner ID Registration</Link></li>
                   </ul>
                 </div>
 
                 {/* Support & Stores */}
                 <div>
                   <h4 className="font-display text-sm font-semibold text-sand-100 tracking-wider uppercase mb-4">
-                    HQ & Experience Centers
+                    Experience Center & Workshop
                   </h4>
                   <div className="space-y-2.5 text-xs text-slate-400">
                     <p className="flex items-start gap-2">
                       <span className="text-gold">📍</span>
-                      <span>Plot 42, Furniture Hub, Visakhapatnam & Hyderabad, India</span>
+                      <span>Railway New Colony, Opposite HDFC Bank, Above ORA Motors Showroom, Visakhapatnam, AP</span>
+                    </p>
+                    <p className="text-[11px] text-amber-300">
+                      ★ Upcoming Centers: Hyderabad • Bengaluru • Delhi NCR
                     </p>
                     <p className="flex items-center gap-2">
                       <span className="text-gold">👤</span>
@@ -200,16 +229,18 @@ export default function RootLayout({
                     <p className="flex items-center gap-2">
                       <span className="text-emerald-400">💬</span>
                       <a href="https://wa.me/919959427831" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">
-                        Call & WhatsApp: +91 99594 27831
+                        Call / WhatsApp: 9959427831 / 9347965863
                       </a>
                     </p>
                     <p className="flex items-center gap-2">
                       <span className="text-gold">✉️</span>
-                      <span>support@dreamcomfort.in</span>
+                      <a href="mailto:dreamcomfortfurnitureindia@gmail.com" className="hover:text-gold transition-colors">
+                        dreamcomfortfurnitureindia@gmail.com
+                      </a>
                     </p>
                     <div className="pt-2">
                       <Link href="/stores" className="text-xs text-gold underline hover:text-gold-light">
-                        Find a Local Franchise Store →
+                        View Showrooms & Directions →
                       </Link>
                     </div>
                   </div>
@@ -218,7 +249,7 @@ export default function RootLayout({
 
               {/* Bottom bar */}
               <div className="pt-8 border-t border-navy-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-                <p>© {new Date().getFullYear()} Dream Comfort Furniture India Ltd. All rights reserved.</p>
+                <p>© {new Date().getFullYear()} dreamcomfortfurnitureindia. All rights reserved.</p>
                 <div className="flex gap-6">
                   <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
                   <span className="hover:text-slate-400 cursor-pointer">Terms of Distributor Agreement</span>

@@ -36,7 +36,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
   }
 
   function handleShareRef() {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://dreamcomfort.in";
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://dreamcomfortfurnitureindia.com";
     const refUrl = `${origin}/products/${product.slug}?ref=DC109283`;
     navigator.clipboard.writeText(refUrl);
     setCopied(true);
