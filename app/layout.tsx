@@ -31,20 +31,21 @@ export default function RootLayout({
       <body className={`${fraunces.variable} ${inter.variable} font-body bg-navy-900 text-sand-100 min-h-screen flex flex-col antialiased`}>
         <CartProvider>
           {/* Top Announcement Bar - Pure Premium Furniture Delivery & Showrooms */}
-          <div className="bg-gradient-to-r from-navy-950 via-teak-dark to-navy-950 border-b border-gold/30 text-xs py-2 px-4 sm:px-8 text-center text-slate-200 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 mx-auto sm:mx-0">
-              <span className="inline-block w-2 h-2 rounded-full bg-gold animate-ping" />
-              <span>
-                ✨ <strong>Direct From Workshop:</strong> Authentic Solid Sheesham & Teak Wood • 10-Year Anti-Termite Guarantee • Nationwide Safe Delivery
+          <div className="bg-gradient-to-r from-navy-950 via-teak-dark to-navy-950 border-b border-gold/30 text-[11px] sm:text-xs py-2 px-3 sm:px-8 text-center text-slate-200 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1.5 justify-center text-center">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-gold animate-ping shrink-0" />
+              <span className="truncate max-w-[90vw] sm:max-w-none">
+                ✨ <strong>Direct From Workshop:</strong> Authentic Solid Sheesham & Teak Wood • 10-Yr Warranty
               </span>
             </div>
-            <div className="flex items-center gap-4 text-xs font-medium mx-auto sm:mx-0">
-              <span className="text-gold flex items-center gap-1 font-semibold">
-                Customer Care & Custom Orders
-              </span>
-              <span className="text-slate-500">|</span>
-              <a href="https://wa.me/919959427831" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors flex items-center gap-1">
-                <span>💬 Call / WhatsApp:</span>
+            <div className="flex items-center gap-3 text-[11px] font-medium justify-center">
+              <a
+                href="https://wa.me/919959427831"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors flex items-center gap-1 whitespace-nowrap"
+              >
+                <span>💬 WhatsApp:</span>
                 <span>+91 99594 27831</span>
               </a>
             </div>
@@ -53,25 +54,25 @@ export default function RootLayout({
           <div className="swatch-strip" />
 
           {/* Main Navigation Header */}
-          <header className="sticky top-0 z-40 bg-navy-900/95 backdrop-blur-md border-b border-navy-700/80 px-4 sm:px-8 lg:px-12 py-3.5 transition-all">
-            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <header className="sticky top-0 z-40 bg-navy-900/95 backdrop-blur-md border-b border-navy-700/80 px-3 sm:px-8 lg:px-12 py-2.5 sm:py-3.5 transition-all">
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
               {/* Brand Logo */}
-              <Link href="/" className="flex items-center gap-2.5 group">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-teak flex items-center justify-center shadow-lg shadow-gold/20 border border-gold/50 group-hover:scale-105 transition-transform">
-                  <span className="text-navy-900 font-bold font-display text-xl leading-none">DC</span>
+              <Link href="/" className="flex items-center gap-2 group min-w-0 shrink">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-gold to-teak flex items-center justify-center shadow-lg shadow-gold/20 border border-gold/50 group-hover:scale-105 transition-transform shrink-0">
+                  <span className="text-navy-900 font-bold font-display text-base sm:text-xl leading-none">DC</span>
                 </div>
-                <div>
-                  <div className="font-display font-bold text-lg sm:text-xl tracking-wide text-sand-100 flex items-center">
+                <div className="min-w-0">
+                  <div className="font-display font-bold text-sm sm:text-lg lg:text-xl tracking-tight sm:tracking-wide text-sand-100 truncate">
                     DreamComfortFurnitureIndia
                   </div>
-                  <span className="text-[10px] tracking-widest uppercase text-gold/80 block font-sans">
+                  <span className="text-[9px] sm:text-[10px] tracking-wider uppercase text-gold/80 block font-sans truncate">
                     Handcrafted Luxury Solid Wood Living
                   </span>
                 </div>
               </Link>
 
-              {/* Navigation Links */}
-              <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
+              {/* Navigation Links (Desktop) */}
+              <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300 shrink-0">
                 <Link href="/products" className="hover:text-gold transition-colors">
                   Furniture Catalog
                 </Link>
@@ -93,7 +94,7 @@ export default function RootLayout({
               </nav>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                 <HeaderSearch />
                 <CartButton />
 
@@ -103,7 +104,7 @@ export default function RootLayout({
 
                 <Link
                   href="/products"
-                  className="px-3.5 sm:px-4 py-2 rounded-lg gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 transition-all shadow-md shadow-gold/20 flex items-center gap-1.5 whitespace-nowrap"
+                  className="hidden sm:inline-flex px-3.5 sm:px-4 py-2 rounded-lg gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 transition-all shadow-md shadow-gold/20 items-center gap-1.5 whitespace-nowrap"
                 >
                   <span>Explore Catalog</span>
                   <span>→</span>
@@ -112,36 +113,36 @@ export default function RootLayout({
             </div>
 
             {/* Mobile & Tablet Quick-Access Navigation Bar */}
-            <div className="flex lg:hidden items-center justify-between gap-1 pt-2.5 mt-2 border-t border-navy-800 text-xs overflow-x-auto no-scrollbar py-0.5">
+            <div className="flex lg:hidden items-center justify-between gap-1 pt-2 mt-2 border-t border-navy-800 text-xs overflow-x-auto no-scrollbar py-0.5">
               <Link
                 href="/products"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1"
+                className="px-2 py-1 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1 text-[11px]"
               >
                 <span>🛋️</span>
-                <span>Furniture</span>
+                <span>Catalog</span>
               </Link>
               <Link
                 href="/stores"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1"
+                className="px-2 py-1 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1 text-[11px]"
               >
                 <span>📍</span>
                 <span>Stores</span>
               </Link>
               <Link
                 href="/about"
-                className="px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1"
+                className="px-2 py-1 rounded-lg text-slate-300 hover:text-gold hover:bg-navy-800/60 font-medium whitespace-nowrap transition-colors flex items-center gap-1 text-[11px]"
               >
                 <span>🪵</span>
                 <span>Heritage</span>
               </Link>
               <Link
                 href="/business-plan"
-                className="px-2.5 py-1.5 rounded-lg text-gold bg-gold/10 border border-gold/30 font-semibold whitespace-nowrap transition-all flex items-center gap-1 hover:bg-gold hover:text-navy-900"
+                className="px-2.5 py-1 rounded-lg text-gold bg-gold/10 border border-gold/30 font-semibold whitespace-nowrap transition-all flex items-center gap-1 hover:bg-gold hover:text-navy-900 text-[11px]"
               >
                 <span>✨</span>
                 <span>Partner Portal</span>
               </Link>
-              <div className="sm:hidden flex items-center pl-1 border-l border-navy-800">
+              <div className="sm:hidden flex items-center pl-1 border-l border-navy-800 text-[11px]">
                 <NavAuth />
               </div>
             </div>
