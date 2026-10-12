@@ -45,6 +45,19 @@ export default function AdminUploadPage() {
     <main className="px-6 md:px-12 py-12 max-w-3xl">
       <Script src="https://upload-widget.cloudinary.com/global/all.js" strategy="lazyOnload" />
 
+      <div className="mb-6 p-4 rounded-xl bg-gold/15 border border-gold/40 flex items-center justify-between">
+        <div>
+          <strong className="text-walnut block font-semibold text-sm">Full Catalog & Media Management Dashboard</strong>
+          <span className="text-xs text-charcoal/80">Manage products, Cloudinary & Postimages media studio, and showroom video clips.</span>
+        </div>
+        <a
+          href="/admin"
+          className="text-xs bg-walnut text-cream px-3 py-2 rounded font-medium hover:bg-charcoal transition-colors whitespace-nowrap"
+        >
+          Go to /admin →
+        </a>
+      </div>
+
       <h1 className="font-display text-3xl text-walnut mb-2">Upload product photos</h1>
       <p className="text-charcoal/70 mb-8">
         Upload photos here, then copy each URL into the matching product&apos;s{" "}

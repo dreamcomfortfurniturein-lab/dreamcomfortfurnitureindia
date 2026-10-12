@@ -251,10 +251,13 @@ export default function RootLayout({
               {/* Bottom bar */}
               <div className="pt-8 border-t border-navy-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
                 <p>© {new Date().getFullYear()} dreamcomfortfurnitureindia. All rights reserved.</p>
-                <div className="flex gap-6">
+                <div className="flex flex-wrap gap-4 sm:gap-6">
                   <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
                   <span className="hover:text-slate-400 cursor-pointer">Terms of Distributor Agreement</span>
                   <span className="hover:text-slate-400 cursor-pointer">Direct Selling Code of Ethics</span>
+                  <Link href="/admin" className="text-gold/70 hover:text-gold hover:underline">
+                    Admin Portal
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,0 +1,31 @@
+[
+  {
+    "id": "MEDIA_1791818466139_Y6I9",
+    "createdAt": "2026-10-12T15:21:06.139Z",
+    "orientation": "vertical",
+    "type": "video",
+    "mediaUrl": "https://res.cloudinary.com/og57tmj8/video/upload/v1785482308/products/az48cydgfryqhphpysez.mp4",
+    "title": "Teakwood Carving Reel",
+    "subtitle": "Live workshop clip",
+    "ctaLink": "/products",
+    "uploaderName": "Pranay",
+    "uploaderPhone": "+91 99594 27831",
+    "approvalCode": "619849",
+    "status": "approved",
+    "approvedAt": "2026-10-12T15:21:20.555Z"
+  },
+  {
+    "id": "REQ_SAMPLE_101",
+    "createdAt": "2026-10-12T20:00:00.000Z",
+    "orientation": "vertical",
+    "type": "video",
+    "mediaUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "title": "Master Carver Headboard Finishing",
+    "subtitle": "Direct phone clip from our Visakhapatnam workshop floor",
+    "ctaLink": "/products",
+    "uploaderName": "Workshop Manager",
+    "uploaderPhone": "+91 99594 27831",
+    "approvalCode": "729410",
+    "status": "pending"
+  }
+]

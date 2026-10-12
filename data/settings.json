@@ -2,5 +2,37 @@
   "heroVideos": [
     "https://res.cloudinary.com/og57tmj8/video/upload/v1785299830/products/kxl85oiq8kv8wwyfjktn.mp4",
     "https://res.cloudinary.com/og57tmj8/video/upload/v1785482308/products/az48cydgfryqhphpysez.mp4"
-  ]
+  ],
+  "heroLandscape": {
+    "videos": [
+      "https://res.cloudinary.com/og57tmj8/video/upload/v1785299830/products/kxl85oiq8kv8wwyfjktn.mp4",
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+    ],
+    "poster": {
+      "badge": "✦ New Collection 2026",
+      "tag": "100% Solid Teakwood",
+      "title": "Bedrooms, reimagined.",
+      "subtitle": "The Hollow edit just landed — handcrafted low-platform teakwood and moisture-resistant wood frames in deep ink and warm walnut.",
+      "ctaText": "Shop The Edit →",
+      "ctaLink": "/products?category=Bedroom Sets",
+      "imageUrl": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"
+    }
+  },
+  "heroVertical": {
+    "videos": [
+      "https://res.cloudinary.com/og57tmj8/video/upload/v1785482308/products/az48cydgfryqhphpysez.mp4",
+      "https://res.cloudinary.com/og57tmj8/video/upload/v1785482308/products/az48cydgfryqhphpysez.mp4",
+      "https://res.cloudinary.com/og57tmj8/video/upload/v1785482308/products/az48cydgfryqhphpysez.mp4",
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+    ],
+    "poster": {
+      "badge": "✦ Mobile & Reels Exclusive",
+      "tag": "Artisan Handcrafted",
+      "title": "Living Luxury, redefined.",
+      "subtitle": "Royal Sheesham 7-seater suite tailored for compact & grand spaces alike with 10-year termite warranty.",
+      "ctaText": "Explore Living Sets →",
+      "ctaLink": "/products?category=Living Room",
+      "imageUrl": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80"
+    }
+  }
 }

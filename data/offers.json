@@ -1,0 +1,38 @@
+[
+  {
+    "id": "OFFER-FESTIVE-25",
+    "title": "Ganesh Chaturthi Festive Living Room Edit",
+    "discount": "25% OFF",
+    "code": "FESTIVE25",
+    "category": "Living Room",
+    "badge": "Limited Time Flash Sale",
+    "description": "Get flat 25% discount on all Royal Sheesham 7-Seater and Maharaja Luxury suites. Free white-glove assembly in Vizag and Hyderabad.",
+    "validUntil": "31 Oct 2026",
+    "minOrder": 40000,
+    "active": true
+  },
+  {
+    "id": "OFFER-TEAK-BED-15",
+    "title": "Solid CP Teak Hydraulic King Bed Launch Offer",
+    "discount": "₹15,000 Flat Off",
+    "code": "TEAKKING15",
+    "category": "Bedroom Sets",
+    "badge": "New Arrival Special",
+    "description": "Complimentary premium German hydraulic storage upgrade plus 10-year anti-termite certificate with every king bed purchase.",
+    "validUntil": "15 Nov 2026",
+    "minOrder": 50000,
+    "active": true
+  },
+  {
+    "id": "OFFER-DINING-FREE-CHAIRS",
+    "title": "Emperor 8-Seater Teak Dining Suite Bundle",
+    "discount": "2 Free Cushioned Chairs",
+    "code": "ROYALCHAIRS",
+    "category": "Handcrafted Solid Teak",
+    "badge": "Signature Suite Bundle",
+    "description": "Order any 6-seater or 8-seater hand-carved dining suite and receive 2 additional carved guest chairs free.",
+    "validUntil": "20 Nov 2026",
+    "minOrder": 65000,
+    "active": true
+  }
+]

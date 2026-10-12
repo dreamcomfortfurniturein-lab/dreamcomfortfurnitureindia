@@ -1,5 +1,20 @@
 import { createBrowserClient } from "@supabase/ssr";
 
+/**
+ * Returns true if real, valid Supabase credentials are configured in environment variables.
+ */
+export function isSupabaseConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return Boolean(
+    url &&
+    key &&
+    !url.includes("placeholder") &&
+    !key.includes("placeholder") &&
+    url.startsWith("https://")
+  );
+}
+
 export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-project.supabase.co";
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";

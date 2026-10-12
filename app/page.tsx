@@ -1,6 +1,8 @@
 import Link from "next/link";
 import products from "@/data/products.json";
+import settings from "@/data/settings.json";
 import TestimonialShowcase from "./testimonial-showcase";
+import FrontSplitHero from "./front-split-hero";
 
 export default function Home() {
   const featured = products.slice(0, 4);
@@ -68,130 +70,16 @@ export default function Home() {
 
   return (
     <main className="bg-navy-900 text-sand-100">
-      {/* 1. HERO SECTION */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-gold/20 py-20 lg:py-28">
-        {/* Luxury Background Image with Darker High-Contrast Gradient Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=2000&q=90"
-            alt="Modern Indian Luxury Living Room with Teakwood Furniture and Gold Accents"
-            className="w-full h-full object-cover object-center filter brightness-[0.25] contrast-125 scale-105 transform animate-fade-in"
+      {/* 1. HERO SECTION: SPLIT VIDEO (LEFT) & POSTER (RIGHT) */}
+      <section className="relative overflow-hidden border-b border-gold/20 pt-6 pb-12 sm:pt-8 sm:pb-16 bg-navy-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FrontSplitHero
+            videos={settings.heroVideos}
+            landscapeVideos={settings.heroLandscape?.videos}
+            landscapePoster={settings.heroLandscape?.poster}
+            verticalVideos={settings.heroVertical?.videos}
+            verticalPoster={settings.heroVertical?.poster}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-900/95 to-navy-950/80" />
-          <div className="absolute inset-0 bg-radial-gradient from-transparent to-navy-950/90" />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Hero Copy */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-navy-950/90 border border-gold/60 text-gold text-xs font-semibold backdrop-blur-md shadow-lg">
-              <span className="w-2 h-2 rounded-full bg-gold animate-ping" />
-              <span>Direct From Our Master Artisan Workshops</span>
-            </div>
-
-            <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white drop-shadow-md leading-tight">
-              Timeless Solid Wood Luxury.{" "}
-              <span className="text-amber-400 drop-shadow-[0_2px_12px_rgba(251,191,36,0.35)] block">
-                Handcrafted for Generations.
-              </span>
-            </h1>
-
-            <p className="text-slate-100 text-base sm:text-xl max-w-2xl font-normal leading-relaxed drop-shadow">
-              Discover authentic Sheesham & CP Teakwood furniture designed for modern Indian homes. 
-              Solar kiln dried with 10-year anti-termite guarantee and white-glove doorstep delivery.
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Link
-                href="/products"
-                className="px-8 py-4 rounded-xl gold-gradient-bg text-navy-900 font-bold text-base hover:brightness-110 transition-all shadow-xl shadow-gold/25 flex items-center justify-center gap-2 group"
-              >
-                <span>Explore Furniture Catalog</span>
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
-              </Link>
-              <Link
-                href="/stores"
-                className="px-8 py-4 rounded-xl bg-navy-800/90 hover:bg-navy-700/90 border border-gold/40 text-sand-100 font-semibold text-base hover:border-gold transition-all backdrop-blur-md flex items-center justify-center gap-2"
-              >
-                <span>Visit Experience Centers</span>
-                <span>📍</span>
-              </Link>
-            </div>
-
-            {/* Key Trust Badges */}
-            <div className="pt-8 border-t border-slate-700/60 grid grid-cols-3 gap-4 text-center sm:text-left max-w-xl">
-              <div>
-                <p className="text-2xl sm:text-3xl font-bold font-display text-gold">100%</p>
-                <p className="text-xs text-slate-400">Solid Teak & Sheesham</p>
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-bold font-display text-gold">10-Year</p>
-                <p className="text-xs text-slate-400">Anti-Termite Warranty</p>
-              </div>
-              <div>
-                <p className="text-2xl sm:text-3xl font-bold font-display text-gold">12,500+</p>
-                <p className="text-xs text-slate-400">Homes Furnished Across India</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Luxury Quality Showcase Card */}
-          <div className="lg:col-span-4 hidden lg:block">
-            <div className="glass-card rounded-2xl p-6 border-2 border-gold/50 shadow-2xl space-y-4 relative overflow-hidden bg-gradient-to-b from-navy-900/90 to-navy-950/95">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-2xl pointer-events-none" />
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1">
-                  ⭐ Master Craftsmanship
-                </span>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-[10px] font-bold">
-                  Certified Hardwood
-                </span>
-              </div>
-
-              <div>
-                <h3 className="font-display font-bold text-xl text-sand-100">
-                  Solar Kiln Dried Hardwood
-                </h3>
-                <p className="text-xs text-amber-300 font-medium mt-0.5">
-                  12% Moisture Optimized • Zero Warp Guarantee
-                </p>
-              </div>
-
-              <div className="space-y-2 text-xs text-slate-300">
-                <div className="flex items-start gap-2 bg-navy-950/80 p-2.5 rounded-lg border border-slate-700/80">
-                  <span className="text-emerald-400 font-bold text-sm">🪵</span>
-                  <div>
-                    <strong className="text-sand-100">100% Solid Sheesham & Teak:</strong>
-                    <p className="text-[11px] text-slate-400">Hand-selected heartwood with natural grain patterns and traditional mortise-and-tenon joinery.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2 bg-navy-950/80 p-2.5 rounded-lg border border-slate-700/80">
-                  <span className="text-gold font-bold text-sm">🛡️</span>
-                  <div>
-                    <strong className="text-sand-100">Anti-Termite & Borer Proof:</strong>
-                    <p className="text-[11px] text-slate-400">Pressure-treated with eco-friendly organic sealants backed by our 10-year official warranty.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-2">
-                <Link
-                  href="/products"
-                  className="block w-full py-2.5 rounded-lg bg-gold hover:bg-gold-dark text-navy-900 text-center text-xs font-bold transition-all shadow-md"
-                >
-                  Explore All Collections →
-                </Link>
-                <Link
-                  href="/business-plan"
-                  className="block w-full py-2 rounded-lg bg-navy-950 hover:bg-navy-800 text-gold text-center text-xs font-medium transition-all border border-gold/30"
-                >
-                  ✨ Partner & Trade Inquiries →
-                </Link>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 

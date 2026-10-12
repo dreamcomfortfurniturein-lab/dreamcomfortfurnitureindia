@@ -1,0 +1,54 @@
+[
+  {
+    "id": "CUST-9821",
+    "name": "Dr. Srinivas Rao",
+    "email": "srinivas.rao@gmail.com",
+    "phone": "+91 98490 11223",
+    "tier": "Platinum",
+    "city": "Visakhapatnam",
+    "totalOrders": 3,
+    "totalSpent": 285000,
+    "lastOrderDate": "04 Oct 2026",
+    "activeOffersClaimed": ["FESTIVE25"],
+    "status": "Active"
+  },
+  {
+    "id": "CUST-8412",
+    "name": "Meera Venkat",
+    "email": "meera.venkat@outlook.com",
+    "phone": "+91 97011 44556",
+    "tier": "Gold",
+    "city": "Hyderabad",
+    "totalOrders": 2,
+    "totalSpent": 142000,
+    "lastOrderDate": "22 Sep 2026",
+    "activeOffersClaimed": ["TEAKKING15"],
+    "status": "Active"
+  },
+  {
+    "id": "CUST-7219",
+    "name": "Rajiv Nambiar",
+    "email": "rajiv.nambiar@gmail.com",
+    "phone": "+91 94402 77889",
+    "tier": "Silver",
+    "city": "Vijayawada",
+    "totalOrders": 1,
+    "totalSpent": 68000,
+    "lastOrderDate": "15 Aug 2026",
+    "activeOffersClaimed": ["ROYALCHAIRS"],
+    "status": "Active"
+  },
+  {
+    "id": "CUST-6104",
+    "name": "Ananya Roy",
+    "email": "ananya.roy@yahoo.com",
+    "phone": "+91 98850 33441",
+    "tier": "Standard",
+    "city": "Bengaluru",
+    "totalOrders": 1,
+    "totalSpent": 35000,
+    "lastOrderDate": "01 Jul 2026",
+    "activeOffersClaimed": [],
+    "status": "Active"
+  }
+]
