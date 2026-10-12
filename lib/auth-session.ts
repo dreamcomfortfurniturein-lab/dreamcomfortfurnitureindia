@@ -24,7 +24,73 @@ const STORAGE_KEYS = {
   SESSION_MODE: "dcf_active_session_mode",
   DISTRIBUTORS: "dcf_admin_distributors",
   AVATAR: "dcf_auth_avatar",
+  SESSION_START: "dcf_session_start",
+  SESSION_EXPIRES_AT: "dcf_session_expires_at",
+  EXPIRED_REASON: "dcf_session_expired_reason",
 };
+
+// Default Free Session Time Limit: 2 Hours (7200 seconds)
+export const DEFAULT_SESSION_DURATION_MS = 2 * 60 * 60 * 1000;
+
+/**
+ * Get the public site URL, avoiding internal localhost in live production.
+ */
+export function getPublicSiteUrl(): string {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("localhost")) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "https://dreamcomfortfurniture.in";
+}
+
+/**
+ * Get remaining session time in seconds. Returns 0 if expired or unauthenticated.
+ */
+export function getSessionTimeRemainingSeconds(): number {
+  if (typeof window === "undefined") return 0;
+  const expiresAtStr = localStorage.getItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
+  if (!expiresAtStr) return 0;
+  const expiresAt = parseInt(expiresAtStr, 10);
+  if (isNaN(expiresAt)) return 0;
+  const remaining = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+  return remaining;
+}
+
+/**
+ * Format seconds into a friendly MM:SS or HH:MM:SS string.
+ */
+export function formatTimeRemaining(totalSeconds: number): string {
+  if (totalSeconds <= 0) return "00:00";
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes.toString().padStart(2, "0")}m`;
+  }
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+}
+
+/**
+ * Get last session expiration reason (e.g. "session_expired" or "time_limit_over").
+ */
+export function getLastExpiredReason(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(STORAGE_KEYS.EXPIRED_REASON);
+}
+
+/**
+ * Clear session expired notice after user dismisses or acknowledges it.
+ */
+export function clearExpiredReason(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(STORAGE_KEYS.EXPIRED_REASON);
+}
 
 /**
  * Check if the given email is the Super Admin.
@@ -134,12 +200,25 @@ export function computeUserRole(email: string | null | undefined): UserRole {
 
 /**
  * Get current authenticated user profile from browser storage.
+ * Enforces automatic session expiration if the free time limit has ended.
  */
 export function getCurrentAuthUser(): DCFAuthUser | null {
   if (typeof window === "undefined") return null;
 
   const email = localStorage.getItem(STORAGE_KEYS.EMAIL);
   if (!email) return null;
+
+  // Session Time Limit Expiration Enforcement
+  const expiresAtStr = localStorage.getItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
+  if (expiresAtStr) {
+    const expiresAt = parseInt(expiresAtStr, 10);
+    if (!isNaN(expiresAt) && Date.now() > expiresAt) {
+      // Time limit is over: invalidate session and set expiration notice
+      localStorage.setItem(STORAGE_KEYS.EXPIRED_REASON, "session_expired");
+      signOutGoogleUser();
+      return null;
+    }
+  }
 
   const role = computeUserRole(email);
   const { status, distributorRecord } = getPartnerStatus(email);
@@ -160,6 +239,7 @@ export function getCurrentAuthUser(): DCFAuthUser | null {
 
 /**
  * Perform Google Authentication / SSO Sign In.
+ * Sets session start timestamp and automatic free session time limit.
  */
 export function loginWithGoogleAccount(
   email: string,
@@ -172,9 +252,17 @@ export function loginWithGoogleAccount(
   const { status, distributorRecord } = getPartnerStatus(normalizedEmail);
 
   if (typeof window !== "undefined") {
+    const now = Date.now();
     localStorage.setItem(STORAGE_KEYS.EMAIL, normalizedEmail);
     localStorage.setItem(STORAGE_KEYS.NAME, userName);
     localStorage.setItem(STORAGE_KEYS.ROLE, role);
+    localStorage.setItem(STORAGE_KEYS.SESSION_START, now.toString());
+    localStorage.setItem(
+      STORAGE_KEYS.SESSION_EXPIRES_AT,
+      (now + DEFAULT_SESSION_DURATION_MS).toString()
+    );
+    localStorage.removeItem(STORAGE_KEYS.EXPIRED_REASON);
+
     if (avatarUrl) {
       localStorage.setItem(STORAGE_KEYS.AVATAR, avatarUrl);
     }
@@ -209,6 +297,8 @@ export function signOutGoogleUser(): void {
   localStorage.removeItem(STORAGE_KEYS.NAME);
   localStorage.removeItem(STORAGE_KEYS.ROLE);
   localStorage.removeItem(STORAGE_KEYS.AVATAR);
+  localStorage.removeItem(STORAGE_KEYS.SESSION_START);
+  localStorage.removeItem(STORAGE_KEYS.SESSION_EXPIRES_AT);
   localStorage.setItem(STORAGE_KEYS.SESSION_MODE, "customer");
   window.dispatchEvent(new Event("dcf_auth_change"));
 }

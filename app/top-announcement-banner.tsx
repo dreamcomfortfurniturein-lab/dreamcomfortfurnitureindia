@@ -8,11 +8,14 @@ import {
   signOutGoogleUser,
   loginWithGoogleAccount,
   extractFirstName,
+  getSessionTimeRemainingSeconds,
+  formatTimeRemaining,
   DCFAuthUser,
 } from "@/lib/auth-session";
 
 export function TopAnnouncementBanner() {
   const [authUser, setAuthUser] = useState<DCFAuthUser | null>(null);
+  const [sessionRemaining, setSessionRemaining] = useState<number>(0);
   const supabase = createClient();
 
   useEffect(() => {
@@ -65,6 +68,26 @@ export function TopAnnouncementBanner() {
     };
   }, [supabase]);
 
+  // Session Time Limit monitoring & auto expiration
+  useEffect(() => {
+    if (!authUser) {
+      setSessionRemaining(0);
+      return;
+    }
+    function updateCountdown() {
+      const remaining = getSessionTimeRemainingSeconds();
+      setSessionRemaining(remaining);
+      if (remaining <= 0 && authUser) {
+        signOutGoogleUser();
+        setAuthUser(null);
+        window.location.href = "/login?reason=session_expired";
+      }
+    }
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [authUser]);
+
   async function handleLogout() {
     signOutGoogleUser();
     try {
@@ -84,8 +107,17 @@ export function TopAnnouncementBanner() {
         <div className="flex items-center gap-2 text-sand-200">
           <span className="text-gold font-bold">✨ Welcome to Dream Comfort:</span>
           {authUser ? (
-            <span>
-              Welcome back, <strong className="text-gold font-bold">{firstName}</strong>! 10-Year Anti-Termite Guarantee on All Solid Teak Collections.
+            <span className="flex items-center gap-2 flex-wrap">
+              <span>
+                Welcome back, <strong className="text-gold font-bold">{firstName}</strong>!
+              </span>
+              <span
+                className="px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 font-mono text-[10px] inline-flex items-center gap-1"
+                title="Free Session Duration"
+              >
+                <span>⏱️</span>
+                <span>Session: {formatTimeRemaining(sessionRemaining)}</span>
+              </span>
             </span>
           ) : (
             <span>Handcrafted Solid Teak & Sheesham Wood • 10-Year Anti-Termite Guarantee</span>

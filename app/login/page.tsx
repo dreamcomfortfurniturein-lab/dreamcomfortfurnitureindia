@@ -15,6 +15,8 @@ import {
   getCurrentAuthUser,
   signOutGoogleUser,
   extractFirstName,
+  getLastExpiredReason,
+  clearExpiredReason,
   DCFAuthUser,
 } from "@/lib/auth-session";
 import { WELCOME_QUOTES, getRandomQuote, WelcomeQuote } from "@/lib/quotes";
@@ -27,6 +29,8 @@ export default function LoginPage() {
   const [customGmail, setCustomGmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [expiredNotice, setExpiredNotice] = useState<string | null>(null);
+  const [rateLimitSeconds, setRateLimitSeconds] = useState<number>(0);
   const [showAccountRecoveryModal, setShowAccountRecoveryModal] = useState(false);
   const [showCustomInput, setShowCustomInput] = useState(false);
 
@@ -64,13 +68,33 @@ export default function LoginPage() {
     // 1. Pick a fresh random welcoming quote on every page load/sign-in
     setCurrentQuote(getRandomQuote());
 
-    // 2. Check if user is already signed in via local storage
+    // 2. Check for session expiration or rate limit notices
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const reason = searchParams.get("reason");
+      const err = searchParams.get("error");
+      const lastExpired = getLastExpiredReason();
+
+      if (reason === "session_expired" || lastExpired === "session_expired") {
+        setExpiredNotice(
+          "⚠️ Session Expired: Your secure session time limit has ended. Please sign in with your Google account to renew access."
+        );
+        clearExpiredReason();
+      } else if (reason === "free_limit_over" || (err && err.toLowerCase().includes("rate"))) {
+        setRateLimitSeconds(60);
+        setExpiredNotice(
+          "⚠️ Free Tier Rate Limit reached. Time limit retry active: Please wait 60s before retrying, or continue below."
+        );
+      }
+    }
+
+    // 3. Check if user is already signed in via local storage
     const user = getCurrentAuthUser();
     if (user) {
       setAuthUser(user);
     }
 
-    // 3. Sync active Supabase session (after Google OAuth redirect)
+    // 4. Sync active Supabase session (after Google OAuth redirect)
     const supabase = createClient();
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.email) {
@@ -86,6 +110,15 @@ export default function LoginPage() {
       }
     });
   }, []);
+
+  // Countdown timer for rate limit time limit
+  useEffect(() => {
+    if (rateLimitSeconds <= 0) return;
+    const interval = setInterval(() => {
+      setRateLimitSeconds((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [rateLimitSeconds]);
 
   function handleRollNextQuote() {
     let next = getRandomQuote();
@@ -109,18 +142,57 @@ export default function LoginPage() {
     try {
       if (hasSupabase && !emailToUse.includes("example")) {
         try {
+          const currentOrigin = window.location.origin;
+          const isLiveSite =
+            !window.location.hostname.includes("localhost") &&
+            !window.location.hostname.includes("127.0.0.1");
+
           const supabase = createClient();
           const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-              redirectTo: `${window.location.origin}/auth/callback`,
+              redirectTo: `${currentOrigin}/auth/callback`,
               skipBrowserRedirect: true,
             },
           });
+
+          if (oauthError) {
+            const errStr = (oauthError.message || "").toLowerCase();
+            if (errStr.includes("rate") || errStr.includes("quota") || errStr.includes("429")) {
+              setRateLimitSeconds(60);
+              setExpiredNotice(
+                "⚠️ Free Tier Rate Limit reached. Time limit retry active: Please wait 60 seconds before retrying, or continue with Google Identity below."
+              );
+            } else if (errStr.includes("expired") || errStr.includes("invalid")) {
+              setExpiredNotice("⚠️ Session Expired: Please reconnect your Google account.");
+            }
+          }
+
           if (!oauthError && data?.url && !isUnreachableSupabaseHost(data.url)) {
-            const isReady = await isSupabaseOAuthProviderReady(data.url);
+            // CRITICAL FIX: Ensure Supabase authorize URL does not bounce to localhost in live production!
+            let authUrl = data.url;
+            try {
+              const parsed = new URL(data.url);
+              const targetRedirect = parsed.searchParams.get("redirect_to");
+              if (
+                isLiveSite &&
+                targetRedirect &&
+                (targetRedirect.includes("localhost") || targetRedirect.includes("127.0.0.1"))
+              ) {
+                console.warn(
+                  "[DCF Auth] Correcting localhost redirect in live to:",
+                  `${currentOrigin}/auth/callback`
+                );
+                parsed.searchParams.set("redirect_to", `${currentOrigin}/auth/callback`);
+                authUrl = parsed.toString();
+              }
+            } catch {
+              // fallback to data.url
+            }
+
+            const isReady = await isSupabaseOAuthProviderReady(authUrl);
             if (isReady) {
-              window.location.href = data.url;
+              window.location.href = authUrl;
               return;
             } else {
               console.warn(
@@ -283,6 +355,33 @@ export default function LoginPage() {
                 Fast, secure access using your Google Account.
               </p>
             </div>
+
+            {expiredNotice && (
+              <div className="p-4 rounded-2xl bg-amber-950/80 border border-amber-500/50 text-amber-200 text-xs space-y-2 shadow-lg animate-fadeIn text-left">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-sm text-amber-300">
+                    <span>⏱️</span>
+                    <span>Session Expired / Time Limit Notice</span>
+                  </div>
+                  {rateLimitSeconds > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/30 text-amber-200 font-mono text-[10px] font-bold">
+                      Retry in {rateLimitSeconds}s
+                    </span>
+                  )}
+                </div>
+                <p className="text-sand-300/90 leading-relaxed text-[11px]">
+                  {expiredNotice}
+                </p>
+                {rateLimitSeconds > 0 && (
+                  <div className="w-full bg-navy-950 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className="bg-amber-400 h-full transition-all duration-1000"
+                      style={{ width: `${(rateLimitSeconds / 60) * 100}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             {error && (
               <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs">

@@ -93,18 +93,45 @@ export default function SignUpPage() {
     try {
       if (hasSupabase && !emailToUse.includes("example")) {
         try {
+          const currentOrigin = window.location.origin;
+          const isLiveSite =
+            !window.location.hostname.includes("localhost") &&
+            !window.location.hostname.includes("127.0.0.1");
+
           const supabase = createClient();
           const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-              redirectTo: `${window.location.origin}/auth/callback`,
+              redirectTo: `${currentOrigin}/auth/callback`,
               skipBrowserRedirect: true,
             },
           });
+
           if (!oauthError && data?.url && !isUnreachableSupabaseHost(data.url)) {
-            const isReady = await isSupabaseOAuthProviderReady(data.url);
+            // Ensure live origin is used instead of defaulting to localhost
+            let authUrl = data.url;
+            try {
+              const parsed = new URL(data.url);
+              const targetRedirect = parsed.searchParams.get("redirect_to");
+              if (
+                isLiveSite &&
+                targetRedirect &&
+                (targetRedirect.includes("localhost") || targetRedirect.includes("127.0.0.1"))
+              ) {
+                console.warn(
+                  "[DCF Auth] Correcting localhost redirect in live to:",
+                  `${currentOrigin}/auth/callback`
+                );
+                parsed.searchParams.set("redirect_to", `${currentOrigin}/auth/callback`);
+                authUrl = parsed.toString();
+              }
+            } catch {
+              // fallback
+            }
+
+            const isReady = await isSupabaseOAuthProviderReady(authUrl);
             if (isReady) {
-              window.location.href = data.url;
+              window.location.href = authUrl;
               return;
             } else {
               console.warn(
