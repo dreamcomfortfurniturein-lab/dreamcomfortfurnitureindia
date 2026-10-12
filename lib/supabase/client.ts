@@ -4,7 +4,6 @@ import { createBrowserClient } from "@supabase/ssr";
 const PLACEHOLDER_SUPABASE_HOSTS = [
   "placeholder-project.supabase.co",
   "your-project-id.supabase.co",
-  "dawjbqptuthqoeaowobl.supabase.co", // Reported NXDOMAIN (project does not exist or paused)
 ];
 
 export function isUnreachableSupabaseHost(url?: string | null): boolean {
