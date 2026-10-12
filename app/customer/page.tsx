@@ -87,12 +87,11 @@ export default function CustomerPortalPage() {
     setSessionMode("customer");
   }
 
-  // Handle Request Partner Elevation (Mandatory Email to dreamcomfortfurniture.in@gmail.com and WhatsApp to 9347965863)
-  function handlePartnerRequest(e: React.FormEvent) {
-    e.preventDefault();
+  // Handle Request Partner Elevation (Via WhatsApp or Gmail)
+  function handlePartnerRequest(channel: "whatsapp" | "gmail" = "whatsapp") {
     const email = authUser?.email || "customer@gmail.com";
     const name = authUser?.name || email.split("@")[0];
-    const phone = partnerPhoneInput.trim() || "+91 9347965863";
+    const phone = partnerPhoneInput.trim().length > 4 ? partnerPhoneInput.trim() : "+91 9347965863";
 
     submitPartnerAccessRequest(email, name, phone);
 
@@ -100,14 +99,27 @@ export default function CustomerPortalPage() {
       name,
       email,
       phone,
-      notes: "Requested via Customer Portal Elevation Modal",
+      notes: `Requested via Customer Portal Elevation Modal (${channel.toUpperCase()})`,
     });
 
-    // Automatically trigger WhatsApp alert to 9347965863
-    try {
-      window.open(urls.whatsappUrl, "_blank");
-    } catch {
-      // silent
+    if (channel === "whatsapp") {
+      try {
+        window.open(urls.whatsappUrl, "_blank");
+      } catch {
+        // silent
+      }
+      setRequestSuccessMessage(
+        `Opening WhatsApp (+91 9347965863)... Send the pre-filled message to request Partner Portal approval from Master Admin.`
+      );
+    } else {
+      try {
+        window.open(urls.gmailUrl, "_blank");
+      } catch {
+        // silent
+      }
+      setRequestSuccessMessage(
+        `Opening Gmail (${ADMIN_EMAIL_ADDRESS})... Send the pre-filled email from your Gmail account to request Partner Portal approval.`
+      );
     }
 
     // Backend recording
@@ -119,7 +131,7 @@ export default function CustomerPortalPage() {
           name,
           email,
           phone,
-          notes: "Customer Portal Elevation Request",
+          notes: `Customer Portal Elevation Request via ${channel.toUpperCase()}`,
         }),
       });
     } catch {
@@ -127,9 +139,6 @@ export default function CustomerPortalPage() {
     }
 
     setPartnerRequestModalOpen(false);
-    setRequestSuccessMessage(
-      `Partner Access Request submitted! Email dispatched to ${ADMIN_EMAIL_ADDRESS} and WhatsApp notification sent to 9347965863. Awaiting Master Admin approval.`
-    );
     setAuthUser(getCurrentAuthUser());
   }
 
@@ -415,10 +424,7 @@ export default function CustomerPortalPage() {
       {/* ========================================================================= */}
       {partnerRequestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-sm">
-          <form
-            onSubmit={handlePartnerRequest}
-            className="bg-navy-900 border border-gold/30 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4"
-          >
+          <div className="bg-navy-900 border border-gold/30 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-gold/20 pb-3">
               <div>
                 <h3 className="font-display font-bold text-lg text-sand-50">
@@ -473,22 +479,50 @@ export default function CustomerPortalPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-gold/15">
-              <button
-                type="button"
-                onClick={() => setPartnerRequestModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-navy-800 text-sand-200 text-xs"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow-md shadow-gold/20"
-              >
-                Submit Request
-              </button>
+            <div className="space-y-2 pt-3 border-t border-gold/15">
+              <div className="text-[11px] text-sand-300 font-semibold uppercase tracking-wider text-center">
+                Send Request Directly to Admin:
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handlePartnerRequest("whatsapp")}
+                  className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366] text-[#25D366] hover:text-navy-950 border border-[#25D366]/40 font-bold text-xs transition-all shadow-md"
+                >
+                  <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                  </svg>
+                  <span>Via WhatsApp</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePartnerRequest("gmail")}
+                  className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[#EA4335]/20 hover:bg-[#EA4335] text-[#EA4335] hover:text-white border border-[#EA4335]/40 font-bold text-xs transition-all shadow-md"
+                >
+                  <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.272H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.49l8.073-5.997C21.69 2.279 24 3.434 24 5.457z" />
+                  </svg>
+                  <span>Via Gmail</span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between pt-1">
+                <a
+                  href={`mailto:${ADMIN_EMAIL_ADDRESS}?subject=${encodeURIComponent(`Partner Elevation Request: ${authUser?.name}`)}&body=${encodeURIComponent(`Hello Admin,\n\nI request access to the Partner Portal.\nName: ${authUser?.name}\nEmail: ${authUser?.email}\nPhone: ${partnerPhoneInput || "+91 9347965863"}\n\nPlease approve in Admin Dashboard.`)}`}
+                  className="text-[10px] text-sand-400 hover:text-gold transition-colors underline decoration-dotted"
+                >
+                  Or default mail app (mailto)
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setPartnerRequestModalOpen(false)}
+                  className="text-[11px] text-sand-400 hover:text-sand-200"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-          </form>
+          </div>
         </div>
       )}
     </main>
