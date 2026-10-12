@@ -1,9 +1,10 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-// List of known placeholder Supabase domains to avoid placeholder redirects
+// List of known placeholder or non-existent Supabase domains to avoid DNS crashes
 const PLACEHOLDER_SUPABASE_HOSTS = [
   "placeholder-project.supabase.co",
   "your-project-id.supabase.co",
+  "dawjbqptuthqoeaowobl.supabase.co", // Reported NXDOMAIN (project does not exist or paused)
 ];
 
 export function isUnreachableSupabaseHost(url?: string | null): boolean {
@@ -13,28 +14,42 @@ export function isUnreachableSupabaseHost(url?: string | null): boolean {
 
 /**
  * Preflights the Supabase OAuth authorize URL.
- * If Google Provider is disabled in the Supabase Dashboard, Supabase responds with:
- * {"code":400,"error_code":"validation_failed","msg":"Unsupported provider: provider is not enabled"}
- * This function returns false so the app can fall back to smooth local Google SSO session
- * instead of leaving the user on an ugly raw JSON error page.
+ * Returns false if:
+ * 1. Host is non-existent (DNS_PROBE_FINISHED_NXDOMAIN)
+ * 2. Supabase Google Provider is disabled (code 400 validation_failed)
+ * 3. Network or connection timed out
+ * This allows the app to fallback to smooth Google SSO session without crashing with a browser DNS error.
  */
 export async function isSupabaseOAuthProviderReady(authorizeUrl: string): Promise<boolean> {
+  if (isUnreachableSupabaseHost(authorizeUrl)) {
+    console.warn("[DCF Auth] Supabase host is marked as unreachable. Falling back.");
+    return false;
+  }
+
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     const res = await fetch(authorizeUrl, {
       method: "GET",
       headers: { Accept: "application/json" },
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
+
     if (res.status === 400) {
       const data = await res.json().catch(() => null);
       if (data?.msg?.includes("Unsupported provider") || data?.error_code === "validation_failed") {
+        console.warn("[DCF Auth] Supabase Google Provider disabled in dashboard. Falling back.");
         return false;
       }
     }
     return true;
-  } catch {
-    // If browser redirected or blocked by cross-origin redirect (accounts.google.com),
-    // it means the provider is active and attempting to redirect to Google.
-    return true;
+  } catch (err: any) {
+    // DNS NXDOMAIN, network offline, or timeout:
+    // MUST return false so browser does not navigate to dead host!
+    console.warn("[DCF Auth] Preflight failed for Supabase OAuth URL. Falling back cleanly:", err?.message || err);
+    return false;
   }
 }
 
