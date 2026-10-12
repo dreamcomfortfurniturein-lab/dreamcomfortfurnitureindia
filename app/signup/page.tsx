@@ -7,6 +7,7 @@ import {
   createClient,
   isSupabaseConfigured,
   isUnreachableSupabaseHost,
+  isSupabaseOAuthProviderReady,
 } from "@/lib/supabase/client";
 import {
   getCurrentAuthUser,
@@ -83,8 +84,15 @@ export default function SignUpPage() {
             },
           });
           if (!oauthError && data?.url && !isUnreachableSupabaseHost(data.url)) {
-            window.location.href = data.url;
-            return;
+            const isReady = await isSupabaseOAuthProviderReady(data.url);
+            if (isReady) {
+              window.location.href = data.url;
+              return;
+            } else {
+              console.warn(
+                "Supabase Google Provider is not enabled yet in dashboard. Falling back smoothly to local Google session."
+              );
+            }
           }
         } catch (e) {
           console.warn("Supabase Google OAuth fallback:", e);

@@ -12,6 +12,33 @@ export function isUnreachableSupabaseHost(url?: string | null): boolean {
 }
 
 /**
+ * Preflights the Supabase OAuth authorize URL.
+ * If Google Provider is disabled in the Supabase Dashboard, Supabase responds with:
+ * {"code":400,"error_code":"validation_failed","msg":"Unsupported provider: provider is not enabled"}
+ * This function returns false so the app can fall back to smooth local Google SSO session
+ * instead of leaving the user on an ugly raw JSON error page.
+ */
+export async function isSupabaseOAuthProviderReady(authorizeUrl: string): Promise<boolean> {
+  try {
+    const res = await fetch(authorizeUrl, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    });
+    if (res.status === 400) {
+      const data = await res.json().catch(() => null);
+      if (data?.msg?.includes("Unsupported provider") || data?.error_code === "validation_failed") {
+        return false;
+      }
+    }
+    return true;
+  } catch {
+    // If browser redirected or blocked by cross-origin redirect (accounts.google.com),
+    // it means the provider is active and attempting to redirect to Google.
+    return true;
+  }
+}
+
+/**
  * Returns true if real, valid Supabase credentials are configured in environment variables.
  */
 export function isSupabaseConfigured(): boolean {
