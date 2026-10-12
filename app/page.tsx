@@ -3,7 +3,7 @@ import products from "@/data/products.json";
 import settings from "@/data/settings.json";
 import TestimonialShowcase from "./testimonial-showcase";
 import FrontSplitHero from "./front-split-hero";
-import TopAnnouncementBanner from "./top-announcement-banner";
+import TopAnnouncementBanner from "@/app/top-announcement-banner";
 
 export default function Home() {
   const featured = products.slice(0, 4);

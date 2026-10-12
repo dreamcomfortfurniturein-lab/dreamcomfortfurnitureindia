@@ -11,7 +11,7 @@ import {
   DCFAuthUser,
 } from "@/lib/auth-session";
 
-export default function TopAnnouncementBanner() {
+export function TopAnnouncementBanner() {
   const [authUser, setAuthUser] = useState<DCFAuthUser | null>(null);
   const supabase = createClient();
 
@@ -140,3 +140,5 @@ export default function TopAnnouncementBanner() {
     </div>
   );
 }
+
+export default TopAnnouncementBanner;
