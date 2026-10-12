@@ -36,6 +36,31 @@ export function isSuperAdminEmail(email: string | null | undefined): boolean {
 }
 
 /**
+ * Extract clean, friendly first name from full name or email address.
+ * E.g., "Rajeshwar Rao" -> "Rajeshwar", "meera.venkat@gmail.com" -> "Meera"
+ */
+export function extractFirstName(fullNameOrEmail?: string | null): string {
+  if (!fullNameOrEmail) return "User";
+  const trimmed = fullNameOrEmail.trim();
+  if (isSuperAdminEmail(trimmed)) {
+    return "Director";
+  }
+  if (trimmed.includes("@")) {
+    const local = trimmed.split("@")[0];
+    const first = local.split(/[._-]/)[0];
+    return first.charAt(0).toUpperCase() + first.slice(1);
+  }
+  const parts = trimmed.split(/\s+/);
+  if (parts.length > 0 && parts[0]) {
+    if (["mr.", "mrs.", "ms.", "dr."].includes(parts[0].toLowerCase()) && parts[1]) {
+      return parts[1];
+    }
+    return parts[0];
+  }
+  return trimmed;
+}
+
+/**
  * Get current distributors registry (localStorage with fallback to initialDistributorsData).
  */
 export function getDistributorsRegistry(): any[] {

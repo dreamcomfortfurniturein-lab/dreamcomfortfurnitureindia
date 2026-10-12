@@ -26,7 +26,20 @@ export async function GET(request: NextRequest) {
         },
       }
     );
-    await supabase.auth.exchangeCodeForSession(code);
+    const { data } = await supabase.auth.exchangeCodeForSession(code);
+    const userEmail = data?.user?.email?.trim().toLowerCase();
+
+    // If a specific next path was requested, honor it
+    if (next && next !== "/") {
+      return NextResponse.redirect(`${origin}${next}`);
+    }
+
+    // Role-based portal direct routing
+    if (userEmail === "dreamcomfortfurniture.in@gmail.com") {
+      return NextResponse.redirect(`${origin}/admin`);
+    } else if (userEmail) {
+      return NextResponse.redirect(`${origin}/customer`);
+    }
   }
 
   return NextResponse.redirect(`${origin}${next}`);

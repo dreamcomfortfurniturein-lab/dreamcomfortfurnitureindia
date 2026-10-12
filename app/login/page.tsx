@@ -14,6 +14,7 @@ import {
   loginWithGoogleAccount,
   getCurrentAuthUser,
   signOutGoogleUser,
+  extractFirstName,
   DCFAuthUser,
 } from "@/lib/auth-session";
 import { WELCOME_QUOTES, getRandomQuote, WelcomeQuote } from "@/lib/quotes";
@@ -63,11 +64,27 @@ export default function LoginPage() {
     // 1. Pick a fresh random welcoming quote on every page load/sign-in
     setCurrentQuote(getRandomQuote());
 
-    // 2. Check if user is already signed in
+    // 2. Check if user is already signed in via local storage
     const user = getCurrentAuthUser();
     if (user) {
       setAuthUser(user);
     }
+
+    // 3. Sync active Supabase session (after Google OAuth redirect)
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        const meta = session.user.user_metadata || {};
+        const fullName =
+          meta.full_name ||
+          meta.name ||
+          meta.given_name ||
+          session.user.email.split("@")[0];
+        const avatar = meta.avatar_url || meta.picture || undefined;
+        const logged = loginWithGoogleAccount(session.user.email, fullName, avatar);
+        setAuthUser(logged);
+      }
+    });
   }, []);
 
   function handleRollNextQuote() {
@@ -138,8 +155,14 @@ export default function LoginPage() {
     }
   }
 
-  function handleSignOutCurrent() {
+  async function handleSignOutCurrent() {
     signOutGoogleUser();
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      // silent
+    }
     setAuthUser(null);
     handleRollNextQuote();
   }
@@ -199,7 +222,7 @@ export default function LoginPage() {
                 {authUser.role === "super_admin" ? "👑" : authUser.role === "distributor" ? "💼" : "🛍️"}
               </div>
               <h2 className="font-display text-xl sm:text-2xl font-bold text-sand-50">
-                Welcome back, {authUser.name}!
+                Welcome back, {extractFirstName(authUser.name || authUser.email)}!
               </h2>
               <p className="text-xs text-sand-300/70">
                 You are securely signed in via Google (<span className="text-gold font-mono">{authUser.email}</span>).
@@ -241,9 +264,9 @@ export default function LoginPage() {
 
               <button
                 onClick={handleSignOutCurrent}
-                className="w-full py-2.5 rounded-xl bg-navy-950 text-sand-300 hover:text-white border border-sand-300/20 text-xs transition-colors"
+                className="w-full py-2.5 rounded-xl bg-navy-950 hover:bg-red-950/40 text-sand-300 hover:text-red-300 border border-sand-300/20 hover:border-red-500/30 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
               >
-                Switch Google Account / Sign Out
+                <span>Log Out of Google Account</span>
               </button>
             </div>
           </div>

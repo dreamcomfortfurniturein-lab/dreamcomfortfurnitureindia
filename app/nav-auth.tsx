@@ -7,8 +7,10 @@ import { createClient } from "@/lib/supabase/client";
 import {
   getCurrentAuthUser,
   signOutGoogleUser,
+  loginWithGoogleAccount,
   getActiveSessionMode,
   setActiveSessionMode,
+  extractFirstName,
   DCFAuthUser,
 } from "@/lib/auth-session";
 
@@ -27,17 +29,48 @@ export default function NavAuth() {
       setLoading(false);
     }
 
+    function syncFromSupabase(sessionUser: any) {
+      if (sessionUser?.email) {
+        const meta = sessionUser.user_metadata || {};
+        const fullName =
+          meta.full_name ||
+          meta.name ||
+          meta.given_name ||
+          sessionUser.email.split("@")[0];
+        const avatar = meta.avatar_url || meta.picture || undefined;
+        const loggedIn = loginWithGoogleAccount(sessionUser.email, fullName, avatar);
+        setAuthUser(loggedIn);
+        setSessionMode(getActiveSessionMode());
+        setLoading(false);
+        return loggedIn;
+      }
+      return null;
+    }
+
+    // 1. Initial sync from local storage
     syncUser();
 
-    // Listen to in-app & cross-tab auth state changes
+    // 2. Initial sync from active Supabase session (handles OAuth redirects)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        syncFromSupabase(session.user);
+      } else {
+        syncUser();
+      }
+    });
+
+    // 3. Listen to in-app & cross-tab auth state changes
     window.addEventListener("dcf_auth_change", syncUser);
     window.addEventListener("dcf_session_mode_change", syncUser);
     window.addEventListener("storage", syncUser);
 
-    // Supabase listener
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user?.email && !getCurrentAuthUser()) {
-        syncUser();
+    // 4. Supabase auth change listener
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user?.email) {
+        syncFromSupabase(session.user);
+      } else if (event === "SIGNED_OUT") {
+        signOutGoogleUser();
+        setAuthUser(null);
       }
     });
 
@@ -56,6 +89,7 @@ export default function NavAuth() {
     } catch {
       // silent
     }
+    setAuthUser(null);
     router.push("/");
     router.refresh();
   }
@@ -65,9 +99,31 @@ export default function NavAuth() {
   if (authUser) {
     const isSuperAdmin = authUser.role === "super_admin";
     const isDistributor = authUser.role === "distributor";
+    const firstName = extractFirstName(authUser.name || authUser.email);
 
     return (
-      <div className="flex items-center gap-2.5 sm:gap-3 text-xs">
+      <div className="flex items-center gap-2 sm:gap-3 text-xs">
+        {/* User First Name Greeting Pill */}
+        <div
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-navy-850/90 border border-gold/40 text-sand-100 shadow-sm"
+          title={`Signed in as ${authUser.email}`}
+        >
+          {authUser.avatarUrl ? (
+            <img
+              src={authUser.avatarUrl}
+              alt={firstName}
+              className="w-5 h-5 rounded-full border border-gold/50 object-cover shrink-0"
+            />
+          ) : (
+            <span className="w-5 h-5 rounded-full bg-gold/25 text-gold flex items-center justify-center text-[10px] font-bold border border-gold/50 shrink-0">
+              {firstName.charAt(0).toUpperCase()}
+            </span>
+          )}
+          <span className="font-semibold text-sand-50 whitespace-nowrap">
+            {firstName}
+          </span>
+        </div>
+
         {/* Role Portal Shortcut */}
         {isSuperAdmin ? (
           <Link
@@ -76,13 +132,12 @@ export default function NavAuth() {
             title="Super Admin Portal"
           >
             <span>👑</span>
-            <span className="hidden md:inline">Super Admin</span>
+            <span className="hidden md:inline">Admin</span>
           </Link>
         ) : isDistributor ? (
           <Link
             href={sessionMode === "distributor" ? "/dashboard" : "/customer"}
             onClick={() => {
-              // If entering dashboard, toggle mode
               if (sessionMode !== "distributor") {
                 setActiveSessionMode("distributor");
               }
@@ -100,27 +155,23 @@ export default function NavAuth() {
             title="Customer Portal"
           >
             <span>🛍️</span>
-            <span className="hidden md:inline">Customer</span>
+            <span className="hidden md:inline">Portal</span>
           </Link>
         )}
 
-        {/* User Identity */}
-        <span className="text-sand-200 hidden lg:inline font-medium max-w-[120px] truncate" title={authUser.email}>
-          {authUser.name || authUser.email.split("@")[0]}
-        </span>
-
-        {/* Sign Out Button */}
+        {/* ONLY Log Out button - strictly "Log Out", no "Sign In" */}
         <button
           onClick={handleLogout}
-          className="text-sand-400 hover:text-gold transition-colors text-xs px-2 py-1 rounded hover:bg-navy-800"
-          title="Sign out from Google session"
+          className="px-2.5 py-1 rounded-lg bg-navy-850 hover:bg-red-950/60 text-sand-300 hover:text-red-300 border border-sand-700/50 hover:border-red-500/40 font-semibold transition-all text-xs flex items-center gap-1 shadow-sm"
+          title="Log Out"
         >
-          Sign Out
+          <span>Log Out</span>
         </button>
       </div>
     );
   }
 
+  // When not signed in: show Google Sign In button
   return (
     <Link
       href="/login"

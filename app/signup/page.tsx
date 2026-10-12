@@ -12,6 +12,8 @@ import {
 import {
   getCurrentAuthUser,
   loginWithGoogleAccount,
+  signOutGoogleUser,
+  extractFirstName,
   SUPER_ADMIN_EMAIL,
   DCFAuthUser,
 } from "@/lib/auth-session";
@@ -46,11 +48,27 @@ export default function SignUpPage() {
     // Pick a random welcoming quote on every page load/visit
     setCurrentQuote(getRandomQuote());
 
-    // Check if user is already signed in
+    // Check if user is already signed in via local storage
     const user = getCurrentAuthUser();
     if (user) {
       setAuthUser(user);
     }
+
+    // Sync active Supabase session
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) {
+        const meta = session.user.user_metadata || {};
+        const fullName =
+          meta.full_name ||
+          meta.name ||
+          meta.given_name ||
+          session.user.email.split("@")[0];
+        const avatar = meta.avatar_url || meta.picture || undefined;
+        const logged = loginWithGoogleAccount(session.user.email, fullName, avatar);
+        setAuthUser(logged);
+      }
+    });
   }, []);
 
   function handleNextQuote() {
@@ -178,7 +196,7 @@ export default function SignUpPage() {
                   Active Session Detected
                 </span>
                 <p className="text-xs sm:text-sm text-sand-100">
-                  You are already signed in as <strong className="text-gold">{authUser.name}</strong> ({authUser.email}).
+                  You are already signed in as <strong className="text-gold">{extractFirstName(authUser.name || authUser.email)}</strong> ({authUser.email}).
                 </p>
               </div>
             </div>
@@ -190,12 +208,22 @@ export default function SignUpPage() {
               >
                 Go to Your Portal →
               </Link>
-              <Link
-                href="/login"
-                className="px-3.5 py-2 rounded-xl bg-navy-900 text-sand-200 hover:text-white border border-sand-300/20 text-xs"
+              <button
+                onClick={async () => {
+                  signOutGoogleUser();
+                  try {
+                    const supabase = createClient();
+                    await supabase.auth.signOut();
+                  } catch {
+                    // silent
+                  }
+                  setAuthUser(null);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-navy-900 hover:bg-red-950/50 text-sand-200 hover:text-red-300 border border-sand-300/20 hover:border-red-500/30 text-xs font-semibold transition-colors"
+                title="Log Out"
               >
-                Sign In View
-              </Link>
+                Log Out
+              </button>
             </div>
           </div>
         )}

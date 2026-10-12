@@ -3,6 +3,7 @@ import products from "@/data/products.json";
 import settings from "@/data/settings.json";
 import TestimonialShowcase from "./testimonial-showcase";
 import FrontSplitHero from "./front-split-hero";
+import TopAnnouncementBanner from "./top-announcement-banner";
 
 export default function Home() {
   const featured = products.slice(0, 4);
@@ -47,29 +48,8 @@ export default function Home() {
 
   return (
     <main className="bg-navy-900 text-sand-100">
-      {/* WELCOME ONBOARDING GUIDE BANNER (GUIDES FIRST TIME VISITORS TO SIGN UP) */}
-      <div className="bg-gradient-to-r from-navy-950 via-gold/15 to-navy-950 border-b border-gold/30 py-2.5 px-4 text-center">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2 text-sand-200">
-            <span className="text-gold font-bold">✨ Welcome to Dream Comfort:</span>
-            <span>Handcrafted Solid Teak & Sheesham Wood • 10-Year Anti-Termite Guarantee</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/signup"
-              className="gold-gradient-bg text-navy-900 font-bold px-3 py-1 rounded-lg text-[11px] hover:brightness-110 shadow-sm"
-            >
-              Sign Up via Google (Unlock 25% Off) →
-            </Link>
-            <Link
-              href="/login"
-              className="text-sand-300 hover:text-gold text-[11px] px-2 py-1 rounded hover:bg-navy-800"
-            >
-              Sign In
-            </Link>
-          </div>
-        </div>
-      </div>
+      {/* WELCOME ONBOARDING GUIDE BANNER (DYNAMIC USER STATE) */}
+      <TopAnnouncementBanner />
 
       {/* 1. HERO SECTION: SPLIT VIDEO (LEFT) & POSTER (RIGHT) */}
       <section className="relative overflow-hidden border-b border-gold/20 pt-6 pb-12 sm:pt-8 sm:pb-16 bg-navy-900">
