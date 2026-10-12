@@ -3,7 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import {
+  createClient,
+  isSupabaseConfigured,
+  isUnreachableSupabaseHost,
+} from "@/lib/supabase/client";
 import {
   SUPER_ADMIN_EMAIL,
   loginWithGoogleAccount,
@@ -88,13 +92,17 @@ export default function LoginPage() {
       if (hasSupabase && !emailToUse.includes("example")) {
         try {
           const supabase = createClient();
-          const { error: oauthError } = await supabase.auth.signInWithOAuth({
+          const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
               redirectTo: `${window.location.origin}/auth/callback`,
+              skipBrowserRedirect: true,
             },
           });
-          if (!oauthError) return;
+          if (!oauthError && data?.url && !isUnreachableSupabaseHost(data.url)) {
+            window.location.href = data.url;
+            return;
+          }
         } catch (e) {
           console.warn("Supabase Google OAuth fallback:", e);
         }
