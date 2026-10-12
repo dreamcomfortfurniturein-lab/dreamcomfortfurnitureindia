@@ -1,15 +1,14 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-// List of known unreachable / non-existent / placeholder Supabase domains to avoid NXDOMAIN DNS errors
-const INVALID_SUPABASE_HOSTS = [
-  "dawjbqptuthqoeaowobl.supabase.co",
+// List of known placeholder Supabase domains to avoid placeholder redirects
+const PLACEHOLDER_SUPABASE_HOSTS = [
   "placeholder-project.supabase.co",
   "your-project-id.supabase.co",
 ];
 
 export function isUnreachableSupabaseHost(url?: string | null): boolean {
   if (!url) return true;
-  return INVALID_SUPABASE_HOSTS.some((host) => url.toLowerCase().includes(host.toLowerCase()));
+  return PLACEHOLDER_SUPABASE_HOSTS.some((host) => url.toLowerCase().includes(host.toLowerCase()));
 }
 
 /**
@@ -17,7 +16,9 @@ export function isUnreachableSupabaseHost(url?: string | null): boolean {
  */
 export function isSupabaseConfigured(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return false;
   if (url.includes("placeholder") || key.includes("placeholder")) return false;
   if (url.includes("your-project-id")) return false;
@@ -32,6 +33,9 @@ export function createClient() {
     isSupabaseConfigured() && rawUrl
       ? rawUrl
       : "https://placeholder-project.supabase.co";
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "placeholder-anon-key";
   return createBrowserClient(url, key);
 }

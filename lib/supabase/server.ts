@@ -1,7 +1,6 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
-const INVALID_SUPABASE_HOSTS = [
-  "dawjbqptuthqoeaowobl.supabase.co",
+const PLACEHOLDER_SUPABASE_HOSTS = [
   "placeholder-project.supabase.co",
   "your-project-id.supabase.co",
 ];
@@ -12,12 +11,14 @@ const INVALID_SUPABASE_HOSTS = [
 export function isSupabaseServerConfigured(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return false;
   if (url.includes("placeholder") || key.includes("placeholder")) return false;
   if (url.includes("your-project-id")) return false;
   if (!url.startsWith("https://")) return false;
-  if (INVALID_SUPABASE_HOSTS.some((host) => url.toLowerCase().includes(host.toLowerCase()))) {
+  if (PLACEHOLDER_SUPABASE_HOSTS.some((host) => url.toLowerCase().includes(host.toLowerCase()))) {
     return false;
   }
   return true;
@@ -31,6 +32,7 @@ export function getServiceSupabase() {
       : "https://placeholder-project.supabase.co";
   const serviceKey =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     "placeholder-anon-key";
   return createSupabaseClient(url, serviceKey);
