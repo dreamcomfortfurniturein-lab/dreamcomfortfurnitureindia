@@ -8,6 +8,9 @@ import {
   getActiveSessionMode,
   setActiveSessionMode,
   submitPartnerAccessRequest,
+  generatePartnerNotificationUrls,
+  ADMIN_WHATSAPP_NUMBER,
+  ADMIN_EMAIL_ADDRESS,
   getPartnerStatus,
   DCFAuthUser,
   SessionViewMode,
@@ -84,17 +87,49 @@ export default function CustomerPortalPage() {
     setSessionMode("customer");
   }
 
-  // Handle Request Partner Elevation
+  // Handle Request Partner Elevation (Mandatory Email to dreamcomfortfurniture.in@gmail.com and WhatsApp to 9347965863)
   function handlePartnerRequest(e: React.FormEvent) {
     e.preventDefault();
     const email = authUser?.email || "customer@gmail.com";
     const name = authUser?.name || email.split("@")[0];
-    submitPartnerAccessRequest(email, name, partnerPhoneInput || "+91 99594 27831");
+    const phone = partnerPhoneInput.trim() || "+91 9347965863";
+
+    submitPartnerAccessRequest(email, name, phone);
+
+    const urls = generatePartnerNotificationUrls({
+      name,
+      email,
+      phone,
+      notes: "Requested via Customer Portal Elevation Modal",
+    });
+
+    // Automatically trigger WhatsApp alert to 9347965863
+    try {
+      window.open(urls.whatsappUrl, "_blank");
+    } catch {
+      // silent
+    }
+
+    // Backend recording
+    try {
+      fetch("/api/partner-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          notes: "Customer Portal Elevation Request",
+        }),
+      });
+    } catch {
+      // offline fallback
+    }
+
     setPartnerRequestModalOpen(false);
     setRequestSuccessMessage(
-      "Partner Access Request submitted! Awaiting approval from Super Admin (dreamcomfortfurniture.in@gmail.com)."
+      `Partner Access Request submitted! Email dispatched to ${ADMIN_EMAIL_ADDRESS} and WhatsApp notification sent to 9347965863. Awaiting Master Admin approval.`
     );
-    // Refresh user state
     setAuthUser(getCurrentAuthUser());
   }
 

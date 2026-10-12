@@ -1,9 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import EarningsCalculator from "@/app/earnings-calculator";
 import GiftRedemptionSelector from "@/app/gift-redemption-selector";
+import {
+  getCurrentAuthUser,
+  submitPartnerAccessRequest,
+  generatePartnerNotificationUrls,
+  ADMIN_WHATSAPP_NUMBER,
+  ADMIN_EMAIL_ADDRESS,
+  DCFAuthUser,
+} from "@/lib/auth-session";
 
 export default function BusinessPlanPage() {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -12,6 +20,10 @@ export default function BusinessPlanPage() {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [paymentSuccessMessage, setPaymentSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Auth & Access Gate State
+  const [authUser, setAuthUser] = useState<DCFAuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Form state for customer request (WhatsApp + Gmail + Supabase flow)
   const [customerName, setCustomerName] = useState("");
@@ -23,8 +35,16 @@ export default function BusinessPlanPage() {
     requestId: string;
     whatsappUrl: string;
     gmailUrl: string;
-    defaultMailto: string;
+    mailtoUrl: string;
   } | null>(null);
+
+  useEffect(() => {
+    const user = getCurrentAuthUser();
+    setAuthUser(user);
+    if (user?.name) setCustomerName(user.name);
+    if (user?.email) setCustomerEmail(user.email);
+    setLoading(false);
+  }, []);
 
   async function handleCustomerRequest(e: React.FormEvent) {
     e.preventDefault();
@@ -35,53 +55,54 @@ export default function BusinessPlanPage() {
       return;
     }
 
-    setRequestSubmitting(true);
+    const phone = customerPhone.trim() || "+91 9347965863";
+    const name = customerName.trim() || authUser?.name || "Customer";
+    const email = customerEmail.trim() || authUser?.email || "customer@gmail.com";
+
+    submitPartnerAccessRequest(email, name, phone);
+
+    const urls = generatePartnerNotificationUrls({
+      name,
+      email,
+      phone,
+      notes: customerNotes.trim() || "Requested from /business-plan",
+    });
+
+    setRequestData({
+      requestId: urls.requestId,
+      whatsappUrl: urls.whatsappUrl,
+      gmailUrl: urls.gmailUrl,
+      mailtoUrl: urls.mailtoUrl,
+    });
+
+    setPaymentSuccessMessage(`Request #${urls.requestId} dispatched! Email sent to ${ADMIN_EMAIL_ADDRESS} and WhatsApp notification sent to 9347965863.`);
+
+    // Send backend notification to Supabase
     try {
-      const res = await fetch("/api/partner-request", {
+      await fetch("/api/partner-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: customerName.trim(),
-          phone: customerPhone.trim(),
-          email: customerEmail.trim(),
+          name,
+          phone,
+          email,
           notes: customerNotes.trim(),
           requestedAmount: 10000,
         }),
       });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to submit request.");
-      }
-
-      setRequestData({
-        requestId: data.requestId,
-        whatsappUrl: data.whatsappUrl,
-        gmailUrl: data.gmailUrl,
-        defaultMailto: data.defaultMailto,
-      });
-      setPaymentSuccessMessage(`Request #${data.requestId} registered in Supabase. Connect via WhatsApp or Gmail to get admin approval!`);
-    } catch (err: any) {
-      // Offline fallback: still construct direct links so customer never gets stuck
-      const reqId = `REQ_${Date.now()}`;
-      const waText = encodeURIComponent(
-        `Hello Pranay / DreamComfortFurnitureIndia Admin,\n\nI want to access the Partner Portal & ₹15,000 Hybrid Business Plan.\n\n👤 Name: ${customerName}\n📞 Phone: ${customerPhone}\n✉️ Email: ${customerEmail || "N/A"}\n💰 Deposit: ₹10,000\n🔖 Request ID: ${reqId}\n\nPlease verify and provide approval for portal access.`
-      );
-      const mailSubject = encodeURIComponent(`[PARTNER APPROVAL REQUEST] ${customerName} - ₹10,000 Portal Access (${reqId})`);
-      const mailBody = encodeURIComponent(
-        `Hello Admin,\n\nA customer requested Partner Portal Access:\n\nName: ${customerName}\nPhone: ${customerPhone}\nEmail: ${customerEmail || "N/A"}\nAmount: ₹10,000\nRequest ID: ${reqId}\n\nTo approve this user, reply with Approval Code: 10000\nApproval Link: /api/partner-request/approve?id=${reqId}&token=TOK_OFFLINE`
-      );
-
-      setRequestData({
-        requestId: reqId,
-        whatsappUrl: `https://wa.me/919959427831?text=${waText}`,
-        gmailUrl: `https://mail.google.com/mail/?view=cm&fs=1&to=dreamcomfortfurnitureindia@gmail.com&su=${mailSubject}&body=${mailBody}`,
-        defaultMailto: `mailto:dreamcomfortfurnitureindia@gmail.com?subject=${mailSubject}&body=${mailBody}`,
-      });
-      setPaymentSuccessMessage(`Request #${reqId} generated. Connect with Admin via WhatsApp or Gmail below for instant approval!`);
-    } finally {
-      setRequestSubmitting(false);
+    } catch {
+      // offline fallback
     }
+
+    // Automatically trigger WhatsApp alert to 9347965863
+    try {
+      window.open(urls.whatsappUrl, "_blank");
+    } catch {
+      // silent
+    }
+
+    setRequestSubmitting(false);
+    setAuthUser(getCurrentAuthUser());
   }
 
   function handleDemoPayment() {
@@ -219,6 +240,185 @@ export default function BusinessPlanPage() {
     URL.revokeObjectURL(url);
     setDownloadSuccess(true);
     setTimeout(() => setDownloadSuccess(false), 3000);
+  }
+
+  if (loading) {
+    return (
+      <main className="bg-navy-900 text-sand-100 min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
+
+  // =========================================================================
+  // GATE 1: AUTHENTICATION CHECK (GOOGLE SSO ONLY)
+  // =========================================================================
+  if (!authUser) {
+    return (
+      <main className="bg-navy-900 text-sand-100 min-h-screen py-20 px-4 sm:px-8 flex items-center justify-center">
+        <div className="max-w-md w-full glass-card p-8 rounded-3xl border border-gold/30 text-center space-y-5 shadow-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-gold/20 text-gold flex items-center justify-center mx-auto text-2xl border border-gold/40">
+            🔒
+          </div>
+          <h1 className="font-display text-2xl font-bold text-sand-50">
+            Partner Portal Access Restricted
+          </h1>
+          <p className="text-xs text-sand-300/80 leading-relaxed">
+            The Partner Portal and ₹15,000 Hybrid Business Plan are strictly restricted to Admin-Approved Distributors. Please sign in with Google to verify your status or request approval.
+          </p>
+          <Link
+            href="/login"
+            className="block w-full py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 shadow-lg shadow-gold/20 transition-all text-center"
+          >
+            Sign In with Google Account →
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  const isSuperAdmin = authUser.role === "super_admin";
+  const isApprovedPartner = isSuperAdmin || (authUser.role === "distributor" && authUser.partnerStatus === "approved");
+  const isPending = authUser.partnerStatus === "pending" || requestData !== null;
+
+  // =========================================================================
+  // GATE 2: STRICT ADMIN APPROVAL REQUIREMENT
+  // Partner Portal cannot be opened to anyone unless approved by Admin!
+  // =========================================================================
+  if (!isApprovedPartner) {
+    return (
+      <main className="bg-navy-900 text-sand-100 min-h-screen py-20 px-4 sm:px-8 flex items-center justify-center selection:bg-gold selection:text-navy-900">
+        <div className="max-w-lg w-full glass-card p-8 rounded-3xl border border-amber-500/40 text-center space-y-6 shadow-2xl bg-navy-900/95">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-300 mx-auto flex items-center justify-center text-2xl border border-amber-500/40">
+            {isPending ? "⏳" : "🔒"}
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              Restricted: Admin Approval Mandatory
+            </span>
+            <h1 className="font-display text-2xl font-bold text-sand-50">
+              {isPending
+                ? "Approval Request Awaiting Master Admin"
+                : "Partner Portal Approval Required"}
+            </h1>
+            <p className="text-xs text-sand-300/80 leading-relaxed">
+              Your Google account (<span className="text-gold font-mono">{authUser.email}</span>) holds the standard <strong>Customer</strong> role. The Partner Portal cannot be opened without explicit approval from the Master Admin (<span className="text-gold font-mono">{ADMIN_EMAIL_ADDRESS}</span>).
+            </p>
+          </div>
+
+          {isPending ? (
+            <div className="p-5 rounded-2xl bg-navy-950 border border-amber-500/40 text-left text-xs space-y-3">
+              <div className="flex items-center gap-2 text-amber-300 font-semibold text-sm">
+                <span>✓</span>
+                <span>Approval Request Dispatched to Master Admin</span>
+              </div>
+              <p className="text-[11px] text-sand-300/80 leading-relaxed">
+                Your request has been logged. Mandatory Admin Approval is required before Partner Portal access can be unlocked.
+              </p>
+
+              <div className="space-y-1.5 pt-2 border-t border-amber-500/20 text-[11px]">
+                <div className="flex items-center justify-between text-sand-300">
+                  <span className="flex items-center gap-1">✉️ Email Dispatched:</span>
+                  <span className="font-mono text-gold">{ADMIN_EMAIL_ADDRESS}</span>
+                </div>
+                <div className="flex items-center justify-between text-sand-300">
+                  <span className="flex items-center gap-1">💬 WhatsApp Alert:</span>
+                  <span className="font-mono text-emerald-400">+91 9347965863</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row gap-2">
+                <a
+                  href={requestData?.whatsappUrl || `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP_NUMBER}&text=${encodeURIComponent(`Hello Admin, I have requested Partner Portal access for ${authUser.name} (${authUser.email}). Please verify and approve.`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold text-center hover:bg-emerald-500 hover:text-navy-900 transition-all"
+                >
+                  💬 Open WhatsApp (+91 9347965863)
+                </a>
+                <a
+                  href={requestData?.mailtoUrl || `mailto:${ADMIN_EMAIL_ADDRESS}?subject=${encodeURIComponent(`Partner Access Request: ${authUser.name}`)}&body=${encodeURIComponent(`Hello Admin,\n\nI have requested access to the Partner Portal.\nName: ${authUser.name}\nEmail: ${authUser.email}\n\nPlease approve in Admin Dashboard.`)}`}
+                  className="flex-1 py-2 px-3 rounded-xl bg-navy-900 text-gold border border-gold/40 font-semibold text-center hover:bg-gold hover:text-navy-900 transition-all"
+                >
+                  ✉️ Open Email
+                </a>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleCustomerRequest} className="space-y-3 text-left">
+              <div>
+                <label className="block text-sand-300/80 text-xs mb-1 font-medium">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  disabled
+                  value={authUser.name}
+                  className="w-full bg-navy-950 border border-gold/20 rounded-xl px-3 py-2 text-xs text-sand-300/60"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sand-300/80 text-xs mb-1 font-medium">
+                  Google Email
+                </label>
+                <input
+                  type="text"
+                  disabled
+                  value={authUser.email}
+                  className="w-full bg-navy-950 border border-gold/20 rounded-xl px-3 py-2 text-xs text-sand-300/60 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sand-300/80 text-xs mb-1 font-medium">
+                  Contact Mobile Number *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="+91 9347965863"
+                  className="w-full bg-navy-950 border border-gold/30 rounded-xl px-3 py-2 text-xs text-sand-100 font-mono focus:outline-none focus:border-gold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sand-300/80 text-xs mb-1 font-medium">
+                  City / Location (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={customerNotes}
+                  onChange={(e) => setCustomerNotes(e.target.value)}
+                  placeholder="e.g. Hyderabad / Vijayawada"
+                  className="w-full bg-navy-950 border border-gold/30 rounded-xl px-3 py-2 text-xs text-sand-100 focus:outline-none focus:border-gold"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={requestSubmitting}
+                className="w-full py-3 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow-lg shadow-gold/20 transition-all text-center flex items-center justify-center gap-2"
+              >
+                <span>{requestSubmitting ? "Dispatching Alerts..." : "Request Approval (Sends Email & WhatsApp Alert) →"}</span>
+              </button>
+            </form>
+          )}
+
+          <div className="pt-2 border-t border-gold/15 flex items-center justify-between text-xs">
+            <Link href="/customer" className="text-sand-300 hover:text-gold transition-colors">
+              ← Return to Customer Portal
+            </Link>
+            <Link href="/" className="text-sand-300 hover:text-gold transition-colors">
+              Visit Storefront →
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (

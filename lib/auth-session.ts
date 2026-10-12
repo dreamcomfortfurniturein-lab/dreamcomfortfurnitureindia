@@ -213,6 +213,67 @@ export function signOutGoogleUser(): void {
   window.dispatchEvent(new Event("dcf_auth_change"));
 }
 
+export const ADMIN_WHATSAPP_NUMBER = "919347965863"; // 9347965863
+export const ADMIN_EMAIL_ADDRESS = "dreamcomfortfurniture.in@gmail.com";
+
+export interface PartnerNotificationUrls {
+  requestId: string;
+  whatsappUrl: string;
+  gmailUrl: string;
+  mailtoUrl: string;
+  waText: string;
+}
+
+export function generatePartnerNotificationUrls(params: {
+  name: string;
+  email: string;
+  phone: string;
+  requestId?: string;
+  notes?: string;
+}): PartnerNotificationUrls {
+  const requestId = params.requestId || `REQ_${Date.now()}`;
+  const timeStr = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+
+  const waText = `Hello Admin,
+
+A user has requested access to Dream Comfort Partner Portal:
+👤 Name: ${params.name}
+✉️ Email: ${params.email}
+📞 Phone: ${params.phone}
+⏰ Time: ${timeStr}
+🔖 Request ID: ${requestId}
+${params.notes ? `📝 Note: ${params.notes}\n` : ""}
+Mandatory Admin Approval is required to unlock Partner Portal access.
+Approve in Admin Dashboard: https://dreamcomfortfurnitureindia.vercel.app/admin`;
+
+  const mailSubject = `[URGENT] Partner Portal Access Request - Approval Required (${params.name})`;
+  const mailBody = `Hello Admin,
+
+A user has requested Partner Portal Access at Dream Comfort Furniture India:
+
+👤 Name: ${params.name}
+✉️ Google Email: ${params.email}
+📞 Phone Number: ${params.phone}
+⏰ Timestamp: ${timeStr}
+🔖 Request ID: ${requestId}
+${params.notes ? `📝 Notes: ${params.notes}\n` : ""}
+--------------------------------------------------
+IMPORTANT WORKFLOW RULE:
+The Partner Portal is strictly locked to this user until you approve them.
+
+TO APPROVE THIS USER:
+1. Open the Admin Portal: https://dreamcomfortfurnitureindia.vercel.app/admin
+2. Go to "Distributor Management" and click "Approve Distributor" next to ${params.email}.
+
+Customer Direct WhatsApp: https://wa.me/91${params.phone.replace(/\D/g, "")}`;
+
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP_NUMBER}&text=${encodeURIComponent(waText)}`;
+  const mailtoUrl = `mailto:${ADMIN_EMAIL_ADDRESS}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${ADMIN_EMAIL_ADDRESS}&su=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+
+  return { requestId, whatsappUrl, gmailUrl, mailtoUrl, waText };
+}
+
 /**
  * Request Partner / Distributor access for a Customer.
  */

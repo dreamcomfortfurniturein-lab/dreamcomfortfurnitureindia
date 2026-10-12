@@ -39,17 +39,17 @@ export async function POST(req: NextRequest) {
       console.warn("Supabase insert notice (using server fallback token):", dbErr);
     }
 
-    // 2. Prepare pre-filled WhatsApp link for instant customer-to-admin message
+    // 2. Prepare pre-filled WhatsApp link for mandatory WhatsApp alert to 9347965863
     const waText = encodeURIComponent(
-      `Hello Pranay / DreamComfortFurnitureIndia Admin,\n\nI want to access the Partner Portal & ₹15,000 Hybrid Business Plan.\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n✉️ Email: ${email || "Not provided"}\n💰 Deposit Amount: ₹${requestedAmount.toLocaleString("en-IN")}\n🔖 Request ID: ${requestId}\n\nPlease verify and provide approval for portal access.`
+      `Hello Admin,\n\nA customer has requested access to Dream Comfort Partner Portal:\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n✉️ Email: ${email || "Not provided"}\n💰 Requested Deposit: ₹${requestedAmount.toLocaleString("en-IN")}\n🔖 Request ID: ${requestId}\n\nMandatory Admin Approval is required before Partner Portal access can be unlocked.\nApprove here: https://dreamcomfortfurnitureindia.vercel.app/admin`
     );
-    const whatsappUrl = `https://wa.me/919959427831?text=${waText}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=919347965863&text=${waText}`;
 
     // 3. Prepare Gmail approval mailto link for Admin notification & quick approval response
-    const adminEmail = "dreamcomfortfurnitureindia@gmail.com";
-    const mailSubject = encodeURIComponent(`[PARTNER APPROVAL REQUEST] ${name} - ₹10,000 Portal Access (${requestId})`);
+    const adminEmail = "dreamcomfortfurniture.in@gmail.com";
+    const mailSubject = encodeURIComponent(`[URGENT APPROVAL REQUIRED] Partner Portal Access Request - ${name} (${requestId})`);
     const mailBody = encodeURIComponent(
-      `Hello Admin,\n\nA new customer requested Partner Portal Access:\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email || "N/A"}\nRequested Amount: ₹${requestedAmount.toLocaleString("en-IN")}\nRequest ID: ${requestId}\n\nTo approve this user, reply with Approval Code: 10000 or click approve link:\n/api/partner-request/approve?id=${requestId}&token=${approvalToken}\n\nCustomer WhatsApp: https://wa.me/91${phone.replace(/\D/g, "")}`
+      `Hello Admin,\n\nA user has requested Partner Portal Access at Dream Comfort Furniture India:\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email || "N/A"}\nRequested Amount: ₹${requestedAmount.toLocaleString("en-IN")}\nRequest ID: ${requestId}\n\nIMPORTANT: The Partner Portal is locked for this user until you approve them.\n\nTo approve this user, open your Admin Dashboard:\nhttps://dreamcomfortfurnitureindia.vercel.app/admin\n\nCustomer WhatsApp: https://wa.me/91${phone.replace(/\D/g, "")}`
     );
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${adminEmail}&su=${mailSubject}&body=${mailBody}`;
     const defaultMailto = `mailto:${adminEmail}?subject=${mailSubject}&body=${mailBody}`;

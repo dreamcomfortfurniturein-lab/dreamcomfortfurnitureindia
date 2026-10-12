@@ -8,6 +8,9 @@ import {
   getActiveSessionMode,
   setActiveSessionMode,
   submitPartnerAccessRequest,
+  generatePartnerNotificationUrls,
+  ADMIN_WHATSAPP_NUMBER,
+  ADMIN_EMAIL_ADDRESS,
   DCFAuthUser,
 } from "@/lib/auth-session";
 
@@ -28,6 +31,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [partnerPhone, setPartnerPhone] = useState("");
   const [requestSubmitted, setRequestSubmitted] = useState(false);
+  const [notificationUrls, setNotificationUrls] = useState<any>(null);
 
   const [copied, setCopied] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -172,17 +176,47 @@ export default function DashboardPage() {
     router.push("/customer");
   }
 
-  // Handle partner access request submission
-  function handleSubmitAccessRequest(e: React.FormEvent) {
+  // Handle partner access request submission (Sends Email & WhatsApp Alert)
+  async function handleSubmitAccessRequest(e: React.FormEvent) {
     e.preventDefault();
     if (!authUser) return;
-    submitPartnerAccessRequest(
-      authUser.email,
-      authUser.name,
-      partnerPhone || "+91 99594 27831"
-    );
+    const phone = partnerPhone.trim() || "+91 9347965863";
+
+    submitPartnerAccessRequest(authUser.email, authUser.name, phone);
+
+    const urls = generatePartnerNotificationUrls({
+      name: authUser.name,
+      email: authUser.email,
+      phone,
+      notes: "Submitted via Distributor Portal (/dashboard)",
+    });
+
+    setNotificationUrls(urls);
     setRequestSubmitted(true);
     setAuthUser(getCurrentAuthUser());
+
+    // Send backend notification
+    try {
+      await fetch("/api/partner-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: authUser.name,
+          email: authUser.email,
+          phone,
+          notes: "Partner Portal Access Request from /dashboard",
+        }),
+      });
+    } catch {
+      // offline fallback
+    }
+
+    // Automatically trigger WhatsApp alert to 9347965863
+    try {
+      window.open(urls.whatsappUrl, "_blank");
+    } catch {
+      // silent
+    }
   }
 
   if (loading) {
@@ -250,14 +284,42 @@ export default function DashboardPage() {
           </div>
 
           {isPending ? (
-            <div className="p-4 rounded-2xl bg-navy-950 border border-amber-500/30 text-left text-xs space-y-2">
-              <div className="flex items-center gap-2 text-amber-300 font-semibold">
+            <div className="p-5 rounded-2xl bg-navy-950 border border-amber-500/40 text-left text-xs space-y-3">
+              <div className="flex items-center gap-2 text-amber-300 font-semibold text-sm">
                 <span>✓</span>
-                <span>Verification Notification Dispatched</span>
+                <span>Approval Request Dispatched to Master Admin</span>
               </div>
-              <p className="text-[11px] text-sand-300/70 leading-relaxed">
-                Your request has been logged. Once approved by Super Admin in the Admin Dashboard, your account will be upgraded to <strong>Partner / Distributor</strong> with full operational authority.
+              <p className="text-[11px] text-sand-300/80 leading-relaxed">
+                Mandatory Admin Approval is required. The Partner Portal will remain strictly locked until the Master Admin reviews and approves your account.
               </p>
+
+              <div className="space-y-1.5 pt-2 border-t border-amber-500/20 text-[11px]">
+                <div className="flex items-center justify-between text-sand-300">
+                  <span className="flex items-center gap-1">✉️ Email Dispatched:</span>
+                  <span className="font-mono text-gold">{ADMIN_EMAIL_ADDRESS}</span>
+                </div>
+                <div className="flex items-center justify-between text-sand-300">
+                  <span className="flex items-center gap-1">💬 WhatsApp Alert:</span>
+                  <span className="font-mono text-emerald-400">+91 9347965863</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row gap-2">
+                <a
+                  href={`https://api.whatsapp.com/send?phone=${ADMIN_WHATSAPP_NUMBER}&text=${encodeURIComponent(`Hello Admin, I have requested Partner Portal access for ${authUser.name} (${authUser.email}). Please verify and approve.`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold text-center hover:bg-emerald-500 hover:text-navy-900 transition-all"
+                >
+                  💬 Open WhatsApp (+91 9347965863)
+                </a>
+                <a
+                  href={`mailto:${ADMIN_EMAIL_ADDRESS}?subject=${encodeURIComponent(`Partner Access Request: ${authUser.name}`)}&body=${encodeURIComponent(`Hello Admin,\n\nI have requested access to the Partner Portal.\nName: ${authUser.name}\nEmail: ${authUser.email}\n\nPlease approve in Admin Dashboard.`)}`}
+                  className="flex-1 py-2 px-3 rounded-xl bg-navy-900 text-gold border border-gold/40 font-semibold text-center hover:bg-gold hover:text-navy-900 transition-all"
+                >
+                  ✉️ Open Email
+                </a>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmitAccessRequest} className="space-y-3 text-left">
