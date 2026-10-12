@@ -1,7 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  getCurrentAuthUser,
+  getActiveSessionMode,
+  setActiveSessionMode,
+  submitPartnerAccessRequest,
+  DCFAuthUser,
+} from "@/lib/auth-session";
 
 type DownlineNode = {
   id: string;
@@ -15,6 +23,12 @@ type DownlineNode = {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [authUser, setAuthUser] = useState<DCFAuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [partnerPhone, setPartnerPhone] = useState("");
+  const [requestSubmitted, setRequestSubmitted] = useState(false);
+
   const [copied, setCopied] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawBank, setWithdrawBank] = useState("HDFC Bank •••• 4892");
@@ -69,24 +83,24 @@ export default function DashboardPage() {
         leg: "Right",
         bv: 175000,
         status: "Active",
-        joinedDate: "28 Nov 2025",
+        joinedDate: "20 Dec 2025",
         children: [
           {
             id: "DC401928",
-            name: "Karan Patel",
-            rank: "Silver Exec",
+            name: "Karthik Reddy",
+            rank: "Associate",
             leg: "Left",
-            bv: 92000,
+            bv: 85000,
             status: "Active",
-            joinedDate: "22 Dec 2025",
+            joinedDate: "28 Jan 2026",
           },
           {
-            id: "DC419200",
-            name: "Meera Krishnan",
+            id: "DC491823",
+            name: "Dr. Srinivas Rao",
             rank: "Associate",
             leg: "Right",
-            bv: 35000,
-            status: "Grace",
+            bv: 90000,
+            status: "Active",
             joinedDate: "08 Feb 2026",
           },
         ],
@@ -125,6 +139,17 @@ export default function DashboardPage() {
     },
   ];
 
+  useEffect(() => {
+    const user = getCurrentAuthUser();
+    setAuthUser(user);
+    setLoading(false);
+
+    // RULE 4.1: If user is an approved distributor or Super Admin, activate Distributor session
+    if (user?.role === "distributor" || user?.role === "super_admin") {
+      setActiveSessionMode("distributor");
+    }
+  }, []);
+
   function handleCopy() {
     navigator.clipboard.writeText(referralLink);
     setCopied(true);
@@ -141,9 +166,177 @@ export default function DashboardPage() {
     setWithdrawAmount("");
   }
 
+  // Handle exiting distributor session to customer perspective
+  function handleExitToCustomerView() {
+    setActiveSessionMode("customer");
+    router.push("/customer");
+  }
+
+  // Handle partner access request submission
+  function handleSubmitAccessRequest(e: React.FormEvent) {
+    e.preventDefault();
+    if (!authUser) return;
+    submitPartnerAccessRequest(
+      authUser.email,
+      authUser.name,
+      partnerPhone || "+91 99594 27831"
+    );
+    setRequestSubmitted(true);
+    setAuthUser(getCurrentAuthUser());
+  }
+
+  if (loading) {
+    return (
+      <main className="bg-navy-900 text-sand-100 min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
+
+  // =========================================================================
+  // GATE 1: AUTHENTICATION CHECK (GOOGLE SSO ONLY)
+  // =========================================================================
+  if (!authUser) {
+    return (
+      <main className="bg-navy-900 text-sand-100 min-h-screen py-20 px-4 sm:px-8 flex items-center justify-center">
+        <div className="max-w-md w-full glass-card p-8 rounded-3xl border border-gold/30 text-center space-y-5 shadow-2xl">
+          <div className="w-14 h-14 rounded-2xl bg-gold/20 text-gold flex items-center justify-center mx-auto text-2xl border border-gold/40">
+            💼
+          </div>
+          <h1 className="font-display text-2xl font-bold text-sand-50">
+            Distributor Portal Access
+          </h1>
+          <p className="text-xs text-sand-300/80 leading-relaxed">
+            Google Single Sign-On (SSO) is required to access the distributor back-office and operational MLM network.
+          </p>
+          <Link
+            href="/login"
+            className="block w-full py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 shadow-lg shadow-gold/20 transition-all text-center"
+          >
+            Sign In with Google Account →
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  const isSuperAdmin = authUser.role === "super_admin";
+  const isApprovedPartner = authUser.role === "distributor" || isSuperAdmin;
+  const isPending = authUser.partnerStatus === "pending" || requestSubmitted;
+
+  // =========================================================================
+  // GATE 2: ADMIN APPROVAL INTERCEPTION FOR STANDARD CUSTOMERS
+  // =========================================================================
+  if (!isApprovedPartner) {
+    return (
+      <main className="bg-navy-900 text-sand-100 min-h-screen py-20 px-4 sm:px-8 flex items-center justify-center selection:bg-gold selection:text-navy-900">
+        <div className="max-w-lg w-full glass-card p-8 rounded-3xl border border-amber-500/40 text-center space-y-6 shadow-2xl bg-navy-900/90">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-300 mx-auto flex items-center justify-center text-2xl border border-amber-500/40">
+            {isPending ? "⏳" : "🔒"}
+          </div>
+
+          <div className="space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              Role Access Control: Customer Status
+            </span>
+            <h1 className="font-display text-2xl font-bold text-sand-50">
+              {isPending
+                ? "Partner Request Awaiting Admin Approval"
+                : "Distributor Portal Approval Required"}
+            </h1>
+            <p className="text-xs text-sand-300/80 leading-relaxed">
+              Your Google identity (<span className="text-gold font-mono">{authUser.email}</span>) holds the default <strong>Customer</strong> role. Operational MLM features require explicit approval from the Master Admin (<span className="text-gold font-mono">dreamcomfortfurniture.in@gmail.com</span>).
+            </p>
+          </div>
+
+          {isPending ? (
+            <div className="p-4 rounded-2xl bg-navy-950 border border-amber-500/30 text-left text-xs space-y-2">
+              <div className="flex items-center gap-2 text-amber-300 font-semibold">
+                <span>✓</span>
+                <span>Verification Notification Dispatched</span>
+              </div>
+              <p className="text-[11px] text-sand-300/70 leading-relaxed">
+                Your request has been logged. Once approved by Super Admin in the Admin Dashboard, your account will be upgraded to <strong>Partner / Distributor</strong> with full operational authority.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmitAccessRequest} className="space-y-3 text-left">
+              <div>
+                <label className="block text-sand-300/80 text-xs mb-1 font-medium">
+                  Contact Phone Number *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={partnerPhone}
+                  onChange={(e) => setPartnerPhone(e.target.value)}
+                  placeholder="+91 99594 27831"
+                  className="w-full bg-navy-950 border border-gold/30 rounded-xl px-3 py-2 text-xs text-sand-100 font-mono focus:outline-none focus:border-gold"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow-lg shadow-gold/20 transition-all text-center"
+              >
+                Submit Partner Access Request →
+              </button>
+            </form>
+          )}
+
+          <div className="pt-2 border-t border-gold/15 flex items-center justify-between text-xs">
+            <Link href="/customer" className="text-sand-300 hover:text-gold transition-colors">
+              ← Return to Customer Portal
+            </Link>
+            <Link href="/" className="text-sand-300 hover:text-gold transition-colors">
+              Visit Storefront →
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // =========================================================================
+  // GATE 3: APPROVED DISTRIBUTOR / SUPER ADMIN WORKFLOW
+  // Active Distributor Session automatically locks Customer Page
+  // =========================================================================
   return (
-    <main className="bg-navy-900 text-sand-100 min-h-screen py-10 px-4 sm:px-8 lg:px-12">
-      <div className="max-w-7xl mx-auto space-y-10">
+    <main className="bg-navy-900 text-sand-100 min-h-screen py-8 px-4 sm:px-8 lg:px-12 selection:bg-gold selection:text-navy-900">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* RULE 4.1: ACTIVE DISTRIBUTOR SESSION CONTROL BAR */}
+        <div className="glass-card p-4 rounded-2xl border border-gold/30 bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gold/20 text-gold border border-gold/40 flex items-center justify-center text-lg font-bold">
+              💼
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-sand-50">
+                  Active Distributor Session in Progress
+                </span>
+                <span className="px-2 py-0.2 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                  🔒 Customer Page Locked
+                </span>
+              </div>
+              <p className="text-[11px] text-sand-300/70">
+                To prevent data contamination, Customer view is locked. Exit to Customer perspective to view storefront updates.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExitToCustomerView}
+              className="px-4 py-2 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow-md shadow-gold/20 transition-all flex items-center gap-1.5"
+              title="Exits distributor session and unlocks Customer Storefront"
+            >
+              <span>🛍️</span>
+              <span>Exit to Customer View (Unlocks Page) →</span>
+            </button>
+          </div>
+        </div>
+
         {/* Welcome Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-navy-700/80 pb-6">
           <div>
@@ -151,13 +344,22 @@ export default function DashboardPage() {
               <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-bold">
                 ● Live Distributor Portal
               </span>
-              <span className="text-xs text-slate-400 font-mono">ID: DC109283</span>
+              <span className="text-xs text-slate-400 font-mono">
+                ID: {authUser.distributorId || "DC109283"}
+              </span>
+              {isSuperAdmin && (
+                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold">
+                  👑 Master Admin
+                </span>
+              )}
             </div>
             <h1 className="font-display text-3xl font-bold text-sand-100 mt-1">
-              Welcome back, Pranay
+              Welcome back, {authUser.name}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400">
-              Rank: <span className="text-gold font-bold">Crown Ambassador</span> | Left Leg: <span className="text-emerald-400">2,45,000 BV</span> | Right Leg: <span className="text-cyan-400">1,75,000 BV</span>
+              Rank: <span className="text-gold font-bold">Crown Ambassador</span> | Left Leg:{" "}
+              <span className="text-emerald-400">2,45,000 BV</span> | Right Leg:{" "}
+              <span className="text-cyan-400">1,75,000 BV</span>
             </p>
           </div>
 
@@ -181,303 +383,258 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 1. OVERVIEW WIDGETS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Earnings */}
-          <div className="glass-card p-5 rounded-2xl border border-gold/30 space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Total Earnings (Lifetime)
-            </span>
-            <div className="text-2xl sm:text-3xl font-bold gold-gradient-text font-display">
-              ₹8,45,200
-            </div>
-            <p className="text-[11px] text-emerald-400 font-medium">
-              +₹96,100 this current month
-            </p>
+        {/* 4 Core Metric KPI Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-5 rounded-2xl bg-navy-800/80 border border-gold/20 shadow-lg space-y-1">
+            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold block">Total Earnings (YTD)</span>
+            <div className="text-2xl sm:text-3xl font-black text-sand-100 font-serif">₹2,84,500</div>
+            <span className="text-[11px] text-emerald-400">✓ Settled to registered bank</span>
           </div>
 
-          {/* Current Monthly BV */}
-          <div className="glass-card p-5 rounded-2xl border border-navy-700 space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Monthly Team Volume
-            </span>
-            <div className="text-2xl sm:text-3xl font-bold text-sand-100 font-display">
-              4,20,000 <span className="text-xs text-gold font-sans">BV</span>
-            </div>
-            <p className="text-[11px] text-cyan-400 font-medium">
-              Balanced Matching: 1,75,000 BV
-            </p>
+          <div className="p-5 rounded-2xl bg-navy-800/80 border border-gold/20 shadow-lg space-y-1">
+            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold block">Wallet Balance Available</span>
+            <div className="text-2xl sm:text-3xl font-black text-gold font-serif">₹42,800</div>
+            <span className="text-[11px] text-slate-300">Next auto-settlement: Tuesday</span>
           </div>
 
-          {/* Direct Referral Count */}
-          <div className="glass-card p-5 rounded-2xl border border-navy-700 space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Personally Sponsored
-            </span>
-            <div className="text-2xl sm:text-3xl font-bold text-sand-100 font-display">
-              8 <span className="text-xs text-slate-400 font-sans">Active Leads</span>
-            </div>
-            <p className="text-[11px] text-slate-400 font-medium">
-              4 in Left Team • 4 in Right Team
-            </p>
+          <div className="p-5 rounded-2xl bg-navy-800/80 border border-gold/20 shadow-lg space-y-1">
+            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold block">Total Downline Partners</span>
+            <div className="text-2xl sm:text-3xl font-black text-sand-100 font-serif">148 Active</div>
+            <span className="text-[11px] text-cyan-400">82 Left • 66 Right Leg</span>
           </div>
 
-          {/* Active Downline Count */}
-          <div className="glass-card p-5 rounded-2xl border border-navy-700 space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Total Downline Network
-            </span>
-            <div className="text-2xl sm:text-3xl font-bold text-sand-100 font-display">
-              142 <span className="text-xs text-slate-400 font-sans">Distributors</span>
+          <div className="p-5 rounded-2xl bg-navy-800/80 border border-gold/20 shadow-lg space-y-1">
+            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold block">Next Rank Target</span>
+            <div className="text-2xl sm:text-3xl font-black text-sand-100 font-serif">Royal Crown</div>
+            <div className="w-full bg-navy-950 rounded-full h-1.5 mt-2 overflow-hidden border border-gold/20">
+              <div className="bg-gold h-full rounded-full" style={{ width: "78%" }} />
             </div>
-            <p className="text-[11px] text-emerald-400 font-medium">
-              134 Active status (94.3%)
-            </p>
+            <span className="text-[10px] text-slate-400 mt-1 block">78% BV criteria achieved</span>
           </div>
         </div>
 
-        {/* 2. REFERRAL LINK GENERATOR WIDGET */}
-        <div className="glass-card p-6 rounded-2xl border border-gold/40 shadow-xl relative overflow-hidden">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-1">
-              <span className="px-2.5 py-0.5 rounded-full bg-gold/20 text-gold text-xs font-bold border border-gold/30">
-                1-Click Sponsor Referral Link
-              </span>
-              <h3 className="font-display text-lg font-bold text-sand-100">
-                Grow Your Furniture Distribution Tree
-              </h3>
-              <p className="text-xs text-slate-300">
-                Share this unique tracking link with interior designers, showroom owners, and entrepreneurs. Sponsoring ID is locked.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 max-w-xl w-full">
-              <input
-                type="text"
-                readOnly
-                value={referralLink}
-                className="w-full bg-navy-950 border border-slate-700 rounded-lg px-4 py-2.5 text-xs text-amber-200 font-mono outline-none"
-              />
-              <button
-                onClick={handleCopy}
-                className="px-5 py-2.5 rounded-lg gold-gradient-bg text-navy-900 font-bold text-xs whitespace-nowrap hover:brightness-110 shadow transition-all"
-              >
-                {copied ? "✓ Copied!" : "📋 Copy Link"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* 3. DOWNLINE GENEALOGY TREE */}
-        <div className="glass-card p-6 rounded-2xl border border-navy-700 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Downline Interactive Tree */}
+        <div className="p-6 rounded-3xl bg-navy-800/90 border border-gold/20 shadow-xl space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-navy-700/80 pb-4">
             <div>
-              <span className="text-xs font-bold text-gold uppercase tracking-wider">Interactive Genealogy</span>
-              <h3 className="font-display text-xl font-bold text-sand-100 mt-0.5">
-                Binary & Unilevel Network Hierarchy
-              </h3>
+              <h2 className="font-display text-xl font-bold text-sand-100">
+                Binary Genealogy Network Tree
+              </h2>
               <p className="text-xs text-slate-400">
-                Click any distributor node to inspect their personal volume, rank tier, and active leg balances.
+                Visual downline tracking. Click any leader node to inspect real-time team BV and weekly performance.
               </p>
             </div>
-
-            <div className="flex items-center gap-4 text-xs">
-              <span className="flex items-center gap-1.5 text-emerald-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Active Member
+            <div className="flex items-center gap-2 text-xs">
+              <span className="flex items-center gap-1 text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" /> Active Member
               </span>
-              <span className="flex items-center gap-1.5 text-amber-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Grace Period
+              <span className="flex items-center gap-1 text-amber-400">
+                <span className="w-2 h-2 rounded-full bg-amber-400" /> 15-Day Grace
               </span>
             </div>
           </div>
 
-          {/* Mobile Scroll Tip */}
-          <div className="flex items-center gap-2 text-[11px] text-amber-300/80 md:hidden bg-navy-950/90 px-3 py-1.5 rounded-lg border border-gold/20">
-            <span>👉</span>
-            <span>Swipe horizontally on mobile/tablet to explore entire Left & Right genealogy teams</span>
-          </div>
-
-          {/* Interactive Tree Graph Container */}
-          <div className="p-4 sm:p-6 bg-navy-950/80 rounded-xl border border-slate-800 overflow-x-auto min-w-full">
-            <div className="min-w-[680px] mx-auto py-2">
-              <button
+          {/* Tree Visualization */}
+          <div className="overflow-x-auto py-6">
+            <div className="min-w-[650px] flex flex-col items-center space-y-6">
+              {/* Root */}
+              <div
                 onClick={() => setSelectedNode(downlineTree)}
-                className={`p-4 rounded-xl border text-center transition-all w-60 shadow-lg ${
+                className={`cursor-pointer p-4 rounded-2xl border-2 transition-all text-center w-64 shadow-xl ${
                   selectedNode?.id === downlineTree.id
-                    ? "border-gold bg-gold/15"
-                    : "border-gold/50 bg-navy-900 hover:border-gold"
+                    ? "border-gold bg-gold/15 shadow-gold/20"
+                    : "border-gold/40 bg-navy-950 hover:border-gold"
                 }`}
               >
-                <span className="text-[10px] font-bold uppercase text-gold block">Root Sponsor</span>
-                <p className="font-bold text-sm text-sand-100">{downlineTree.name}</p>
-                <p className="text-xs text-amber-300 font-semibold">{downlineTree.rank}</p>
-                <div className="text-[11px] text-emerald-400 font-mono mt-1">
-                  Team BV: {downlineTree.bv.toLocaleString("en-IN")}
-                </div>
-              </button>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold text-navy-900 font-bold uppercase tracking-wider">
+                  {downlineTree.rank}
+                </span>
+                <div className="font-bold text-sand-100 text-sm mt-1">{downlineTree.name}</div>
+                <div className="text-xs text-gold font-mono">{downlineTree.bv.toLocaleString()} BV</div>
+                <div className="text-[10px] text-slate-400 font-mono mt-0.5">ID: {downlineTree.id}</div>
+              </div>
 
-              {/* Connecting lines */}
-              <div className="w-0.5 h-6 bg-slate-700" />
-              <div className="w-1/2 h-0.5 bg-slate-700 relative" />
-
-              {/* Tier 1 Level (Left & Right) */}
-              <div className="grid grid-cols-2 gap-8 w-full max-w-2xl mt-4">
+              {/* Level 1 (Left & Right) */}
+              <div className="grid grid-cols-2 gap-12 w-full max-w-2xl">
                 {downlineTree.children?.map((child) => (
-                  <div key={child.id} className="flex flex-col items-center">
-                    <button
+                  <div key={child.id} className="flex flex-col items-center space-y-4">
+                    <div
                       onClick={() => setSelectedNode(child)}
-                      className={`p-3.5 rounded-xl border text-center transition-all w-full max-w-xs shadow ${
+                      className={`cursor-pointer p-3.5 rounded-xl border transition-all text-center w-56 shadow-lg ${
                         selectedNode?.id === child.id
                           ? "border-gold bg-gold/15"
-                          : "border-slate-700 bg-navy-900 hover:border-gold/60"
+                          : "border-slate-700 bg-navy-950 hover:border-gold/60"
                       }`}
                     >
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-navy-950 text-slate-300 border border-slate-700 inline-block mb-1">
-                        {child.leg} Leg Node
+                      <span className="text-[9px] px-2 py-0.2 rounded-full bg-navy-800 text-cyan-300 font-semibold border border-cyan-500/30">
+                        {child.leg} Leg • {child.rank}
                       </span>
-                      <p className="font-semibold text-xs text-sand-100">{child.name}</p>
-                      <p className="text-[11px] text-gold">{child.rank}</p>
-                      <p className="text-[10px] text-emerald-400 font-mono">{child.bv.toLocaleString("en-IN")} BV</p>
-                    </button>
+                      <div className="font-bold text-sand-100 text-xs mt-1">{child.name}</div>
+                      <div className="text-xs text-emerald-400 font-mono">{child.bv.toLocaleString()} BV</div>
+                      <div className="text-[10px] text-slate-400 font-mono">ID: {child.id}</div>
+                    </div>
 
-                    {/* Tier 2 Sub-children */}
-                    {child.children && (
-                      <div className="flex flex-col items-center w-full mt-3">
-                        <div className="w-0.5 h-4 bg-slate-700" />
-                        <div className="grid grid-cols-2 gap-3 w-full">
-                          {child.children.map((grand) => (
-                            <button
-                              key={grand.id}
-                              onClick={() => setSelectedNode(grand)}
-                              className={`p-2.5 rounded-lg border text-center transition-all text-xs ${
-                                selectedNode?.id === grand.id
-                                  ? "border-gold bg-gold/15"
-                                  : "border-slate-800 bg-navy-900/90 hover:border-slate-600"
-                              }`}
-                            >
-                              <span className="text-[9px] text-slate-400 block">{grand.leg} Leg</span>
-                              <p className="font-medium text-[11px] text-sand-100 truncate">{grand.name}</p>
-                              <p className="text-[10px] text-slate-300">{grand.rank}</p>
-                              <span className="text-[10px] text-emerald-400 font-mono block">
-                                {grand.bv.toLocaleString("en-IN")} BV
-                              </span>
-                            </button>
-                          ))}
+                    {/* Level 2 Sub-children */}
+                    <div className="grid grid-cols-2 gap-3 w-full">
+                      {child.children?.map((grandChild) => (
+                        <div
+                          key={grandChild.id}
+                          onClick={() => setSelectedNode(grandChild)}
+                          className={`cursor-pointer p-2.5 rounded-lg border text-center transition-all ${
+                            selectedNode?.id === grandChild.id
+                              ? "border-gold bg-gold/15"
+                              : "border-slate-800 bg-navy-900 hover:border-slate-600"
+                          }`}
+                        >
+                          <div className="text-[10px] text-sand-200 font-semibold truncate">{grandChild.name}</div>
+                          <div className="text-[10px] text-gold font-mono">{grandChild.bv.toLocaleString()} BV</div>
+                          <div className="text-[9px] text-slate-400">{grandChild.leg} Leg</div>
                         </div>
-                      </div>
-                    )}
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Node Details Inspection Drawer */}
+          {/* Node Details Inspection Panel */}
           {selectedNode && (
-            <div className="p-4 rounded-xl bg-navy-950 border border-gold/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="p-4 rounded-2xl bg-navy-950 border border-gold/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] uppercase font-bold text-gold">Inspecting Downline Partner</span>
-                <h4 className="font-bold text-sand-100 text-sm">{selectedNode.name} ({selectedNode.id})</h4>
-                <p className="text-xs text-slate-400">
-                  Joined on {selectedNode.joinedDate} • Status: <span className="text-emerald-400 font-semibold">{selectedNode.status}</span>
-                </p>
-              </div>
-              <div className="flex items-center gap-4 text-xs">
-                <div>
-                  <span className="text-slate-400 text-[10px] block">Current Rank:</span>
-                  <span className="font-bold text-gold">{selectedNode.rank}</span>
+                <span className="text-xs text-gold uppercase tracking-wider font-bold">Node Selected:</span>
+                <div className="font-bold text-sand-100 text-base">{selectedNode.name} ({selectedNode.id})</div>
+                <div className="text-xs text-slate-300">
+                  Rank: <strong className="text-gold">{selectedNode.rank}</strong> • Leg: {selectedNode.leg} • Volume: <strong className="text-emerald-400">{selectedNode.bv.toLocaleString()} BV</strong> • Joined: {selectedNode.joinedDate}
                 </div>
-                <div>
-                  <span className="text-slate-400 text-[10px] block">Volume Contributed:</span>
-                  <span className="font-bold text-emerald-400 font-mono">{selectedNode.bv.toLocaleString("en-IN")} BV</span>
-                </div>
-                <button
-                  onClick={() => setSelectedNode(null)}
-                  className="px-3 py-1 text-xs text-slate-400 hover:text-white"
-                >
-                  ✕ Close
-                </button>
               </div>
+              <button
+                onClick={() => setSelectedNode(null)}
+                className="text-xs px-3 py-1.5 rounded-lg bg-navy-800 text-slate-300 hover:text-white"
+              >
+                Close Inspector
+              </button>
             </div>
           )}
         </div>
 
-        {/* 4. WALLET & COMMISSION HISTORY */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8" id="wallet">
-          {/* Withdrawal Request Form */}
-          <div className="lg:col-span-5 glass-card p-6 rounded-2xl border border-navy-700 space-y-4">
-            <span className="text-xs font-bold text-gold uppercase tracking-wider">E-Wallet Payout</span>
+        {/* Wallet & Bank Settlements */}
+        <div id="wallet" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Withdrawal Form */}
+          <div className="lg:col-span-1 p-6 rounded-3xl bg-navy-800/90 border border-gold/20 shadow-xl space-y-4">
             <h3 className="font-display text-lg font-bold text-sand-100">
-              Request Bank NEFT Transfer
+              Bank Withdrawal Request
             </h3>
             <p className="text-xs text-slate-400">
-              Available withdrawable commission balance: <strong className="text-emerald-400">₹64,300</strong>
+              Direct transfer to your registered verified bank account. Processed weekly every Tuesday.
             </p>
 
-            <form onSubmit={handleWithdraw} className="space-y-4 pt-2">
+            <form onSubmit={handleWithdraw} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Withdrawal Amount (₹)
-                </label>
+                <label className="block text-xs text-slate-300 mb-1">Settlement Bank</label>
+                <select
+                  value={withdrawBank}
+                  onChange={(e) => setWithdrawBank(e.target.value)}
+                  className="w-full bg-navy-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-sand-100 focus:outline-none focus:border-gold"
+                >
+                  <option value="HDFC Bank •••• 4892">HDFC Bank (Current A/c •••• 4892)</option>
+                  <option value="SBI •••• 1044">State Bank of India (•••• 1044)</option>
+                  <option value="ICICI Bank •••• 8821">ICICI Bank (•••• 8821)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs text-slate-300 mb-1">Amount to Withdraw (₹)</label>
                 <input
                   type="number"
                   placeholder="Min ₹1,000"
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
-                  className="w-full bg-navy-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-xs text-sand-100 outline-none focus:border-gold"
+                  className="w-full bg-navy-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-sand-100 focus:outline-none focus:border-gold font-mono"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">
-                  Linked KYC Verified Bank Account
-                </label>
-                <select
-                  value={withdrawBank}
-                  onChange={(e) => setWithdrawBank(e.target.value)}
-                  className="w-full bg-navy-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-xs text-sand-100 outline-none focus:border-gold"
-                >
-                  <option value="HDFC Bank •••• 4892">HDFC Bank (A/C: •••• 4892, IFSC: HDFC0001201)</option>
-                  <option value="ICICI Bank •••• 9104">ICICI Bank (A/C: •••• 9104, IFSC: ICIC0000491)</option>
-                </select>
-              </div>
-
               {withdrawStatus && (
-                <p className="text-xs text-emerald-400 p-2.5 rounded-lg bg-emerald-950/60 border border-emerald-500/30">
+                <div className="p-3 rounded-xl bg-gold/15 border border-gold/30 text-xs text-sand-100">
                   {withdrawStatus}
-                </p>
+                </div>
               )}
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-lg gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow transition-all"
+                className="w-full py-2.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow-md shadow-gold/20"
               >
-                Submit Withdrawal Request →
+                Submit Tuesday Payout Request
               </button>
             </form>
           </div>
 
-          {/* Recent Commission Log */}
-          <div className="lg:col-span-7 glass-card p-6 rounded-2xl border border-navy-700 space-y-4">
-            <span className="text-xs font-bold text-gold uppercase tracking-wider">Statement</span>
+          {/* Commission Statement Log */}
+          <div className="lg:col-span-2 p-6 rounded-3xl bg-navy-800/90 border border-gold/20 shadow-xl space-y-4">
             <h3 className="font-display text-lg font-bold text-sand-100">
-              Recent Commission Disbursements
+              Recent Tuesday Commission Settlements
             </h3>
 
-            <div className="divide-y divide-navy-700/60 text-xs">
-              {commissionHistory.map((item) => (
-                <div key={item.id} className="py-3 flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-medium text-sand-100">{item.type}</p>
-                    <p className="text-[11px] text-slate-400">{item.date} • Ref: {item.id}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-gold text-sm">+₹{item.amount.toLocaleString("en-IN")}</p>
-                    <span className="text-[10px] text-emerald-400">{item.status}</span>
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-navy-950 text-slate-400 uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th className="py-2.5 px-3">Date</th>
+                    <th className="py-2.5 px-3">Type</th>
+                    <th className="py-2.5 px-3">Amount</th>
+                    <th className="py-2.5 px-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                  {commissionHistory.map((item) => (
+                    <tr key={item.id} className="hover:bg-navy-750">
+                      <td className="py-3 px-3 font-mono text-slate-300">{item.date}</td>
+                      <td className="py-3 px-3 text-sand-100">{item.type}</td>
+                      <td className="py-3 px-3 font-mono font-bold text-emerald-400">₹{item.amount.toLocaleString()}</td>
+                      <td className="py-3 px-3">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold">
+                          {item.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
+        </div>
+
+        {/* Referral Link & Social Sharing */}
+        <div className="p-6 rounded-3xl bg-navy-800/90 border border-gold/20 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 className="font-display text-lg font-bold text-sand-100">
+              Your Personalized Sponsor Registration Link
+            </h3>
+            <p className="text-xs text-slate-400">
+              Share with new partners to place them in your binary downline network.
+            </p>
+            <div className="mt-2 font-mono text-xs text-gold truncate max-w-lg">
+              {referralLink}
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={handleCopy}
+              className="px-4 py-2 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow"
+            >
+              {copied ? "Copied Link ✓" : "Copy Sponsor Link"}
+            </button>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                `Join Dream Comfort Furniture India as an official partner with my sponsor ID DC109283: ${referralLink}`
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 transition-colors"
+            >
+              Share via WhatsApp
+            </a>
           </div>
         </div>
       </div>

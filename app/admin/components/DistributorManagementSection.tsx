@@ -98,6 +98,9 @@ export default function DistributorManagementSection({
       return d;
     });
     onUpdateDistributors(updated);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("dcf_auth_change"));
+    }
     onShowToast(`Distributor ${id} successfully approved and granted Network Access.`, "success");
   }
 
@@ -114,6 +117,9 @@ export default function DistributorManagementSection({
       return d;
     });
     onUpdateDistributors(updated);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("dcf_auth_change"));
+    }
     onShowToast(`Distributor ${id} has been suspended. Operational workflows locked.`, "error");
   }
 
