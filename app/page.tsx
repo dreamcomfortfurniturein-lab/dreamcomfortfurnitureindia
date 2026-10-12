@@ -45,31 +45,32 @@ export default function Home() {
     },
   ];
 
-  const mlmHighlights = [
-    {
-      icon: "🪵",
-      title: "Quality Assurance",
-      desc: "100% seasoned Sheesham and CP Teak wood with 10-year anti-termite guarantee and German hardware fittings.",
-    },
-    {
-      icon: "🏭",
-      title: "Direct-From-Factory Pricing",
-      desc: "Bypass multiple middlemen, wholesalers, and retail markups to offer premium luxury at unbeatable factory rates.",
-    },
-    {
-      icon: "📦",
-      title: "Zero Inventory Risk",
-      desc: "As an Independent Distributor, you never buy bulk stock. We warehouse, package, and doorstep-deliver nationwide.",
-    },
-    {
-      icon: "💳",
-      title: "Weekly Commission Payouts",
-      desc: "Direct bank transfer every Tuesday. Transparent tracking of Retail margins, Binary matches, and Leadership pools.",
-    },
-  ];
-
   return (
     <main className="bg-navy-900 text-sand-100">
+      {/* WELCOME ONBOARDING GUIDE BANNER (GUIDES FIRST TIME VISITORS TO SIGN UP) */}
+      <div className="bg-gradient-to-r from-navy-950 via-gold/15 to-navy-950 border-b border-gold/30 py-2.5 px-4 text-center">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 text-sand-200">
+            <span className="text-gold font-bold">✨ Welcome to Dream Comfort:</span>
+            <span>Handcrafted Solid Teak & Sheesham Wood • 10-Year Anti-Termite Guarantee</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/signup"
+              className="gold-gradient-bg text-navy-900 font-bold px-3 py-1 rounded-lg text-[11px] hover:brightness-110 shadow-sm"
+            >
+              Sign Up via Google (Unlock 25% Off) →
+            </Link>
+            <Link
+              href="/login"
+              className="text-sand-300 hover:text-gold text-[11px] px-2 py-1 rounded hover:bg-navy-800"
+            >
+              Sign In
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* 1. HERO SECTION: SPLIT VIDEO (LEFT) & POSTER (RIGHT) */}
       <section className="relative overflow-hidden border-b border-gold/20 pt-6 pb-12 sm:pt-8 sm:pb-16 bg-navy-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
