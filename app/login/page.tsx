@@ -252,11 +252,12 @@ export default function LoginPage() {
             )}
 
             {/* Official Google Sign-In Button */}
+            {/* Official Google Sign-In Button (For All Regular Users / Customers) */}
             <div className="space-y-4">
               <button
-                onClick={() => handleGoogleAuth(selectedGoogleEmail || "customer.vip@gmail.com")}
+                onClick={() => handleGoogleAuth("customer.shopper@gmail.com")}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm transition-all shadow-xl hover:shadow-2xl border border-slate-200 active:scale-[0.99] disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm transition-all shadow-xl hover:shadow-2xl border border-slate-200 active:scale-[0.99] disabled:opacity-50"
               >
                 <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                   <path
@@ -276,77 +277,51 @@ export default function LoginPage() {
                     d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
                   />
                 </svg>
-                <span>{loading ? "Signing in..." : "Continue with Google"}</span>
+                <span>{loading ? "Connecting to Google..." : "Continue with Google"}</span>
               </button>
 
-              <div className="relative flex py-1 items-center">
-                <div className="flex-grow border-t border-gold/15"></div>
-                <span className="flex-shrink mx-3 text-[10px] text-sand-300/50 uppercase tracking-widest">
-                  Quick Identity Select
-                </span>
-                <div className="flex-grow border-t border-gold/15"></div>
-              </div>
+              <p className="text-[11px] text-sand-300/60 text-center">
+                One-tap sign in • Default customer role assigned automatically.
+              </p>
 
-              {/* 1-Click Identity Presets */}
-              <div className="space-y-2">
-                {PRESET_GOOGLE_ACCOUNTS.map((acc) => (
+              {/* DEDICATED ADMIN GMAIL ACCESS ONLY (RESTRICTED TO DREAMCOMFORTFURNITURE.IN@GMAIL.COM) */}
+              {showCustomInput && (
+                <div className="p-4 rounded-2xl bg-navy-950 border border-gold/40 space-y-3 mt-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-gold flex items-center gap-1.5">
+                      <span>👑</span>
+                      <span>Master Admin Access</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomInput(false)}
+                      className="text-[10px] text-sand-400 hover:text-white"
+                    >
+                      ✕ Close
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-sand-300/80 leading-relaxed">
+                    Strictly authorized for the single Master Admin account credential:
+                  </p>
+
                   <div
-                    key={acc.email}
-                    onClick={() => {
-                      setSelectedGoogleEmail(acc.email);
-                      handleGoogleAuth(acc.email, acc.name);
-                    }}
-                    className="p-3 rounded-2xl border border-gold/15 bg-navy-950/70 hover:border-gold hover:bg-navy-850 transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                    onClick={() => handleGoogleAuth(SUPER_ADMIN_EMAIL, "Master Admin")}
+                    className="p-3 rounded-xl bg-gold/15 border border-gold/50 hover:bg-gold/25 transition-all cursor-pointer flex items-center justify-between group"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-navy-800 border border-gold/30 flex items-center justify-center text-sm shrink-0">
-                        {acc.icon}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-xs font-semibold text-sand-100 group-hover:text-gold transition-colors flex items-center gap-1.5">
-                          <span className="truncate">{acc.name}</span>
-                          <span className={`text-[8px] px-1.5 py-0.2 rounded-full border font-bold uppercase ${acc.badgeColor}`}>
-                            {acc.roleBadge}
-                          </span>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-base">👑</span>
+                      <div>
+                        <div className="text-xs font-bold text-sand-50 group-hover:text-gold transition-colors">
+                          Master Admin Identity
                         </div>
-                        <div className="text-[10px] text-sand-300/60 font-mono truncate">
-                          {acc.email}
+                        <div className="text-[11px] text-gold font-mono">
+                          {SUPER_ADMIN_EMAIL}
                         </div>
                       </div>
                     </div>
-                    <span className="text-xs text-gold font-semibold shrink-0">Connect →</span>
+                    <span className="text-xs text-gold font-bold">Connect →</span>
                   </div>
-                ))}
-              </div>
-
-              {/* Connect custom Google Account */}
-              {!showCustomInput ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCustomInput(true)}
-                  className="w-full text-center text-xs text-sand-300/70 hover:text-gold py-1 transition-colors"
-                >
-                  + Use a different @gmail.com address
-                </button>
-              ) : (
-                <div className="p-3 rounded-2xl bg-navy-950 border border-gold/20 space-y-2">
-                  <input
-                    type="email"
-                    value={customGmail}
-                    onChange={(e) => setCustomGmail(e.target.value)}
-                    placeholder="yourname@gmail.com"
-                    className="w-full bg-navy-900 border border-gold/30 rounded-xl px-3 py-2 text-xs text-sand-100 placeholder-sand-300/40 focus:outline-none focus:border-gold font-mono"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!customGmail) return;
-                      handleGoogleAuth(customGmail);
-                    }}
-                    className="w-full py-2 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow"
-                  >
-                    Sign In with This Gmail →
-                  </button>
                 </div>
               )}
             </div>
@@ -370,9 +345,18 @@ export default function LoginPage() {
         )}
 
         {/* Footer */}
-        <div className="text-center text-[11px] text-sand-300/50 space-y-1">
-          <p>Super Admin: dreamcomfortfurniture.in@gmail.com • Customer Default Role</p>
-          <Link href="/" className="text-sand-400 hover:text-gold transition-colors">
+        <div className="text-center text-[11px] text-sand-300/50 space-y-1.5">
+          <p>
+            Default Customer Access • Secured by Google SSO •{" "}
+            <button
+              type="button"
+              onClick={() => setShowCustomInput(!showCustomInput)}
+              className="text-sand-400/80 hover:text-gold underline transition-colors"
+            >
+              Master Admin Login
+            </button>
+          </p>
+          <Link href="/" className="text-sand-400 hover:text-gold transition-colors inline-block">
             ← Return to Main Storefront
           </Link>
         </div>

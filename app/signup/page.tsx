@@ -376,65 +376,9 @@ export default function SignUpPage() {
                   </span>
                 </button>
 
-                <div className="relative flex py-1 items-center">
-                  <div className="flex-grow border-t border-gold/15"></div>
-                  <span className="flex-shrink mx-3 text-[10px] text-sand-300/50 uppercase tracking-widest">
-                    Quick Connect Options
-                  </span>
-                  <div className="flex-grow border-t border-gold/15"></div>
-                </div>
-
-                {/* 1-Click Shopper Preset */}
-                <div
-                  onClick={() => handleGoogleSignUp("customer.vip@gmail.com", "VIP Customer")}
-                  className="p-3.5 rounded-2xl bg-navy-950/90 border border-gold/20 hover:border-gold transition-all cursor-pointer flex items-center justify-between gap-3 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-gold/15 text-gold flex items-center justify-center font-bold text-base shrink-0 border border-gold/30">
-                      🛍️
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold text-sand-100 group-hover:text-gold transition-colors">
-                        New Customer (Default Role)
-                      </div>
-                      <div className="text-[11px] text-sand-300/60 font-mono">
-                        customer.vip@gmail.com
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gold font-bold">1-Click →</span>
-                </div>
-
-                {/* Connect custom Google Account */}
-                {!showCustomInput ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowCustomInput(true)}
-                    className="w-full text-center text-xs text-sand-300/70 hover:text-gold py-1 transition-colors"
-                  >
-                    + Use your personal @gmail.com address
-                  </button>
-                ) : (
-                  <div className="p-3 rounded-2xl bg-navy-950 border border-gold/20 space-y-2">
-                    <input
-                      type="email"
-                      value={customGmail}
-                      onChange={(e) => setCustomGmail(e.target.value)}
-                      placeholder="Enter your Gmail address"
-                      className="w-full bg-navy-900 border border-gold/30 rounded-xl px-3 py-2 text-xs text-sand-100 placeholder-sand-300/40 focus:outline-none focus:border-gold font-mono"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!customGmail) return;
-                        handleGoogleSignUp(customGmail);
-                      }}
-                      className="w-full py-2.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs hover:brightness-110 shadow"
-                    >
-                      Confirm Google Sign Up →
-                    </button>
-                  </div>
-                )}
+                <p className="text-[11px] text-sand-300/60 text-center">
+                  One-tap sign up • Unlocks private member rewards and direct workshop pricing.
+                </p>
               </div>
 
               {/* Already Have An Account Link */}
