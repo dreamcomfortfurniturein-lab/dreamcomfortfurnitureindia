@@ -7,7 +7,7 @@ import FrontSplitHero from "./front-split-hero";
 export default function Home() {
   const featured = products.slice(0, 4);
 
-  const categories = [
+   const categories = [
     {
       name: "Living Room",
       desc: "Royal Sheesham & Velvet Sofas",
