@@ -27,14 +27,22 @@ export async function isSupabaseOAuthProviderReady(authorizeUrl: string): Promis
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000);
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
 
+    // CRITICAL: use redirect: "manual" so browser doesn't follow 302 to accounts.google.com,
+    // which would trigger a cross-origin CORS violation in preflight fetch requests!
     const res = await fetch(authorizeUrl, {
       method: "GET",
       headers: { Accept: "application/json" },
+      redirect: "manual",
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
+
+    // Opaque redirect (302 to accounts.google.com) or 200/302 confirms Google OAuth is active!
+    if (res.type === "opaqueredirect" || res.status === 302 || res.status === 200) {
+      return true;
+    }
 
     if (res.status === 400) {
       const data = await res.json().catch(() => null);
@@ -45,10 +53,14 @@ export async function isSupabaseOAuthProviderReady(authorizeUrl: string): Promis
     }
     return true;
   } catch (err: any) {
-    // DNS NXDOMAIN, network offline, or timeout:
-    // MUST return false so browser does not navigate to dead host!
-    console.warn("[DCF Auth] Preflight failed for Supabase OAuth URL. Falling back cleanly:", err?.message || err);
-    return false;
+    // If the browser intercepted cross-origin redirection (e.g. CORS/opaque redirect error),
+    // the provider is active and attempting to redirect to Google accounts.
+    const msg = String(err?.message || "").toLowerCase();
+    if (msg.includes("abort") || isUnreachableSupabaseHost(authorizeUrl)) {
+      console.warn("[DCF Auth] Preflight failed for Supabase OAuth URL:", err?.message || err);
+      return false;
+    }
+    return true;
   }
 }
 

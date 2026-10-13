@@ -79,19 +79,12 @@ export default function SignUpPage() {
     setCurrentQuote(next);
   }
 
-  async function handleGoogleSignUp(emailToUse: string, displayName?: string) {
+  async function handleGoogleSignUp(emailToUse?: string, displayName?: string) {
     setError("");
     setLoading(true);
 
-    const email = emailToUse.trim().toLowerCase();
-    if (!email.includes("@")) {
-      setError("Please provide a valid Google/Gmail account.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      if (hasSupabase && !emailToUse.includes("example")) {
+      if (hasSupabase && (!emailToUse || !emailToUse.includes("example"))) {
         try {
           const currentOrigin = window.location.origin;
           const isLiveSite =
@@ -108,7 +101,6 @@ export default function SignUpPage() {
           });
 
           if (!oauthError && data?.url && !isUnreachableSupabaseHost(data.url)) {
-            // Ensure live origin is used instead of defaulting to localhost
             let authUrl = data.url;
             try {
               const parsed = new URL(data.url);
@@ -135,7 +127,7 @@ export default function SignUpPage() {
               return;
             } else {
               console.warn(
-                "Supabase Google Provider is not enabled yet in dashboard. Falling back smoothly to local Google session."
+                "Supabase Google Provider is not enabled yet in dashboard. Falling back smoothly."
               );
             }
           }
@@ -144,18 +136,24 @@ export default function SignUpPage() {
         }
       }
 
-      const user = loginWithGoogleAccount(email, displayName);
-      setTimeout(() => {
-        setLoading(false);
-        if (user.role === "super_admin") {
-          router.push("/admin");
-        } else if (user.role === "distributor") {
-          router.push("/dashboard");
-        } else {
-          router.push("/customer");
-        }
-        router.refresh();
-      }, 600);
+      if (emailToUse) {
+        const user = loginWithGoogleAccount(emailToUse, displayName);
+        setTimeout(() => {
+          setLoading(false);
+          if (user.role === "super_admin") {
+            router.push("/admin");
+          } else if (user.role === "distributor") {
+            router.push("/dashboard");
+          } else {
+            router.push("/customer");
+          }
+          router.refresh();
+        }, 600);
+        return;
+      }
+
+      setLoading(false);
+      setError("Unable to initiate Google Sign Up. Please try again.");
     } catch (err: any) {
       setLoading(false);
       setError(err?.message || "Failed to sign up with Google.");
@@ -419,7 +417,7 @@ export default function SignUpPage() {
               {/* Primary Action Button: Official Google SSO Button */}
               <div className="space-y-4">
                 <button
-                  onClick={() => handleGoogleSignUp("pranay.shopper@gmail.com", "Pranay Customer")}
+                  onClick={() => handleGoogleSignUp()}
                   disabled={loading}
                   className="w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm transition-all shadow-xl hover:shadow-2xl border border-slate-200 active:scale-[0.99] disabled:opacity-50"
                 >

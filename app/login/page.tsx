@@ -128,19 +128,12 @@ export default function LoginPage() {
     setCurrentQuote(next);
   }
 
-  async function handleGoogleAuth(emailToUse: string, displayName?: string) {
+  async function handleGoogleAuth(emailToUse?: string, displayName?: string) {
     setError("");
     setLoading(true);
 
-    const email = emailToUse.trim().toLowerCase();
-    if (!email.includes("@")) {
-      setError("Please provide a valid Google/Gmail account.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      if (hasSupabase && !emailToUse.includes("example")) {
+      if (hasSupabase && (!emailToUse || !emailToUse.includes("example"))) {
         try {
           const currentOrigin = window.location.origin;
           const isLiveSite =
@@ -157,6 +150,7 @@ export default function LoginPage() {
           });
 
           if (oauthError) {
+            console.error("[DCF Auth] Supabase OAuth error:", oauthError);
             const errStr = (oauthError.message || "").toLowerCase();
             if (errStr.includes("rate") || errStr.includes("quota") || errStr.includes("429")) {
               setRateLimitSeconds(60);
@@ -169,7 +163,6 @@ export default function LoginPage() {
           }
 
           if (!oauthError && data?.url && !isUnreachableSupabaseHost(data.url)) {
-            // CRITICAL FIX: Ensure Supabase authorize URL does not bounce to localhost in live production!
             let authUrl = data.url;
             try {
               const parsed = new URL(data.url);
@@ -196,7 +189,7 @@ export default function LoginPage() {
               return;
             } else {
               console.warn(
-                "Supabase Google Provider is not enabled yet in dashboard. Falling back smoothly to local Google session."
+                "Supabase Google Provider is not enabled yet in dashboard. Falling back smoothly."
               );
             }
           }
@@ -205,22 +198,26 @@ export default function LoginPage() {
         }
       }
 
-      // Rotate quote upon sign in to fulfill "change everytime sign in"
-      handleRollNextQuote();
+      // If an explicit account was specified (e.g. Master Admin fast login)
+      if (emailToUse) {
+        handleRollNextQuote();
+        const user = loginWithGoogleAccount(emailToUse, displayName);
+        setTimeout(() => {
+          setLoading(false);
+          if (user.role === "super_admin") {
+            router.push("/admin");
+          } else if (user.role === "distributor") {
+            router.push("/dashboard");
+          } else {
+            router.push("/customer");
+          }
+          router.refresh();
+        }, 500);
+        return;
+      }
 
-      const user = loginWithGoogleAccount(email, displayName);
-
-      setTimeout(() => {
-        setLoading(false);
-        if (user.role === "super_admin") {
-          router.push("/admin");
-        } else if (user.role === "distributor") {
-          router.push("/dashboard");
-        } else {
-          router.push("/customer");
-        }
-        router.refresh();
-      }, 500);
+      setLoading(false);
+      setError("Unable to initiate Google Sign In. Please try again or use Master Admin login below.");
     } catch (err: any) {
       setLoading(false);
       setError(err?.message || "Failed to authenticate with Google.");
@@ -393,7 +390,7 @@ export default function LoginPage() {
             {/* Official Google Sign-In Button (For All Regular Users / Customers) */}
             <div className="space-y-4">
               <button
-                onClick={() => handleGoogleAuth("customer.shopper@gmail.com")}
+                onClick={() => handleGoogleAuth()}
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm transition-all shadow-xl hover:shadow-2xl border border-slate-200 active:scale-[0.99] disabled:opacity-50"
               >

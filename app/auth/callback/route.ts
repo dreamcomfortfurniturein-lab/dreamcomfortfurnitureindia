@@ -9,21 +9,24 @@ export async function GET(request: NextRequest) {
   const error = searchParams.get("error");
   const errorDescription = searchParams.get("error_description");
 
-  // Determine true live public origin to prevent any localhost redirection in live
+  // Determine origin based on forwarded headers or request URL
   const forwardedHost =
     request.headers.get("x-forwarded-host") || request.headers.get("host");
   const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
 
-  let origin = `${forwardedProto}://${forwardedHost}`;
+  let origin = forwardedHost
+    ? `${forwardedProto}://${forwardedHost}`
+    : request.nextUrl.origin;
 
-  // If host is localhost or missing in production, fall back to configured live site
-  if (!forwardedHost || forwardedHost.includes("localhost") || forwardedHost.includes("127.0.0.1")) {
+  // In production deployments, ensure we never accidentally bounce to localhost
+  if (
+    (process.env.NODE_ENV === "production" || process.env.VERCEL) &&
+    (!origin || origin.includes("localhost") || origin.includes("127.0.0.1"))
+  ) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-    if (siteUrl && !siteUrl.includes("localhost")) {
-      origin = siteUrl;
-    } else if (process.env.NODE_ENV === "production" || process.env.VERCEL) {
-      origin = "https://dreamcomfortfurniture.in";
-    }
+    origin = siteUrl && !siteUrl.includes("localhost")
+      ? siteUrl
+      : "https://dreamcomfortfurniture.in";
   }
 
   // Handle OAuth provider errors (e.g. Rate limits, quota exceeded, or session expired)
