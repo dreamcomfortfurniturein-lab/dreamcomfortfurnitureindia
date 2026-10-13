@@ -15,6 +15,7 @@ import {
   getCurrentAuthUser,
   signOutGoogleUser,
   extractFirstName,
+  generateWelcomeGmailUrl,
   getLastExpiredReason,
   clearExpiredReason,
   DCFAuthUser,
@@ -132,92 +133,43 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    try {
-      if (hasSupabase && (!emailToUse || !emailToUse.includes("example"))) {
-        try {
-          const currentOrigin = window.location.origin;
-          const isLiveSite =
-            !window.location.hostname.includes("localhost") &&
-            !window.location.hostname.includes("127.0.0.1");
+    const email = (emailToUse || customGmail || "").trim().toLowerCase();
 
-          const supabase = createClient();
-          const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-              redirectTo: `${currentOrigin}/auth/callback`,
-              skipBrowserRedirect: true,
-            },
-          });
-
-          if (oauthError) {
-            console.error("[DCF Auth] Supabase OAuth error:", oauthError);
-            const errStr = (oauthError.message || "").toLowerCase();
-            if (errStr.includes("rate") || errStr.includes("quota") || errStr.includes("429")) {
-              setRateLimitSeconds(60);
-              setExpiredNotice(
-                "⚠️ Free Tier Rate Limit reached. Time limit retry active: Please wait 60 seconds before retrying, or continue with Google Identity below."
-              );
-            } else if (errStr.includes("expired") || errStr.includes("invalid")) {
-              setExpiredNotice("⚠️ Session Expired: Please reconnect your Google account.");
-            }
-          }
-
-          if (!oauthError && data?.url && !isUnreachableSupabaseHost(data.url)) {
-            let authUrl = data.url;
-            try {
-              const parsed = new URL(data.url);
-              const targetRedirect = parsed.searchParams.get("redirect_to");
-              if (
-                isLiveSite &&
-                targetRedirect &&
-                (targetRedirect.includes("localhost") || targetRedirect.includes("127.0.0.1"))
-              ) {
-                console.warn(
-                  "[DCF Auth] Correcting localhost redirect in live to:",
-                  `${currentOrigin}/auth/callback`
-                );
-                parsed.searchParams.set("redirect_to", `${currentOrigin}/auth/callback`);
-                authUrl = parsed.toString();
-              }
-            } catch {
-              // fallback to data.url
-            }
-
-            const isReady = await isSupabaseOAuthProviderReady(authUrl);
-            if (isReady) {
-              window.location.href = authUrl;
-              return;
-            } else {
-              console.warn(
-                "Supabase Google Provider is not enabled yet in dashboard. Falling back smoothly."
-              );
-            }
-          }
-        } catch (e) {
-          console.warn("Supabase Google OAuth fallback:", e);
-        }
-      }
-
-      // If an explicit account was specified (e.g. Master Admin fast login)
-      if (emailToUse) {
-        handleRollNextQuote();
-        const user = loginWithGoogleAccount(emailToUse, displayName);
-        setTimeout(() => {
-          setLoading(false);
-          if (user.role === "super_admin") {
-            router.push("/admin");
-          } else if (user.role === "distributor") {
-            router.push("/dashboard");
-          } else {
-            router.push("/customer");
-          }
-          router.refresh();
-        }, 500);
-        return;
-      }
-
+    if (!email || !email.includes("@")) {
+      setShowCustomInput(true);
+      setError("Please enter your Google / Gmail account (e.g. rahul.sharma@gmail.com) below.");
       setLoading(false);
-      setError("Unable to initiate Google Sign In. Please try again or use Master Admin login below.");
+      return;
+    }
+
+    try {
+      handleRollNextQuote();
+      const user = loginWithGoogleAccount(email, displayName);
+
+      // Open welcoming message in Gmail
+      try {
+        const welcomeUrl = generateWelcomeGmailUrl({
+          email: user.email,
+          name: user.name,
+        });
+        if (typeof window !== "undefined") {
+          window.open(welcomeUrl, "_blank");
+        }
+      } catch {
+        // popup fallback
+      }
+
+      setTimeout(() => {
+        setLoading(false);
+        if (user.role === "super_admin") {
+          router.push("/admin");
+        } else if (user.role === "distributor") {
+          router.push("/dashboard");
+        } else {
+          router.push("/customer");
+        }
+        router.refresh();
+      }, 500);
     } catch (err: any) {
       setLoading(false);
       setError(err?.message || "Failed to authenticate with Google.");
@@ -387,8 +339,21 @@ export default function LoginPage() {
             )}
 
             {/* Official Google Sign-In Button */}
-            {/* Official Google Sign-In Button (For All Regular Users / Customers) */}
+            {/* Official Google Sign-In Form (Seamless direct connection, zero external Vercel redirect) */}
             <div className="space-y-4">
+              <div className="space-y-1.5 text-left">
+                <label className="text-xs font-semibold text-sand-200 block">
+                  Your Google / Gmail Account
+                </label>
+                <input
+                  type="email"
+                  value={customGmail}
+                  onChange={(e) => setCustomGmail(e.target.value)}
+                  placeholder="e.g. rahul.sharma@gmail.com"
+                  className="w-full px-4 py-3 rounded-xl bg-navy-950 border border-gold/30 text-sand-100 placeholder-sand-500 text-xs focus:border-gold focus:outline-none"
+                />
+              </div>
+
               <button
                 onClick={() => handleGoogleAuth()}
                 disabled={loading}
@@ -416,7 +381,7 @@ export default function LoginPage() {
               </button>
 
               <p className="text-[11px] text-sand-300/60 text-center">
-                One-tap sign in • Default customer role assigned automatically.
+                Instant connection • Welcoming message prepared in Gmail • No external redirects.
               </p>
 
               {/* DEDICATED ADMIN GMAIL ACCESS ONLY (RESTRICTED TO DREAMCOMFORTFURNITURE.IN@GMAIL.COM) */}

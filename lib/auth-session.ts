@@ -324,6 +324,7 @@ export function generatePartnerNotificationUrls(params: {
   const requestId = params.requestId || `REQ_${Date.now()}`;
   const timeStr = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
 
+  const siteUrl = getPublicSiteUrl();
   const waText = `Hello Admin,
 
 A user has requested access to Dream Comfort Partner Portal:
@@ -334,7 +335,7 @@ A user has requested access to Dream Comfort Partner Portal:
 🔖 Request ID: ${requestId}
 ${params.notes ? `📝 Note: ${params.notes}\n` : ""}
 Mandatory Admin Approval is required to unlock Partner Portal access.
-Approve in Admin Dashboard: https://dreamcomfortfurnitureindia.vercel.app/admin`;
+Approve in Admin Dashboard: ${siteUrl}/admin`;
 
   const mailSubject = `[URGENT] Partner Portal Access Request - Approval Required (${params.name})`;
   const mailBody = `Hello Admin,
@@ -352,7 +353,7 @@ IMPORTANT WORKFLOW RULE:
 The Partner Portal is strictly locked to this user until you approve them.
 
 TO APPROVE THIS USER:
-1. Open the Admin Portal: https://dreamcomfortfurnitureindia.vercel.app/admin
+1. Open the Admin Portal: ${siteUrl}/admin
 2. Go to "Distributor Management" and click "Approve Distributor" next to ${params.email}.
 
 Customer Direct WhatsApp: https://wa.me/91${params.phone.replace(/\D/g, "")}`;
@@ -362,6 +363,42 @@ Customer Direct WhatsApp: https://wa.me/91${params.phone.replace(/\D/g, "")}`;
   const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${ADMIN_EMAIL_ADDRESS}&su=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
 
   return { requestId, whatsappUrl, gmailUrl, mailtoUrl, waText };
+}
+
+/**
+ * Generate a pre-filled welcoming Gmail message for the authenticated Google user.
+ */
+export function generateWelcomeGmailUrl(params: {
+  email: string;
+  name?: string;
+}): string {
+  const firstName = extractFirstName(params.name || params.email);
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://dreamcomfortfurniture.in";
+  const subject = `Welcome to Dream Comfort Furniture India, ${firstName}! 🛋️✨`;
+  const body = `Dear ${firstName},
+
+Welcome to Dream Comfort Furniture India! 🌟
+
+Your Google Account (${params.email}) has been successfully connected to our handcrafted solid wood luxury platform.
+
+Exclusive Benefits Unlocked for You:
+🎁 25% Private Member Welcome Discount
+🪵 100% Genuine Seasoned Teakwood & Sheesham Craftsmanship
+🚚 Priority Workshop-to-Doorstep Delivery & White-Glove Assembly
+🛡️ Comprehensive Termite & Wood Workmanship Assurance
+
+View your personalized offers and explore our artisan catalog anytime:
+${siteUrl}/customer
+
+Need custom dimensions, fabric selection, or live workshop video consultation?
+📞 Workshop Concierge: +91 9347965863 / +91 9959427831
+✉️ Master Admin Email: ${ADMIN_EMAIL_ADDRESS}
+
+Warm regards,
+Dream Comfort Furniture India
+Handcrafted Solid Wood Luxury Living`;
+
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(params.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 /**

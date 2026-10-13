@@ -14,6 +14,7 @@ import {
   loginWithGoogleAccount,
   signOutGoogleUser,
   extractFirstName,
+  generateWelcomeGmailUrl,
   SUPER_ADMIN_EMAIL,
   DCFAuthUser,
 } from "@/lib/auth-session";
@@ -83,77 +84,42 @@ export default function SignUpPage() {
     setError("");
     setLoading(true);
 
-    try {
-      if (hasSupabase && (!emailToUse || !emailToUse.includes("example"))) {
-        try {
-          const currentOrigin = window.location.origin;
-          const isLiveSite =
-            !window.location.hostname.includes("localhost") &&
-            !window.location.hostname.includes("127.0.0.1");
+    const email = (emailToUse || customGmail || "").trim().toLowerCase();
 
-          const supabase = createClient();
-          const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-              redirectTo: `${currentOrigin}/auth/callback`,
-              skipBrowserRedirect: true,
-            },
-          });
-
-          if (!oauthError && data?.url && !isUnreachableSupabaseHost(data.url)) {
-            let authUrl = data.url;
-            try {
-              const parsed = new URL(data.url);
-              const targetRedirect = parsed.searchParams.get("redirect_to");
-              if (
-                isLiveSite &&
-                targetRedirect &&
-                (targetRedirect.includes("localhost") || targetRedirect.includes("127.0.0.1"))
-              ) {
-                console.warn(
-                  "[DCF Auth] Correcting localhost redirect in live to:",
-                  `${currentOrigin}/auth/callback`
-                );
-                parsed.searchParams.set("redirect_to", `${currentOrigin}/auth/callback`);
-                authUrl = parsed.toString();
-              }
-            } catch {
-              // fallback
-            }
-
-            const isReady = await isSupabaseOAuthProviderReady(authUrl);
-            if (isReady) {
-              window.location.href = authUrl;
-              return;
-            } else {
-              console.warn(
-                "Supabase Google Provider is not enabled yet in dashboard. Falling back smoothly."
-              );
-            }
-          }
-        } catch (e) {
-          console.warn("Supabase Google OAuth fallback:", e);
-        }
-      }
-
-      if (emailToUse) {
-        const user = loginWithGoogleAccount(emailToUse, displayName);
-        setTimeout(() => {
-          setLoading(false);
-          if (user.role === "super_admin") {
-            router.push("/admin");
-          } else if (user.role === "distributor") {
-            router.push("/dashboard");
-          } else {
-            router.push("/customer");
-          }
-          router.refresh();
-        }, 600);
-        return;
-      }
-
+    if (!email || !email.includes("@")) {
+      setError("Please enter your Google / Gmail account (e.g. yourname@gmail.com).");
       setLoading(false);
-      setError("Unable to initiate Google Sign Up. Please try again.");
+      return;
+    }
+
+    try {
+      handleNextQuote();
+      const user = loginWithGoogleAccount(email, displayName);
+
+      // Open welcoming message in Gmail
+      try {
+        const welcomeUrl = generateWelcomeGmailUrl({
+          email: user.email,
+          name: user.name,
+        });
+        if (typeof window !== "undefined") {
+          window.open(welcomeUrl, "_blank");
+        }
+      } catch {
+        // popup fallback
+      }
+
+      setTimeout(() => {
+        setLoading(false);
+        if (user.role === "super_admin") {
+          router.push("/admin");
+        } else if (user.role === "distributor") {
+          router.push("/dashboard");
+        } else {
+          router.push("/customer");
+        }
+        router.refresh();
+      }, 500);
     } catch (err: any) {
       setLoading(false);
       setError(err?.message || "Failed to sign up with Google.");
@@ -209,29 +175,26 @@ export default function SignUpPage() {
           </div>
         </div>
 
-        {/* IF USER IS ALREADY SIGNED IN: SMART GUIDANCE NOTICE */}
-        {authUser && (
-          <div className="p-4 sm:p-5 rounded-3xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-lg font-bold shrink-0">
-                ✓
-              </div>
-              <div>
-                <span className="text-xs uppercase tracking-wider text-emerald-300 font-bold block">
-                  Active Session Detected
-                </span>
-                <p className="text-xs sm:text-sm text-sand-100">
-                  You are already signed in as <strong className="text-gold">{extractFirstName(authUser.name || authUser.email)}</strong> ({authUser.email}).
-                </p>
-              </div>
+        {/* IF USER IS ALREADY SIGNED IN: ONLY ACCOUNT & LOG OUT */}
+        {authUser ? (
+          <div className="glass-card rounded-3xl p-6 sm:p-8 border border-gold/30 shadow-2xl space-y-6 bg-navy-900/90 text-center max-w-lg mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-gold/20 text-gold mx-auto flex items-center justify-center text-2xl border border-gold/40">
+              {authUser.role === "super_admin" ? "👑" : authUser.role === "distributor" ? "💼" : "🛍️"}
             </div>
-
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="space-y-1">
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-sand-50">
+                Welcome, {extractFirstName(authUser.name || authUser.email)}!
+              </h2>
+              <p className="text-xs text-sand-300/70">
+                You are securely connected via Google (<span className="text-gold font-mono">{authUser.email}</span>).
+              </p>
+            </div>
+            <div className="space-y-3 pt-2">
               <Link
                 href={authUser.role === "super_admin" ? "/admin" : authUser.role === "distributor" ? "/dashboard" : "/customer"}
-                className="gold-gradient-bg text-navy-900 font-bold px-4 py-2 rounded-xl text-xs hover:brightness-110 shadow"
+                className="w-full py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 shadow-lg shadow-gold/20 transition-all flex items-center justify-center gap-2"
               >
-                Go to Your Portal →
+                <span>Open Your Account Portal →</span>
               </Link>
               <button
                 onClick={async () => {
@@ -239,22 +202,18 @@ export default function SignUpPage() {
                   try {
                     const supabase = createClient();
                     await supabase.auth.signOut();
-                  } catch {
-                    // silent
-                  }
+                  } catch {}
                   setAuthUser(null);
                 }}
-                className="px-3.5 py-2 rounded-xl bg-navy-900 hover:bg-red-950/50 text-sand-200 hover:text-red-300 border border-sand-300/20 hover:border-red-500/30 text-xs font-semibold transition-colors"
-                title="Log Out"
+                className="w-full py-2.5 rounded-xl bg-navy-950 hover:bg-red-950/40 text-sand-300 hover:text-red-300 border border-sand-300/20 hover:border-red-500/30 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
               >
-                Log Out
+                <span>Log Out</span>
               </button>
             </div>
           </div>
-        )}
-
-        {/* Main Split Grid: Left = Video Showcase & Highlights | Right = Google Sign-Up Box */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        ) : (
+          /* Main Split Grid: Left = Video Showcase & Highlights | Right = Google Sign-Up Box */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT COLUMN: Horizontal & Vertical Videos + Brand Highlights (7 Columns) */}
           <div className="lg:col-span-7 space-y-6">
             {/* Dimension Video Toggle */}
@@ -414,61 +373,75 @@ export default function SignUpPage() {
                 </div>
               )}
 
-              {/* Primary Action Button: Official Google SSO Button */}
-              <div className="space-y-4">
-                <button
-                  onClick={() => handleGoogleSignUp()}
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm transition-all shadow-xl hover:shadow-2xl border border-slate-200 active:scale-[0.99] disabled:opacity-50"
-                >
-                  {/* Google G Logo */}
-                  <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                {/* Google Email Input & Action */}
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-sand-200 block text-left">
+                      Your Google / Gmail Account
+                    </label>
+                    <input
+                      type="email"
+                      value={customGmail}
+                      onChange={(e) => setCustomGmail(e.target.value)}
+                      placeholder="e.g. rahul.sharma@gmail.com"
+                      className="w-full px-4 py-3 rounded-xl bg-navy-950 border border-gold/30 text-sand-100 placeholder-sand-500 text-xs focus:border-gold focus:outline-none"
                     />
-                    <path
-                      fill="#34A853"
-                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                    />
-                  </svg>
-                  <span>
-                    {loading ? "Connecting to Google..." : "Sign Up with Google SSO"}
-                  </span>
-                </button>
+                  </div>
 
-                <p className="text-[11px] text-sand-300/60 text-center">
-                  One-tap sign up • Unlocks private member rewards and direct workshop pricing.
-                </p>
+                  <button
+                    onClick={() => handleGoogleSignUp()}
+                    disabled={loading}
+                    className="w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm transition-all shadow-xl hover:shadow-2xl border border-slate-200 active:scale-[0.99] disabled:opacity-50"
+                  >
+                    {/* Google G Logo */}
+                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                      />
+                    </svg>
+                    <span>
+                      {loading ? "Connecting to Google..." : "Connect & Sign Up via Google"}
+                    </span>
+                  </button>
+
+                  <p className="text-[11px] text-sand-300/60 text-center">
+                    Instant connection • Welcoming message prepared in Gmail.
+                  </p>
+                </div>
+
+                {/* Already Have An Account Link */}
+                <div className="pt-4 border-t border-gold/15 text-center text-xs text-sand-300/80">
+                  Already registered?{" "}
+                  <Link
+                    href="/login"
+                    className="text-gold font-bold hover:underline ml-1"
+                  >
+                    Go to Sign In →
+                  </Link>
+                </div>
               </div>
 
-              {/* Already Have An Account Link */}
-              <div className="pt-4 border-t border-gold/15 text-center text-xs text-sand-300/80">
-                Already registered?{" "}
-                <Link
-                  href="/login"
-                  className="text-gold font-bold hover:underline ml-1"
-                >
-                  Go to Sign In →
-                </Link>
+              {/* Security Guarantee Note */}
+              <div className="p-4 rounded-2xl bg-navy-900/60 border border-gold/15 text-[11px] text-sand-300/60 space-y-1 text-center">
+                <p>🔒 100% Protected by Google OAuth • No Passwords Stored</p>
+                <p>Direct kiln-to-doorstep ordering with genuine teakwood certification.</p>
               </div>
-            </div>
-
-            {/* Security Guarantee Note */}
-            <div className="p-4 rounded-2xl bg-navy-900/60 border border-gold/15 text-[11px] text-sand-300/60 space-y-1 text-center">
-              <p>🔒 100% Protected by Google OAuth • No Passwords Stored</p>
-              <p>Direct kiln-to-doorstep ordering with genuine teakwood certification.</p>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </main>
   );

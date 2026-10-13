@@ -9,6 +9,9 @@ import {
   setActiveSessionMode,
   submitPartnerAccessRequest,
   generatePartnerNotificationUrls,
+  generateWelcomeGmailUrl,
+  extractFirstName,
+  signOutGoogleUser,
   ADMIN_WHATSAPP_NUMBER,
   ADMIN_EMAIL_ADDRESS,
   getPartnerStatus,
@@ -218,7 +221,8 @@ export default function CustomerPortalPage() {
               ● Customer Mode Active (Unlocked)
             </span>
             <span className="text-sand-300/70">
-              Identity: <strong className="text-sand-100 font-mono">{authUser?.email || "Guest Shopper"}</strong>
+              Signed in as: <strong className="text-gold font-semibold">{extractFirstName(authUser?.name || authUser?.email)}</strong>{" "}
+              <span className="text-sand-400 font-mono text-[11px]">({authUser?.email || "Guest"})</span>
             </span>
           </div>
 
@@ -248,8 +252,53 @@ export default function CustomerPortalPage() {
                 <span>Request Partner Access</span>
               </button>
             )}
+
+            {/* Direct Log Out Button */}
+            {authUser && (
+              <button
+                onClick={() => {
+                  signOutGoogleUser();
+                  window.location.href = "/";
+                }}
+                className="px-3 py-1.5 rounded-xl bg-navy-900 hover:bg-red-950/60 text-sand-300 hover:text-red-300 border border-sand-700/50 hover:border-red-500/40 text-xs font-semibold transition-all flex items-center gap-1"
+                title="Log Out of Account"
+              >
+                <span>Log Out</span>
+              </button>
+            )}
           </div>
         </div>
+
+        {/* WELCOMING MESSAGE SENT TO GMAIL BANNER */}
+        {authUser?.email && (
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 border border-gold/40 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gold/20 text-gold flex items-center justify-center text-xl shrink-0 border border-gold/40">
+                ✉️
+              </div>
+              <div>
+                <span className="text-xs uppercase tracking-wider text-gold font-bold block">
+                  Welcoming Message Available in Gmail
+                </span>
+                <p className="text-xs sm:text-sm text-sand-100">
+                  Welcome greeting and 25% welcome offer details prepared for <strong className="text-gold font-mono">{authUser.email}</strong>.
+                </p>
+              </div>
+            </div>
+
+            <a
+              href={generateWelcomeGmailUrl({
+                email: authUser.email,
+                name: authUser.name,
+              })}
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs shrink-0 hover:brightness-110 shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
+            >
+              <span>Open Welcome Letter in Gmail ↗</span>
+            </a>
+          </div>
+        )}
 
         {requestSuccessMessage && (
           <div className="p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs flex items-center justify-between">
@@ -274,7 +323,7 @@ export default function CustomerPortalPage() {
                 <span>Customer Loyalty & Offers Portal</span>
               </div>
               <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-white">
-                Exclusive Promotional Offers & Updates
+                Welcome, {extractFirstName(authUser?.name || authUser?.email)}!
               </h1>
               <p className="text-xs sm:text-sm text-sand-300/80 max-w-2xl leading-relaxed">
                 Welcome to your private customer rewards hub. Browse active festive discount vouchers, track workshop order milestones, and explore our mastercrafted solid teakwood collections.
