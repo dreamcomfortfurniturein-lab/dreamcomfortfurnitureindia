@@ -147,13 +147,6 @@ export default function FrontSplitHero({
             <span>📱 Add from Phone</span>
             <span>↗</span>
           </Link>
-          <span className="text-sand-300/40">•</span>
-          <Link
-            href="/admin"
-            className="text-sand-300 hover:text-gold text-[11px] sm:text-xs"
-          >
-            Admin Approvals
-          </Link>
         </div>
       </div>
 

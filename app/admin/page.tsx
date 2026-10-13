@@ -21,6 +21,7 @@ import {
   CLOUDINARY_UPLOAD_PRESET,
   VideoMeta,
 } from "../../lib/cloudinary";
+import { getCurrentAuthUser, isSuperAdminEmail } from "@/lib/auth-session";
 
 export interface Product {
   slug: string;
@@ -180,6 +181,12 @@ export default function AdminDashboardPage() {
   // Initialize data on mount
   useEffect(() => {
     try {
+      const activeUser = getCurrentAuthUser();
+      if (activeUser?.email && isSuperAdminEmail(activeUser.email)) {
+        setCurrentAuthEmail(activeUser.email);
+        setCurrentAuthRole("master_admin");
+      }
+
       const storedProducts = localStorage.getItem("dcf_admin_products");
       if (storedProducts) {
         setProducts(JSON.parse(storedProducts));

@@ -11,6 +11,7 @@ import {
 } from "@/lib/supabase/client";
 import {
   getCurrentAuthUser,
+  isSuperAdminEmail,
   loginWithGoogleAccount,
   signOutGoogleUser,
   extractFirstName,
@@ -111,7 +112,7 @@ export default function SignUpPage() {
 
       setTimeout(() => {
         setLoading(false);
-        if (user.role === "super_admin") {
+        if (isSuperAdminEmail(user.email)) {
           router.push("/admin");
         } else if (user.role === "distributor") {
           router.push("/dashboard");
@@ -179,7 +180,7 @@ export default function SignUpPage() {
         {authUser ? (
           <div className="glass-card rounded-3xl p-6 sm:p-8 border border-gold/30 shadow-2xl space-y-6 bg-navy-900/90 text-center max-w-lg mx-auto">
             <div className="w-14 h-14 rounded-2xl bg-gold/20 text-gold mx-auto flex items-center justify-center text-2xl border border-gold/40">
-              {authUser.role === "super_admin" ? "👑" : authUser.role === "distributor" ? "💼" : "🛍️"}
+              {isSuperAdminEmail(authUser.email) ? "👑" : authUser.role === "distributor" ? "💼" : "🛍️"}
             </div>
             <div className="space-y-1">
               <h2 className="font-display text-xl sm:text-2xl font-bold text-sand-50">
@@ -191,7 +192,7 @@ export default function SignUpPage() {
             </div>
             <div className="space-y-3 pt-2">
               <Link
-                href={authUser.role === "super_admin" ? "/admin" : authUser.role === "distributor" ? "/dashboard" : "/customer"}
+                href={isSuperAdminEmail(authUser.email) ? "/admin" : authUser.role === "distributor" ? "/dashboard" : "/customer"}
                 className="w-full py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 shadow-lg shadow-gold/20 transition-all flex items-center justify-center gap-2"
               >
                 <span>Open Your Account Portal →</span>

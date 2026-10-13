@@ -17,10 +17,10 @@ export default function NotFound() {
             Return Home
           </Link>
           <Link
-            href="/admin"
+            href="/products"
             className="bg-navy-800 text-gold border border-gold/30 px-5 py-2.5 rounded-xl text-sm hover:bg-navy-700 transition-all"
           >
-            Admin Dashboard
+            Browse Collection
           </Link>
         </div>
       </div>

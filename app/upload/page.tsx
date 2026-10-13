@@ -485,7 +485,7 @@ export default function MobileUploadPage() {
         <div className="text-center pt-2 pb-6 flex items-center justify-center gap-4 text-xs text-sand-300/70">
           <Link href="/" className="hover:text-gold">← Return Home</Link>
           <span>•</span>
-          <Link href="/admin" className="hover:text-gold">Admin Portal</Link>
+          <Link href="/products" className="hover:text-gold">Browse Collection</Link>
         </div>
       </div>
     </div>

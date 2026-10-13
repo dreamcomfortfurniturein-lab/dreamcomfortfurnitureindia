@@ -255,9 +255,6 @@ export default function RootLayout({
                   <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
                   <span className="hover:text-slate-400 cursor-pointer">Terms of Distributor Agreement</span>
                   <span className="hover:text-slate-400 cursor-pointer">Direct Selling Code of Ethics</span>
-                  <Link href="/admin" className="text-gold/70 hover:text-gold hover:underline">
-                    Admin Portal
-                  </Link>
                 </div>
               </div>
             </div>

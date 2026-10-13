@@ -11,6 +11,7 @@ import {
 } from "@/lib/supabase/client";
 import {
   SUPER_ADMIN_EMAIL,
+  isSuperAdminEmail,
   loginWithGoogleAccount,
   getCurrentAuthUser,
   signOutGoogleUser,
@@ -26,44 +27,14 @@ export default function LoginPage() {
   const router = useRouter();
   const [authUser, setAuthUser] = useState<DCFAuthUser | null>(null);
   const [currentQuote, setCurrentQuote] = useState<WelcomeQuote>(WELCOME_QUOTES[0]);
-  const [selectedGoogleEmail, setSelectedGoogleEmail] = useState("");
   const [customGmail, setCustomGmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [expiredNotice, setExpiredNotice] = useState<string | null>(null);
   const [rateLimitSeconds, setRateLimitSeconds] = useState<number>(0);
   const [showAccountRecoveryModal, setShowAccountRecoveryModal] = useState(false);
-  const [showCustomInput, setShowCustomInput] = useState(false);
 
   const hasSupabase = isSupabaseConfigured();
-
-  // Preset Google Accounts for Rapid Demonstration & Role Verification
-  const PRESET_GOOGLE_ACCOUNTS = [
-    {
-      email: SUPER_ADMIN_EMAIL,
-      name: "Master Admin (Director)",
-      roleBadge: "Super Admin",
-      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-      description: "Supreme authority across all portals & approvals.",
-      icon: "👑",
-    },
-    {
-      email: "rajeshwar.rao@gmail.com",
-      name: "Rajeshwar Rao",
-      roleBadge: "Approved Partner",
-      badgeColor: "bg-gold/20 text-gold border-gold/40",
-      description: "Admin-approved distributor with operational access.",
-      icon: "💼",
-    },
-    {
-      email: "customer.vip@gmail.com",
-      name: "Meera Venkat (Customer)",
-      roleBadge: "Customer (Default)",
-      badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/40",
-      description: "Standard customer with access to discounts & orders.",
-      icon: "🛍️",
-    },
-  ];
 
   useEffect(() => {
     // 1. Pick a fresh random welcoming quote on every page load/sign-in
@@ -136,7 +107,6 @@ export default function LoginPage() {
     const email = (emailToUse || customGmail || "").trim().toLowerCase();
 
     if (!email || !email.includes("@")) {
-      setShowCustomInput(true);
       setError("Please enter your Google / Gmail account (e.g. rahul.sharma@gmail.com) below.");
       setLoading(false);
       return;
@@ -161,7 +131,7 @@ export default function LoginPage() {
 
       setTimeout(() => {
         setLoading(false);
-        if (user.role === "super_admin") {
+        if (isSuperAdminEmail(user.email)) {
           router.push("/admin");
         } else if (user.role === "distributor") {
           router.push("/dashboard");
@@ -240,7 +210,7 @@ export default function LoginPage() {
           <div className="glass-card rounded-3xl p-6 sm:p-8 border border-gold/30 shadow-2xl space-y-6 bg-navy-900/90 relative overflow-hidden">
             <div className="text-center space-y-2">
               <div className="w-12 h-12 rounded-2xl bg-gold/20 text-gold mx-auto flex items-center justify-center text-xl font-bold border border-gold/40">
-                {authUser.role === "super_admin" ? "👑" : authUser.role === "distributor" ? "💼" : "🛍️"}
+                {isSuperAdminEmail(authUser.email) ? "👑" : authUser.role === "distributor" ? "💼" : "🛍️"}
               </div>
               <h2 className="font-display text-xl sm:text-2xl font-bold text-sand-50">
                 Welcome back, {extractFirstName(authUser.name || authUser.email)}!
@@ -254,7 +224,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between text-sand-300">
                 <span>Account Role:</span>
                 <span className="px-2.5 py-0.5 rounded-full bg-gold/20 text-gold font-bold uppercase text-[10px] border border-gold/30">
-                  {authUser.role.replace("_", " ")}
+                  {isSuperAdminEmail(authUser.email) ? "SUPER ADMIN" : authUser.role.replace("_", " ")}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sand-300">
@@ -266,7 +236,7 @@ export default function LoginPage() {
             <div className="space-y-3">
               <Link
                 href={
-                  authUser.role === "super_admin"
+                  isSuperAdminEmail(authUser.email)
                     ? "/admin"
                     : authUser.role === "distributor"
                     ? "/dashboard"
@@ -275,7 +245,7 @@ export default function LoginPage() {
                 className="w-full py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 shadow-lg shadow-gold/20 transition-all flex items-center justify-center gap-2"
               >
                 <span>
-                  {authUser.role === "super_admin"
+                  {isSuperAdminEmail(authUser.email)
                     ? "Enter Master Admin Portal →"
                     : authUser.role === "distributor"
                     ? "Enter Distributor Portal →"
@@ -383,47 +353,6 @@ export default function LoginPage() {
               <p className="text-[11px] text-sand-300/60 text-center">
                 Instant connection • Welcoming message prepared in Gmail • No external redirects.
               </p>
-
-              {/* DEDICATED ADMIN GMAIL ACCESS ONLY (RESTRICTED TO DREAMCOMFORTFURNITURE.IN@GMAIL.COM) */}
-              {showCustomInput && (
-                <div className="p-4 rounded-2xl bg-navy-950 border border-gold/40 space-y-3 mt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-gold flex items-center gap-1.5">
-                      <span>👑</span>
-                      <span>Master Admin Access</span>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowCustomInput(false)}
-                      className="text-[10px] text-sand-400 hover:text-white"
-                    >
-                      ✕ Close
-                    </button>
-                  </div>
-
-                  <p className="text-[11px] text-sand-300/80 leading-relaxed">
-                    Strictly authorized for the single Master Admin account credential:
-                  </p>
-
-                  <div
-                    onClick={() => handleGoogleAuth(SUPER_ADMIN_EMAIL, "Master Admin")}
-                    className="p-3 rounded-xl bg-gold/15 border border-gold/50 hover:bg-gold/25 transition-all cursor-pointer flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-base">👑</span>
-                      <div>
-                        <div className="text-xs font-bold text-sand-50 group-hover:text-gold transition-colors">
-                          Master Admin Identity
-                        </div>
-                        <div className="text-[11px] text-gold font-mono">
-                          {SUPER_ADMIN_EMAIL}
-                        </div>
-                      </div>
-                    </div>
-                    <span className="text-xs text-gold font-bold">Connect →</span>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Links to Sign Up & Password Help */}
@@ -446,16 +375,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="text-center text-[11px] text-sand-300/50 space-y-1.5">
-          <p>
-            Default Customer Access • Secured by Google SSO •{" "}
-            <button
-              type="button"
-              onClick={() => setShowCustomInput(!showCustomInput)}
-              className="text-sand-400/80 hover:text-gold underline transition-colors"
-            >
-              Master Admin Login
-            </button>
-          </p>
+          <p>Default Customer Access • Secured by Google SSO</p>
           <Link href="/" className="text-sand-400 hover:text-gold transition-colors inline-block">
             ← Return to Main Storefront
           </Link>

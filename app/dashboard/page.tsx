@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   getCurrentAuthUser,
+  isSuperAdminEmail,
   getActiveSessionMode,
   setActiveSessionMode,
   submitPartnerAccessRequest,
@@ -255,7 +256,7 @@ export default function DashboardPage() {
     );
   }
 
-  const isSuperAdmin = authUser.role === "super_admin";
+  const isSuperAdmin = isSuperAdminEmail(authUser.email);
   const isApprovedPartner = authUser.role === "distributor" || isSuperAdmin;
   const isPending = authUser.partnerStatus === "pending" || requestSubmitted;
 

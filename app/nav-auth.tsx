@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   getCurrentAuthUser,
+  isSuperAdminEmail,
   signOutGoogleUser,
   loginWithGoogleAccount,
   getActiveSessionMode,
@@ -97,7 +98,7 @@ export default function NavAuth() {
   if (loading) return null;
 
   if (authUser) {
-    const isSuperAdmin = authUser.role === "super_admin";
+    const isSuperAdmin = isSuperAdminEmail(authUser.email);
     const isDistributor = authUser.role === "distributor";
     const firstName = extractFirstName(authUser.name || authUser.email);
 

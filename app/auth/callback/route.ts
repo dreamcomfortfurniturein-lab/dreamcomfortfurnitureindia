@@ -84,14 +84,18 @@ export async function GET(request: NextRequest) {
       }
 
       const userEmail = data?.user?.email?.trim().toLowerCase();
+      const isMasterAdmin = userEmail === "dreamcomfortfurniture.in@gmail.com";
 
-      // If a specific next path was requested, honor it
+      // If a specific next path was requested, honor it (strictly block unauthorized access to /admin)
       if (next && next !== "/") {
+        if (next.startsWith("/admin") && !isMasterAdmin) {
+          return NextResponse.redirect(`${origin}/customer`);
+        }
         return NextResponse.redirect(`${origin}${next}`);
       }
 
       // Role-based portal direct routing
-      if (userEmail === "dreamcomfortfurniture.in@gmail.com") {
+      if (isMasterAdmin) {
         return NextResponse.redirect(`${origin}/admin`);
       } else if (userEmail) {
         return NextResponse.redirect(`${origin}/customer`);

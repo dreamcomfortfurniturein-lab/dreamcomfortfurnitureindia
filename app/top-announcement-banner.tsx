@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   getCurrentAuthUser,
+  isSuperAdminEmail,
   signOutGoogleUser,
   loginWithGoogleAccount,
   extractFirstName,
@@ -129,7 +130,7 @@ export function TopAnnouncementBanner() {
             <>
               <Link
                 href={
-                  authUser.role === "super_admin"
+                  isSuperAdminEmail(authUser?.email)
                     ? "/admin"
                     : authUser.role === "distributor"
                     ? "/dashboard"
@@ -137,7 +138,7 @@ export function TopAnnouncementBanner() {
                 }
                 className="gold-gradient-bg text-navy-900 font-bold px-3 py-1 rounded-lg text-[11px] hover:brightness-110 shadow-sm"
               >
-                {authUser.role === "super_admin"
+                {isSuperAdminEmail(authUser?.email)
                   ? "Open Master Admin →"
                   : authUser.role === "distributor"
                   ? "Open Partner Dashboard →"
