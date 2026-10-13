@@ -224,14 +224,33 @@ export default function AdminDashboardPage() {
         setVideos(JSON.parse(storedVideos));
       }
 
-      // 1. Initialize Distributors (Tier 2 Registry)
+      // 1. Initialize Distributors (Tier 2 Registry with live merge & server sync)
       const storedDist = localStorage.getItem("dcf_admin_distributors");
-      if (storedDist) {
-        setDistributors(JSON.parse(storedDist));
-      } else {
-        setDistributors(initialDistributorsData as Distributor[]);
-        localStorage.setItem("dcf_admin_distributors", JSON.stringify(initialDistributorsData));
+      let initialList: Distributor[] = storedDist ? JSON.parse(storedDist) : [...(initialDistributorsData as Distributor[])];
+      if (!Array.isArray(initialList)) initialList = [...(initialDistributorsData as Distributor[])];
+
+      // Merge initialDistributorsData to guarantee skylimits306@gmail.com and active entries
+      for (const initD of initialDistributorsData as Distributor[]) {
+        const idx = initialList.findIndex((d) => d.email && d.email.toLowerCase() === initD.email.toLowerCase());
+        if (idx === -1) {
+          initialList.unshift(initD);
+        } else if (initD.status === "Active" && initialList[idx].status !== "Active") {
+          initialList[idx] = { ...initialList[idx], ...initD, status: "Active" };
+        }
       }
+      setDistributors(initialList);
+      localStorage.setItem("dcf_admin_distributors", JSON.stringify(initialList));
+
+      // Fetch live distributors & pending requests from server
+      fetch("/api/admin/distributors")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.distributors && Array.isArray(data.distributors)) {
+            setDistributors(data.distributors);
+            localStorage.setItem("dcf_admin_distributors", JSON.stringify(data.distributors));
+          }
+        })
+        .catch(() => {});
 
       // 2. Initialize Customer Offers (Tier 1 Integration)
       const storedOffers = localStorage.getItem("dcf_customer_offers");

@@ -1,26 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServiceSupabase } from "@/lib/supabase/server";
+import fs from "fs";
+import path from "path";
+import { getServiceSupabase, isSupabaseServerConfigured } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+const DISTRIBUTORS_FILE = path.join(process.cwd(), "data", "distributors.json");
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
+  const email = searchParams.get("email");
   const token = searchParams.get("token");
 
-  if (!id) {
-    return NextResponse.json({ error: "Missing request id." }, { status: 400 });
+  const identifier = email || id;
+
+  if (!identifier) {
+    return NextResponse.json({ error: "Missing request id or email." }, { status: 400 });
   }
 
-  // Update status in Supabase if configured
+  const normalizedEmail = (email || (id && id.includes("@") ? id : "")).trim().toLowerCase();
+
+  // 1. Update status in Supabase if configured
+  if (isSupabaseServerConfigured()) {
+    try {
+      const supabase = getServiceSupabase();
+      if (normalizedEmail) {
+        await supabase
+          .from("partner_access_requests")
+          .update({ status: "approved", approved_at: new Date().toISOString() })
+          .ilike("email", normalizedEmail);
+      }
+      if (id) {
+        await supabase
+          .from("partner_access_requests")
+          .update({ status: "approved", approved_at: new Date().toISOString() })
+          .eq("request_id", id);
+      }
+    } catch (err) {
+      console.warn("Supabase update error:", err);
+    }
+  }
+
+  // 2. Update status in distributors.json
   try {
-    const supabase = getServiceSupabase();
-    await supabase
-      .from("partner_access_requests")
-      .update({ status: "approved", approved_at: new Date().toISOString() })
-      .eq("request_id", id);
+    if (fs.existsSync(DISTRIBUTORS_FILE)) {
+      const content = fs.readFileSync(DISTRIBUTORS_FILE, "utf-8");
+      const list = JSON.parse(content);
+      const idx = list.findIndex(
+        (d: any) =>
+          (normalizedEmail && d.email && d.email.toLowerCase() === normalizedEmail) ||
+          (id && d.id && d.id.toLowerCase() === id.toLowerCase())
+      );
+      if (idx >= 0) {
+        list[idx].status = "Active";
+        list[idx].permissions = ["Full Network Access", "Direct Selling Leader", "Weekly Payouts"];
+        fs.writeFileSync(DISTRIBUTORS_FILE, JSON.stringify(list, null, 2), "utf-8");
+      }
+    }
   } catch (err) {
-    console.warn("Supabase update error:", err);
+    console.warn("Could not write distributors file:", err);
   }
 
   // Return a friendly approval success page with instructions & unlock passcode
@@ -45,10 +84,10 @@ export async function GET(req: NextRequest) {
         <div class="card">
           <div class="badge">✓ Partner Approved</div>
           <h1>Partner Request Verified</h1>
-          <p>Request ID: <strong>${id}</strong> has been marked as <strong>Approved</strong> in Supabase.</p>
-          <div class="code-box">ACCESS PASSCODE: 10000</div>
-          <p>The partner can now enter passcode <strong>10000</strong> to view all confidential business plan links, the ₹15,000 hybrid model, and the Back-Office CRM.</p>
-          <a class="btn" href="/business-plan">Open Partner Portal →</a>
+          <p>Partner <strong>${identifier}</strong> has been marked as <strong>Approved & Active</strong>.</p>
+          <div class="code-box">STATUS: ACTIVE DISTRIBUTOR</div>
+          <p>The partner portal is now unlocked for <strong>${identifier}</strong>. They can log in via Google to access the full distributor dashboard and MLM network.</p>
+          <a class="btn" href="/dashboard">Open Partner Portal →</a>
         </div>
       </body>
     </html>

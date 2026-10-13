@@ -88,11 +88,12 @@ export default function DistributorManagementSection({
 
   // 1. Approve Action
   function handleApprove(id: string) {
+    const targetDist = distributors.find((d) => d.id === id || (d.email && d.email.toLowerCase() === id.toLowerCase()));
     const updated = distributors.map((d) => {
-      if (d.id === id) {
+      if (d.id === id || (d.email && d.email.toLowerCase() === id.toLowerCase())) {
         const perms = d.permissions.includes("Full Network Access")
           ? d.permissions
-          : [...d.permissions.filter((p) => !p.includes("Pending")), "Full Network Access"];
+          : [...d.permissions.filter((p) => !p.includes("Pending")), "Full Network Access", "Direct Selling Leader", "Weekly Payouts"];
         return { ...d, status: "Active" as const, permissions: perms };
       }
       return d;
@@ -101,13 +102,30 @@ export default function DistributorManagementSection({
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("dcf_auth_change"));
     }
-    onShowToast(`Distributor ${id} successfully approved and granted Network Access.`, "success");
+
+    // Persist approval to server API so partner access works across devices immediately
+    try {
+      fetch("/api/admin/distributors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          email: targetDist?.email,
+          status: "Active",
+        }),
+      });
+    } catch (e) {
+      console.warn("Server sync error:", e);
+    }
+
+    onShowToast(`Distributor ${targetDist?.name || id} (${targetDist?.email || id}) successfully approved and granted Network Access!`, "success");
   }
 
   // 2. Suspend Action
   function handleSuspend(id: string) {
+    const targetDist = distributors.find((d) => d.id === id || (d.email && d.email.toLowerCase() === id.toLowerCase()));
     const updated = distributors.map((d) => {
-      if (d.id === id) {
+      if (d.id === id || (d.email && d.email.toLowerCase() === id.toLowerCase())) {
         return {
           ...d,
           status: "Suspended" as const,
@@ -120,7 +138,23 @@ export default function DistributorManagementSection({
     if (typeof window !== "undefined") {
       window.dispatchEvent(new Event("dcf_auth_change"));
     }
-    onShowToast(`Distributor ${id} has been suspended. Operational workflows locked.`, "error");
+
+    // Persist suspension to server API
+    try {
+      fetch("/api/admin/distributors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          email: targetDist?.email,
+          status: "Suspended",
+        }),
+      });
+    } catch (e) {
+      console.warn("Server sync error:", e);
+    }
+
+    onShowToast(`Distributor ${targetDist?.name || id} has been suspended. Operational workflows locked.`, "error");
   }
 
   // 3. Open Modify Modal

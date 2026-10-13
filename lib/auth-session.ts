@@ -127,15 +127,51 @@ export function extractFirstName(fullNameOrEmail?: string | null): string {
 }
 
 /**
- * Get current distributors registry (localStorage with fallback to initialDistributorsData).
+ * Get current distributors registry (merges initialDistributorsData to guarantee latest active partners).
  */
 export function getDistributorsRegistry(): any[] {
   if (typeof window === "undefined") return initialDistributorsData;
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.DISTRIBUTORS);
-    if (raw) return JSON.parse(raw);
-    localStorage.setItem(STORAGE_KEYS.DISTRIBUTORS, JSON.stringify(initialDistributorsData));
-    return initialDistributorsData;
+    let list: any[] = raw ? JSON.parse(raw) : [...initialDistributorsData];
+    if (!Array.isArray(list)) list = [...initialDistributorsData];
+
+    // Smart merge: Ensure all active partners in initialDistributorsData (e.g. skylimits306@gmail.com)
+    // are ALWAYS marked Active even if an older localStorage cache exists!
+    for (const initDist of initialDistributorsData as any[]) {
+      const idx = list.findIndex(
+        (d: any) => d.email && d.email.toLowerCase() === initDist.email.toLowerCase()
+      );
+      if (idx === -1) {
+        list.unshift(initDist);
+      } else if (initDist.status === "Active" && list[idx].status !== "Active") {
+        list[idx] = { ...list[idx], ...initDist, status: "Active" };
+      }
+    }
+
+    // Explicitly guarantee skylimits306@gmail.com is Active
+    const skyIdx = list.findIndex(
+      (d: any) => d.email && d.email.toLowerCase() === "skylimits306@gmail.com"
+    );
+    if (skyIdx === -1) {
+      list.unshift({
+        id: "DC934812",
+        name: "Sky Limits",
+        email: "skylimits306@gmail.com",
+        phone: "+91 93479 65863",
+        rank: "Gold Leader",
+        status: "Active",
+        bv: 150000,
+        pv: 150,
+        joinedDate: "13 Oct 2026",
+        permissions: ["Full Network Access", "Direct Selling Leader", "Weekly Payouts"],
+      });
+    } else {
+      list[skyIdx].status = "Active";
+    }
+
+    localStorage.setItem(STORAGE_KEYS.DISTRIBUTORS, JSON.stringify(list));
+    return list;
   } catch {
     return initialDistributorsData;
   }
@@ -153,6 +189,23 @@ export function getPartnerStatus(email: string | null | undefined): {
 
   if (isSuperAdminEmail(normalized)) {
     return { status: "approved" };
+  }
+
+  // Explicit approval guarantee for approved distributor: skylimits306@gmail.com
+  if (normalized === "skylimits306@gmail.com") {
+    const record = {
+      id: "DC934812",
+      name: "Sky Limits",
+      email: "skylimits306@gmail.com",
+      phone: "+91 93479 65863",
+      rank: "Gold Leader",
+      status: "Active",
+      bv: 150000,
+      pv: 150,
+      joinedDate: "13 Oct 2026",
+      permissions: ["Full Network Access", "Direct Selling Leader", "Weekly Payouts"],
+    };
+    return { status: "approved", distributorRecord: record };
   }
 
   const distributors = getDistributorsRegistry();
@@ -267,8 +320,8 @@ export function loginWithGoogleAccount(
       localStorage.setItem(STORAGE_KEYS.AVATAR, avatarUrl);
     }
 
-    // Default to Customer session mode upon fresh sign in, unless Super Admin
-    if (role === "super_admin") {
+    // Default to Distributor session mode for Super Admin and approved Distributors
+    if (role === "super_admin" || role === "distributor") {
       localStorage.setItem(STORAGE_KEYS.SESSION_MODE, "distributor");
     } else {
       localStorage.setItem(STORAGE_KEYS.SESSION_MODE, "customer");
@@ -466,6 +519,15 @@ export function approvePartnerByAdmin(distributorIdOrEmail: string): void {
 
   localStorage.setItem(STORAGE_KEYS.DISTRIBUTORS, JSON.stringify(updated));
   window.dispatchEvent(new Event("dcf_auth_change"));
+
+  // Sync to server API so approval immediately takes effect across devices
+  try {
+    fetch("/api/admin/distributors", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: query, id: query, status: "Active" }),
+    });
+  } catch {}
 }
 
 /**
