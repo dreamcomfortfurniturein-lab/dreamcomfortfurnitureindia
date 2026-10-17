@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Fraunces, Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
@@ -20,6 +19,9 @@ export const metadata: Metadata = {
   title: "dreamcomfortfurnitureindia | Handcrafted Solid Wood Luxury Furniture",
   description:
     "India's premier solid Sheesham & CP Teak furniture workshop. Discover hand-carved maharaja sofas, solid teak hydraulic beds, dining suites, and ergonomic office furniture.",
+  other: {
+    "google-adsense-account": "ca-pub-7132015137354089",
+  },
 };
 
 export default function RootLayout({
@@ -30,11 +32,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <Script
+        <meta name="google-adsense-account" content="ca-pub-7132015137354089" />
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7132015137354089"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </head>
       <body className={`${fraunces.variable} ${inter.variable} font-body bg-navy-900 text-sand-100 min-h-screen flex flex-col antialiased`}>
