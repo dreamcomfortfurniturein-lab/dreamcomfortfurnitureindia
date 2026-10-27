@@ -22,7 +22,6 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("Telangana");
   const [pincode, setPincode] = useState("");
-  const [sponsorCode, setSponsorCode] = useState("DC109283");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isTestSuccess, setIsTestSuccess] = useState(false);
@@ -286,7 +285,7 @@ export default function CheckoutPage() {
 
               <div className="p-3 rounded-lg bg-navy-950 text-[11px] text-slate-400 space-y-1">
                 <p>✓ 100% Secure 256-bit Encrypted Payments (UPI, Cards, NetBanking)</p>
-                <p>✓ Direct Selling Cooling-off Guarantee Included</p>
+                <p>✓ 10-Year Solid Wood Warranty & Transit Insurance Included</p>
               </div>
             </div>
           </div>

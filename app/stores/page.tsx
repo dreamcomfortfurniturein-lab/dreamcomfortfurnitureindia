@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Franchise & Experience Centers | DreamComfortFurnitureIndia",
-  description: "Visit our direct selling franchise galleries and experience centers across India.",
+  title: "Showrooms & Experience Centers | Dream Comfort Furniture India",
+  description: "Visit our furniture experience centers and luxury showrooms across India.",
 };
 
 export default function StoresPage() {

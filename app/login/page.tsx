@@ -133,8 +133,6 @@ export default function LoginPage() {
         setLoading(false);
         if (isSuperAdminEmail(user.email)) {
           router.push("/admin");
-        } else if (user.role === "distributor") {
-          router.push("/dashboard");
         } else {
           router.push("/customer");
         }
@@ -210,7 +208,7 @@ export default function LoginPage() {
           <div className="glass-card rounded-3xl p-6 sm:p-8 border border-gold/30 shadow-2xl space-y-6 bg-navy-900/90 relative overflow-hidden">
             <div className="text-center space-y-2">
               <div className="w-12 h-12 rounded-2xl bg-gold/20 text-gold mx-auto flex items-center justify-center text-xl font-bold border border-gold/40">
-                {isSuperAdminEmail(authUser.email) ? "👑" : authUser.role === "distributor" ? "💼" : "🛍️"}
+                {isSuperAdminEmail(authUser.email) ? "👑" : "🛍️"}
               </div>
               <h2 className="font-display text-xl sm:text-2xl font-bold text-sand-50">
                 Welcome back, {extractFirstName(authUser.name || authUser.email)}!
@@ -235,20 +233,12 @@ export default function LoginPage() {
 
             <div className="space-y-3">
               <Link
-                href={
-                  isSuperAdminEmail(authUser.email)
-                    ? "/admin"
-                    : authUser.role === "distributor"
-                    ? "/dashboard"
-                    : "/customer"
-                }
+                href={isSuperAdminEmail(authUser.email) ? "/admin" : "/customer"}
                 className="w-full py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 shadow-lg shadow-gold/20 transition-all flex items-center justify-center gap-2"
               >
                 <span>
                   {isSuperAdminEmail(authUser.email)
                     ? "Enter Master Admin Portal →"
-                    : authUser.role === "distributor"
-                    ? "Enter Distributor Portal →"
                     : "Enter Customer Portal & Offers →"}
                 </span>
               </Link>

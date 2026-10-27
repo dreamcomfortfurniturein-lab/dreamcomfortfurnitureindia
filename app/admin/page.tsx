@@ -93,13 +93,13 @@ const INITIAL_VIDEOS: VideoMeta[] = [
   },
   {
     id: "vid-3",
-    title: "Client Testimonial: Dr. Srinivas Rao Villa Setup",
-    type: "testimonial",
+    title: "Luxury Villa Teak Suite Installation",
+    type: "showroom",
     url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     thumbnailUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=600&q=80",
     sourceType: "direct_mp4",
     duration: "02:10",
-    description: "Verified customer review on the white-glove installation of our Maharaja Teak suite.",
+    description: "Architectural overview on the white-glove installation of our Maharaja Teak suite.",
     createdAt: "2026-04-01",
   },
 ];
@@ -848,7 +848,7 @@ export default function AdminDashboardPage() {
               }`}
             >
               <span>👥</span>
-              <span>Distributor Management</span>
+              <span>Trade & Client Inquiries</span>
               <span className="ml-1 text-[10px] px-1.5 py-0.2 rounded-full bg-gold/20 text-gold font-bold">
                 {distributors.length}
               </span>

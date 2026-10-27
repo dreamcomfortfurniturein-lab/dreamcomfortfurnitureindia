@@ -73,7 +73,7 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
             </div>
           </div>
 
-          {/* Purchasing & MLM Earning Details */}
+          {/* Purchasing & Pricing Details */}
           <div className="lg:col-span-5 space-y-6">
             <div>
               <span className="text-xs font-semibold text-gold tracking-widest uppercase">

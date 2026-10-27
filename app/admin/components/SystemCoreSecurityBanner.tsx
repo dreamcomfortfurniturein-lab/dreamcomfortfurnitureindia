@@ -76,13 +76,13 @@ export default function SystemCoreSecurityBanner({
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/products"
             target="_blank"
             className="text-xs px-3 py-1.5 rounded-xl bg-navy-800/90 hover:bg-navy-750 text-sand-200 border border-gold/20 hover:border-gold transition-all flex items-center gap-1.5"
-            title="Inspect Distributor MLM Portal"
+            title="Inspect Live Furniture Catalog"
           >
-            <span>💼</span>
-            <span>Distributor Portal</span>
+            <span>🛋️</span>
+            <span>Furniture Catalog</span>
             <span className="text-[10px] text-emerald-400">● Live</span>
           </Link>
 

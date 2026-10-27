@@ -43,8 +43,8 @@ function ProductsContent() {
 
   function handleShare(slug: string, productName: string) {
     const origin = typeof window !== "undefined" ? window.location.origin : "https://dreamcomfortfurnitureindia.com";
-    const refUrl = `${origin}/products/${slug}?ref=DC109283`;
-    navigator.clipboard.writeText(refUrl);
+    const cleanUrl = `${origin}/products/${slug}`;
+    navigator.clipboard.writeText(cleanUrl);
     setCopiedSlug(slug);
     setTimeout(() => setCopiedSlug(null), 2500);
   }

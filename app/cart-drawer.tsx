@@ -39,7 +39,7 @@ export default function CartDrawer() {
               <span className="p-2 rounded-lg bg-gold/10 text-gold text-xl">🛒</span>
               <div>
                 <h2 className="text-lg font-bold text-sand-100 font-display">Your Furniture Order</h2>
-                <p className="text-xs text-gold/80">Direct Factory Wholesale & Commission Tracked</p>
+                <p className="text-xs text-gold/80">Direct Workshop Pricing • 10-Yr Guarantee</p>
               </div>
             </div>
             <button

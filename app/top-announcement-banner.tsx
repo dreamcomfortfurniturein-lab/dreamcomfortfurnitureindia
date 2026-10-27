@@ -9,14 +9,11 @@ import {
   signOutGoogleUser,
   loginWithGoogleAccount,
   extractFirstName,
-  getSessionTimeRemainingSeconds,
-  formatTimeRemaining,
   DCFAuthUser,
 } from "@/lib/auth-session";
 
 export function TopAnnouncementBanner() {
   const [authUser, setAuthUser] = useState<DCFAuthUser | null>(null);
-  const [sessionRemaining, setSessionRemaining] = useState<number>(0);
   const supabase = createClient();
 
   useEffect(() => {
@@ -69,26 +66,6 @@ export function TopAnnouncementBanner() {
     };
   }, [supabase]);
 
-  // Session Time Limit monitoring & auto expiration
-  useEffect(() => {
-    if (!authUser) {
-      setSessionRemaining(0);
-      return;
-    }
-    function updateCountdown() {
-      const remaining = getSessionTimeRemainingSeconds();
-      setSessionRemaining(remaining);
-      if (remaining <= 0 && authUser) {
-        signOutGoogleUser();
-        setAuthUser(null);
-        window.location.href = "/login?reason=session_expired";
-      }
-    }
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, [authUser]);
-
   async function handleLogout() {
     signOutGoogleUser();
     try {
@@ -103,25 +80,19 @@ export function TopAnnouncementBanner() {
   const firstName = authUser ? extractFirstName(authUser.name || authUser.email) : "";
 
   return (
-    <div className="bg-gradient-to-r from-navy-950 via-gold/15 to-navy-950 border-b border-gold/30 py-2.5 px-4 text-center">
+    <div className="bg-gradient-to-r from-navy-950 via-gold/15 to-navy-950 border-b border-gold/30 py-2 px-4 text-center">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2 text-sand-200">
-          <span className="text-gold font-bold">✨ Welcome to Dream Comfort:</span>
+          <span className="text-gold font-bold">✨ Dream Comfort Furniture:</span>
           {authUser ? (
             <span className="flex items-center gap-2 flex-wrap">
               <span>
-                Welcome back, <strong className="text-gold font-bold">{firstName}</strong>!
+                Welcome, <strong className="text-gold font-bold">{firstName}</strong>!
               </span>
-              <span
-                className="px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 font-mono text-[10px] inline-flex items-center gap-1"
-                title="Free Session Duration"
-              >
-                <span>⏱️</span>
-                <span>Session: {formatTimeRemaining(sessionRemaining)}</span>
-              </span>
+              <span className="text-slate-300 hidden md:inline">• 100% Solid Teak & Sheesham Wood • 10-Year Guarantee</span>
             </span>
           ) : (
-            <span>Handcrafted Solid Teak & Sheesham Wood • 10-Year Anti-Termite Guarantee</span>
+            <span>Handcrafted Solid Teak & Sheesham Wood • 10-Year Anti-Termite Guarantee • Direct Workshop Pricing</span>
           )}
         </div>
 
@@ -129,20 +100,12 @@ export function TopAnnouncementBanner() {
           {authUser ? (
             <>
               <Link
-                href={
-                  isSuperAdminEmail(authUser?.email)
-                    ? "/admin"
-                    : authUser.role === "distributor"
-                    ? "/dashboard"
-                    : "/customer"
-                }
+                href={isSuperAdminEmail(authUser?.email) ? "/admin" : "/customer"}
                 className="gold-gradient-bg text-navy-900 font-bold px-3 py-1 rounded-lg text-[11px] hover:brightness-110 shadow-sm"
               >
                 {isSuperAdminEmail(authUser?.email)
-                  ? "Open Master Admin →"
-                  : authUser.role === "distributor"
-                  ? "Open Partner Dashboard →"
-                  : "View My Offers & Discounts →"}
+                  ? "Master Admin →"
+                  : "My Customer Hub & Offers →"}
               </Link>
               <button
                 onClick={handleLogout}
@@ -155,10 +118,10 @@ export function TopAnnouncementBanner() {
           ) : (
             <>
               <Link
-                href="/signup"
+                href="/products"
                 className="gold-gradient-bg text-navy-900 font-bold px-3 py-1 rounded-lg text-[11px] hover:brightness-110 shadow-sm"
               >
-                Sign Up via Google (Unlock 25% Off) →
+                Explore Furniture Catalog →
               </Link>
               <Link
                 href="/login"

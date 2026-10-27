@@ -7,18 +7,43 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        forest: {
+          DEFAULT: "#1A3A2A",
+          dark: "#111812",
+          deep: "#0F261B",
+          light: "#25533C",
+          subtle: "#F0F5F2",
+        },
+        offwhite: {
+          DEFAULT: "#FBFBFA",
+          warm: "#F5F5F0",
+          pure: "#FFFFFF",
+          muted: "#EDECE8",
+        },
+        charcoal: {
+          DEFAULT: "#111111",
+          soft: "#222222",
+          muted: "#555555",
+          light: "#777777",
+        },
+        gold: {
+          DEFAULT: "#D4AF37",
+          warm: "#D4AF37",
+          light: "#F7E7A9",
+          accent: "#E5C058",
+          dark: "#B38F24",
+          shimmer: "#FBBF24",
+        },
+        brass: {
+          DEFAULT: "#C5A059",
+          dark: "#9E7B36",
+          light: "#DFC387",
+        },
         navy: {
           900: "#090E1A",
           800: "#0F172A",
           700: "#1E293B",
           600: "#334155",
-        },
-        gold: {
-          DEFAULT: "#D97706",
-          light: "#FDE68A",
-          accent: "#EAB308",
-          dark: "#B45309",
-          shimmer: "#FBBF24",
         },
         teak: {
           DEFAULT: "#78350F",
@@ -34,12 +59,10 @@ module.exports = {
         walnut: "#2B1D14",
         linen: "#F1E8D9",
         cream: "#FAF6EF",
-        brass: "#B08D57",
         sage: "#4A5D45",
-        charcoal: "#24211D",
       },
       fontFamily: {
-        display: ["var(--font-fraunces)", "var(--font-playfair)", "serif"],
+        display: ["var(--font-fraunces)", "var(--font-playfair)", "Georgia", "serif"],
         body: ["var(--font-inter)", "sans-serif"],
       },
     },

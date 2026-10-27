@@ -9,15 +9,12 @@ import {
   isSuperAdminEmail,
   signOutGoogleUser,
   loginWithGoogleAccount,
-  getActiveSessionMode,
-  setActiveSessionMode,
   extractFirstName,
   DCFAuthUser,
 } from "@/lib/auth-session";
 
 export default function NavAuth() {
   const [authUser, setAuthUser] = useState<DCFAuthUser | null>(null);
-  const [sessionMode, setSessionMode] = useState<"customer" | "distributor">("customer");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
@@ -26,7 +23,6 @@ export default function NavAuth() {
     function syncUser() {
       const user = getCurrentAuthUser();
       setAuthUser(user);
-      setSessionMode(getActiveSessionMode());
       setLoading(false);
     }
 
@@ -41,7 +37,6 @@ export default function NavAuth() {
         const avatar = meta.avatar_url || meta.picture || undefined;
         const loggedIn = loginWithGoogleAccount(sessionUser.email, fullName, avatar);
         setAuthUser(loggedIn);
-        setSessionMode(getActiveSessionMode());
         setLoading(false);
         return loggedIn;
       }
@@ -51,7 +46,7 @@ export default function NavAuth() {
     // 1. Initial sync from local storage
     syncUser();
 
-    // 2. Initial sync from active Supabase session (handles OAuth redirects)
+    // 2. Initial sync from active Supabase session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.email) {
         syncFromSupabase(session.user);
@@ -60,9 +55,8 @@ export default function NavAuth() {
       }
     });
 
-    // 3. Listen to in-app & cross-tab auth state changes
+    // 3. Listen to auth state changes
     window.addEventListener("dcf_auth_change", syncUser);
-    window.addEventListener("dcf_session_mode_change", syncUser);
     window.addEventListener("storage", syncUser);
 
     // 4. Supabase auth change listener
@@ -77,7 +71,6 @@ export default function NavAuth() {
 
     return () => {
       window.removeEventListener("dcf_auth_change", syncUser);
-      window.removeEventListener("dcf_session_mode_change", syncUser);
       window.removeEventListener("storage", syncUser);
       listener.subscription.unsubscribe();
     };
@@ -99,7 +92,6 @@ export default function NavAuth() {
 
   if (authUser) {
     const isSuperAdmin = isSuperAdminEmail(authUser.email);
-    const isDistributor = authUser.role === "distributor";
     const firstName = extractFirstName(authUser.name || authUser.email);
 
     return (
@@ -125,7 +117,7 @@ export default function NavAuth() {
           </span>
         </div>
 
-        {/* Role Portal Shortcut */}
+        {/* Account / Admin Link */}
         {isSuperAdmin ? (
           <Link
             href="/admin"
@@ -135,51 +127,36 @@ export default function NavAuth() {
             <span>👑</span>
             <span className="hidden md:inline">Admin</span>
           </Link>
-        ) : isDistributor ? (
-          <Link
-            href={sessionMode === "distributor" ? "/dashboard" : "/customer"}
-            onClick={() => {
-              if (sessionMode !== "distributor") {
-                setActiveSessionMode("distributor");
-              }
-            }}
-            className="px-2.5 py-1 rounded-lg bg-gold/20 text-gold border border-gold/40 font-semibold flex items-center gap-1 hover:brightness-110"
-            title="Distributor / Partner Access"
-          >
-            <span>💼</span>
-            <span className="hidden md:inline">Partner</span>
-          </Link>
         ) : (
           <Link
             href="/customer"
-            className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/40 font-semibold flex items-center gap-1 hover:brightness-110"
-            title="Customer Portal"
+            className="px-2.5 py-1 rounded-lg bg-gold/20 text-gold border border-gold/40 font-semibold flex items-center gap-1 hover:brightness-110"
+            title="Customer Account & Offers"
           >
             <span>🛍️</span>
-            <span className="hidden md:inline">Portal</span>
+            <span className="hidden md:inline">My Account</span>
           </Link>
         )}
 
-        {/* ONLY Log Out button - strictly "Log Out", no "Sign In" */}
         <button
           onClick={handleLogout}
-          className="px-2.5 py-1 rounded-lg bg-navy-850 hover:bg-red-950/60 text-sand-300 hover:text-red-300 border border-sand-700/50 hover:border-red-500/40 font-semibold transition-all text-xs flex items-center gap-1 shadow-sm"
-          title="Log Out"
+          className="text-slate-400 hover:text-red-300 text-[11px] px-1.5 py-1 rounded hover:bg-navy-800 transition-colors"
+          title="Sign Out"
         >
-          <span>Log Out</span>
+          Sign Out
         </button>
       </div>
     );
   }
 
-  // When not signed in: show Google Sign In button
   return (
-    <Link
-      href="/login"
-      className="px-3.5 py-1.5 rounded-lg border border-gold/40 text-gold hover:bg-gold hover:text-navy-900 transition-all text-xs font-semibold flex items-center gap-1.5 shadow-sm shadow-gold/20"
-    >
-      <span>G</span>
-      <span>Google Sign In</span>
-    </Link>
+    <div className="flex items-center gap-2 text-xs">
+      <Link
+        href="/login"
+        className="px-3 py-1.5 rounded-lg border border-gold/40 text-sand-200 hover:text-gold hover:border-gold transition-colors font-medium whitespace-nowrap"
+      >
+        Sign In
+      </Link>
+    </div>
   );
 }
