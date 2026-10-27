@@ -20,6 +20,7 @@ export type CartItem = {
   pv?: number;
   image: string;
   qty: number;
+  material?: string;
 };
 
 type CartContextType = {
