@@ -1,0 +1,3369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dream Comfort Furniture — Media & Room Category Admin</title>
+  <meta name="description" content="Responsive Admin Dashboard to manage photos and videos organized by room categories with Cloudinary upload, Drag & Drop reordering, Lightbox viewer, and JSON persistence.">
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Cloudinary Upload Widget API -->
+  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & CSS VARIABLES (Dark Glassmorphism Theme)
+       ========================================================================== */
+    :root {
+      --bg-base: #0a0d14;
+      --bg-surface: #101522;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-hover: rgba(28, 36, 56, 0.85);
+      --bg-glass: rgba(255, 255, 255, 0.035);
+      --bg-glass-elevated: rgba(255, 255, 255, 0.07);
+      
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(212, 175, 55, 0.55);
+      --border-accent: #d4af37;
+      
+      --accent-gold: #d4af37;
+      --accent-gold-hover: #b8972e;
+      --accent-gold-subtle: rgba(212, 175, 55, 0.12);
+      --accent-cyan: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 20px 40px -8px rgba(0, 0, 0, 0.7);
+      --shadow-gold: 0 0 24px rgba(212, 175, 55, 0.22);
+      
+      --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      --sidebar-width: 300px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(56, 189, 248, 0.04) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(10, 13, 20, 0.96) 0%, rgba(10, 13, 20, 1) 100%);
+      background-attachment: fixed;
+    }
+
+    /* Headings font */
+    h1, h2, h3, h4, .brand-font {
+      font-family: 'Outfit', 'Inter', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 13, 20, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(212, 175, 55, 0.4);
+    }
+
+    /* ==========================================================================
+       LAYOUT & HEADER
+       ========================================================================== */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* TOP NAVBAR */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(13, 17, 27, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.85rem 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: var(--bg-glass-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+    }
+
+    .brand-logo-badge {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #d4af37, #92751f);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+      color: #0b0e14;
+      font-weight: 800;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .brand-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-tagline {
+      font-size: 0.75rem;
+      color: var(--accent-gold);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .cloudinary-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--accent-cyan);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .cloudinary-status-badge:hover {
+      background: rgba(56, 189, 248, 0.2);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: var(--transition-fast);
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #e3c158, #c29d2b);
+      color: #0b0f17;
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+    }
+    .btn-gold:hover {
+      background: linear-gradient(135deg, #ebd178, #d4af37);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-glass {
+      background: var(--bg-glass-elevated);
+      border-color: var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .btn-glass:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-subtle {
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-subtle:hover {
+      color: var(--text-primary);
+      background: var(--bg-glass-elevated);
+    }
+
+    .btn-danger-subtle {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      color: #fb7185;
+    }
+    .btn-danger-subtle:hover {
+      background: rgba(244, 63, 94, 0.2);
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.78rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ==========================================================================
+       MAIN APP LAYOUT: SIDEBAR + CONTENT
+       ========================================================================== */
+    .app-main {
+      display: flex;
+      flex: 1;
+      position: relative;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: rgba(14, 18, 29, 0.75);
+      border-right: 1px solid var(--border-subtle);
+      backdrop-filter: blur(12px);
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      flex-shrink: 0;
+      min-height: calc(100vh - 65px);
+    }
+
+    .sidebar-section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      list-style: none;
+    }
+
+    .category-tab-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 0.85rem;
+      border-radius: var(--radius-md);
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: var(--transition-fast);
+      user-select: none;
+    }
+
+    .category-tab-item:hover {
+      background: var(--bg-glass-elevated);
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .category-tab-item.active {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(212, 175, 55, 0.05));
+      border-color: rgba(212, 175, 55, 0.35);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    .category-tab-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .category-icon {
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .category-title {
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .category-badge-count {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-secondary);
+      transition: var(--transition-fast);
+    }
+
+    .category-tab-item.active .category-badge-count {
+      background: var(--accent-gold);
+      color: #0c0f17;
+    }
+
+    /* Category management tools in sidebar */
+    .sidebar-footer-stats {
+      margin-top: auto;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .stat-val {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* MAIN CONTENT AREA */
+    .content-area {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* BANNER / CATEGORY HERO */
+    .category-banner {
+      background: linear-gradient(135deg, rgba(22, 29, 46, 0.9) 0%, rgba(14, 18, 30, 0.95) 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .category-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .banner-left {
+      position: relative;
+      z-index: 2;
+    }
+
+    .banner-breadcrumbs {
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .banner-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .banner-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 0.4rem;
+      max-width: 680px;
+    }
+
+    .banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      position: relative;
+      z-index: 2;
+      flex-wrap: wrap;
+    }
+
+    /* CONTROLS & FILTER BAR */
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      background: rgba(16, 22, 35, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1.25rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .filter-group-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 240px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.85rem 0.5rem 2.25rem;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: var(--transition-fast);
+    }
+    .search-input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    }
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .pill-filter-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.2rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      gap: 0.2rem;
+    }
+
+    .pill-btn {
+      padding: 0.35rem 0.8rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .pill-btn:hover {
+      color: var(--text-primary);
+    }
+    .pill-btn.active {
+      background: var(--bg-card-hover);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .filter-group-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .reorder-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* ==========================================================================
+       MEDIA GRID & CARDS
+       ========================================================================== */
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .media-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(8px);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .media-card:active {
+      cursor: grabbing;
+    }
+
+    .media-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(212, 175, 55, 0.4);
+      box-shadow: var(--shadow-md), 0 0 20px rgba(212, 175, 55, 0.12);
+    }
+
+    /* Dragging States */
+    .media-card.dragging {
+      opacity: 0.45;
+      transform: scale(0.97);
+      border: 2px dashed var(--accent-gold);
+    }
+
+    .media-card.drag-over {
+      border: 2px solid var(--accent-gold);
+      box-shadow: var(--shadow-gold);
+      transform: translateY(-8px);
+    }
+
+    /* Card Media Box */
+    .card-media-box {
+      width: 100%;
+      height: 220px;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .card-media-box.vertical-preview {
+      /* Gives slight visual clue if vertical */
+      background: #080a10;
+    }
+
+    .card-img-preview,
+    .card-video-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .media-card:hover .card-img-preview,
+    .media-card:hover .card-video-preview {
+      transform: scale(1.05);
+    }
+
+    /* Badges overlaid on preview */
+    .media-type-badge {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 3;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .badge-photo {
+      background: rgba(56, 189, 248, 0.85);
+      color: #0b1320;
+    }
+
+    .badge-video {
+      background: rgba(168, 85, 247, 0.85);
+      color: #ffffff;
+    }
+
+    .media-ratio-badge {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 3;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* Video Play Icon Overlay */
+    .video-play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      transition: background var(--transition-fast);
+      z-index: 2;
+    }
+    .video-play-overlay:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .play-button-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.9);
+      color: #0b0f17;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.5);
+      transition: transform var(--transition-fast);
+    }
+    .media-card:hover .play-button-circle {
+      transform: scale(1.15);
+    }
+
+    /* Card Content Info */
+    .card-body {
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 0.5rem;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: auto;
+      padding-top: 0.6rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card-order-tag {
+      font-weight: 700;
+      color: var(--accent-gold);
+      background: rgba(212, 175, 55, 0.1);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    /* Card Actions Toolbar */
+    .card-actions-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      background: rgba(0, 0, 0, 0.25);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .reorder-btns-group {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .card-reorder-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--bg-glass-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: var(--transition-fast);
+    }
+    .card-reorder-btn:hover:not(:disabled) {
+      background: var(--accent-gold);
+      color: #0b0f17;
+      border-color: var(--accent-gold);
+    }
+    .card-reorder-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .card-item-tools {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 4rem 2rem;
+      background: var(--bg-card);
+      border: 2px dashed var(--border-subtle);
+      border-radius: var(--radius-xl);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .empty-icon {
+      font-size: 3.5rem;
+      opacity: 0.7;
+    }
+    .empty-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .empty-desc {
+      color: var(--text-secondary);
+      max-width: 440px;
+      font-size: 0.9rem;
+    }
+
+    /* ==========================================================================
+       MODALS (Upload, Edit, Lightbox, Settings, Export/Import)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 12, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-normal);
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-window {
+      background: #111625;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 620px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg), 0 0 50px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95) translateY(12px);
+      transition: transform var(--transition-normal);
+    }
+
+    .modal-backdrop.active .modal-window {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 1.35rem 1.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: #111625;
+      z-index: 10;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .modal-close-btn {
+      background: var(--bg-glass-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      font-size: 1.1rem;
+    }
+    .modal-close-btn:hover {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fb7185;
+      border-color: rgba(244, 63, 94, 0.4);
+    }
+
+    .modal-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .modal-footer {
+      padding: 1.25rem 1.75rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      background: rgba(9, 13, 22, 0.5);
+    }
+
+    /* Modal Form Elements */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.9rem;
+      font-size: 0.9rem;
+      color: #fff;
+      outline: none;
+      transition: var(--transition-fast);
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Upload Mode Switcher (Tabs inside modal) */
+    .upload-type-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.3rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-tab-btn {
+      padding: 0.6rem 0.5rem;
+      text-align: center;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      transition: var(--transition-fast);
+    }
+
+    .upload-tab-btn:hover {
+      color: #fff;
+      background: var(--bg-glass-elevated);
+    }
+
+    .upload-tab-btn.active {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.1));
+      color: #fff;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+    }
+
+    /* Cloudinary Direct Trigger Box */
+    .cloudinary-trigger-box {
+      border: 2px dashed rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.04);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      transition: var(--transition-fast);
+    }
+    .cloudinary-trigger-box:hover {
+      background: rgba(56, 189, 248, 0.08);
+      border-color: var(--accent-cyan);
+    }
+
+    .preview-box {
+      width: 100%;
+      height: 180px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .preview-box img,
+    .preview-box video {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* Radio Pills for Aspect Ratio */
+    .ratio-radio-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .ratio-radio-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-secondary);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .ratio-radio-label input {
+      display: none;
+    }
+
+    .ratio-radio-label:has(input:checked) {
+      border-color: var(--accent-gold);
+      background: rgba(212, 175, 55, 0.15);
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       FULLSCREEN LIGHTBOX VIEWER
+       (Supports Landscape/Horizontal & Portrait/Vertical with Viewport limits)
+       ========================================================================== */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 5, 9, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .lightbox-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-topbar {
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 10;
+    }
+
+    .lightbox-title-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .lightbox-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .lightbox-category-tag {
+      font-size: 0.78rem;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    .lightbox-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .lightbox-counter {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .lightbox-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 1.5rem;
+      overflow: hidden;
+    }
+
+    /* The Media Container strictly adheres to viewport limits max-height 90vh, max-width 90vw */
+    .lightbox-media-container {
+      max-width: 90vw;
+      max-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Handling orientation dynamically */
+    .lightbox-media-container.orientation-horizontal {
+      width: min(90vw, 1200px);
+    }
+    .lightbox-media-container.orientation-vertical {
+      height: 82vh;
+      max-width: min(90vw, 550px);
+    }
+
+    .lightbox-img {
+      max-width: 90vw;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      transition: transform 0.2s ease;
+    }
+
+    .lightbox-video {
+      max-width: 90vw;
+      max-height: 82vh;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      background: #000;
+      outline: none;
+    }
+
+    /* Lightbox Navigation Arrows */
+    .lightbox-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(20, 26, 40, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.4rem;
+      z-index: 10;
+      transition: var(--transition-fast);
+      backdrop-filter: blur(8px);
+    }
+    .lightbox-nav-btn:hover {
+      background: var(--accent-gold);
+      color: #0c0f17;
+      border-color: var(--accent-gold);
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: var(--shadow-gold);
+    }
+
+    .lightbox-prev {
+      left: 2rem;
+    }
+    .lightbox-next {
+      right: 2rem;
+    }
+
+    .lightbox-caption-bar {
+      padding: 0.85rem 2rem;
+      background: rgba(10, 13, 20, 0.85);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       TOAST NOTIFICATIONS
+       ========================================================================== */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--radius-md);
+      background: rgba(17, 24, 39, 0.94);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      font-size: 0.86rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all var(--transition-normal);
+      max-width: 380px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-success {
+      border-left: 4px solid var(--accent-emerald);
+    }
+    .toast-info {
+      border-left: 4px solid var(--accent-cyan);
+    }
+    .toast-warning {
+      border-left: 4px solid var(--accent-gold);
+    }
+    .toast-error {
+      border-left: 4px solid var(--accent-rose);
+    }
+
+    /* ==========================================================================
+       JSON EXPORT/IMPORT MODAL CODE BLOCK
+       ========================================================================== */
+    .json-code-preview {
+      background: #080b12;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      color: #38bdf8;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      max-height: 320px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 960px) {
+      .app-main {
+        flex-direction: column;
+      }
+      .mobile-menu-btn {
+        display: flex;
+      }
+      .sidebar {
+        width: 100%;
+        min-height: auto;
+        display: none;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+      .sidebar.open {
+        display: flex;
+      }
+      .content-area {
+        padding: 1.25rem;
+      }
+      .category-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+        padding: 1.5rem;
+      }
+      .lightbox-prev {
+        left: 0.75rem;
+      }
+      .lightbox-next {
+        right: 0.75rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .media-grid {
+        grid-template-columns: 1fr;
+      }
+      .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-box {
+        width: 100%;
+      }
+      .header-actions {
+        gap: 0.35rem;
+      }
+      .top-header {
+        padding: 0.75rem 1rem;
+      }
+      .brand-title {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- ========================================================================
+         TOP HEADER BAR
+         ======================================================================== -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuToggle" title="Toggle Category Navigation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        
+        <div class="brand-group">
+          <div class="brand-logo-badge">DC</div>
+          <div class="brand-meta">
+            <span class="brand-title">Dream Comfort Furniture <span style="font-size: 0.75rem; font-weight: 500; color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.4); padding: 0.1rem 0.4rem; border-radius: 4px;">Studio Admin</span></span>
+            <span class="brand-tagline">Visual Media & Category Dashboard</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Cloudinary integration badge / quick status -->
+        <div class="cloudinary-status-badge" id="cloudinaryBadge" title="Click to configure Cloudinary credentials">
+          <span class="status-dot"></span>
+          <span>Cloudinary Widget Active</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <button class="btn btn-glass btn-sm" id="btnOpenSettings" title="Configure Cloudinary & Defaults">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Settings</span>
+        </button>
+
+        <button class="btn btn-glass btn-sm" id="btnExportJSON" title="Export media catalog to JSON">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>JSON Export</span>
+        </button>
+
+        <button class="btn btn-glass btn-sm" id="btnImportJSON" title="Import from JSON file or text">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Import</span>
+        </button>
+
+        <button class="btn btn-gold btn-sm" id="btnOpenUploadModal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Add Media</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ========================================================================
+         MAIN INTERFACE (SIDEBAR + CONTENT)
+         ======================================================================== -->
+    <div class="app-main">
+      
+      <!-- SIDEBAR: EXPLORE BY CATEGORY -->
+      <aside class="sidebar" id="categorySidebar">
+        <div class="sidebar-section-title">
+          <span>Explore By Category</span>
+          <button class="btn btn-subtle btn-sm" id="btnAddCategoryBtn" title="Create new category folder" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">
+            + New
+          </button>
+        </div>
+
+        <!-- Category Folder Items -->
+        <ul class="sidebar-category-list" id="categoryListContainer">
+          <!-- Populated dynamically via JS -->
+        </ul>
+
+        <!-- Sidebar Footer Summary Stats -->
+        <div class="sidebar-footer-stats">
+          <div class="stat-row">
+            <span>Total Categories:</span>
+            <span class="stat-val" id="totalCategoriesStat">4</span>
+          </div>
+          <div class="stat-row">
+            <span>Total Photos:</span>
+            <span class="stat-val" id="totalPhotosStat">0</span>
+          </div>
+          <div class="stat-row">
+            <span>Total Videos:</span>
+            <span class="stat-val" id="totalVideosStat">0</span>
+          </div>
+          <div class="stat-row">
+            <span>Active Folder Items:</span>
+            <span class="stat-val" id="activeFolderStat" style="color: var(--accent-gold);">0</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN WORKSPACE -->
+      <main class="content-area">
+        
+        <!-- Category Banner -->
+        <section class="category-banner" id="categoryBanner">
+          <div class="banner-left">
+            <div class="banner-breadcrumbs">
+              <span>Media Catalog</span>
+              <span>/</span>
+              <span id="bannerCategoryTag">Living Room</span>
+            </div>
+            <h1 class="banner-title" id="bannerTitle">
+              <span>🛋️ Living Room</span>
+            </h1>
+            <p class="banner-desc" id="bannerDesc">
+              Showcase luxury Teakwood sofa sets, coffee tables, entertainment consoles, and signature centerpieces.
+            </p>
+          </div>
+
+          <div class="banner-actions">
+            <button class="btn btn-gold" id="bannerAddMediaBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Upload to This Room</span>
+            </button>
+            <button class="btn btn-glass" id="btnEditCurrentCategory" title="Rename or modify this category">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Edit Room</span>
+            </button>
+            <button class="btn btn-danger-subtle btn-sm" id="btnDeleteCurrentCategory" title="Delete this room folder">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </section>
+
+        <!-- Search & Control Toolbar -->
+        <section class="controls-bar">
+          <div class="filter-group-left">
+            <!-- Search -->
+            <div class="search-box">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="mediaSearchInput" class="search-input" placeholder="Search by title or caption...">
+            </div>
+
+            <!-- Media Type Filter Pills -->
+            <div class="pill-filter-tabs">
+              <button class="pill-btn active" data-type-filter="all">All Media</button>
+              <button class="pill-btn" data-type-filter="photo">Photos</button>
+              <button class="pill-btn" data-type-filter="video">Videos</button>
+            </div>
+
+            <!-- Orientation Filter Pills -->
+            <div class="pill-filter-tabs">
+              <button class="pill-btn active" data-ratio-filter="all">All Ratios</button>
+              <button class="pill-btn" data-ratio-filter="horizontal" title="Horizontal / Landscape (16:9)">Horizontal</button>
+              <button class="pill-btn" data-ratio-filter="vertical" title="Vertical / Portrait (9:16)">Vertical</button>
+            </div>
+          </div>
+
+          <div class="filter-group-right">
+            <span class="reorder-hint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+              Drag cards or use ↑ / ↓ buttons to reorder
+            </span>
+          </div>
+        </section>
+
+        <!-- Media Grid -->
+        <section>
+          <ul class="media-grid" id="mediaGridContainer">
+            <!-- Dynamic Media Cards rendered here -->
+          </ul>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- ========================================================================
+       MODAL 1: ADD / UPLOAD MEDIA MODAL
+       ======================================================================== -->
+  <div class="modal-backdrop" id="uploadModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Add Media Item</span>
+        </h2>
+        <button class="modal-close-btn" data-close-modal="uploadModalBackdrop">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Target Room Category -->
+        <div class="form-group">
+          <label class="form-label" for="uploadCategorySelect">Target Category Folder</label>
+          <select id="uploadCategorySelect" class="form-select">
+            <!-- Options dynamically added -->
+          </select>
+        </div>
+
+        <!-- Mode Switcher Tabs -->
+        <div class="upload-type-tabs">
+          <button class="upload-tab-btn active" data-upload-mode="photo_url">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Photo URL</span>
+          </button>
+          <button class="upload-tab-btn" data-upload-mode="cloudinary_video">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/><polygon points="12 8 17 12 12 16 12 8"/></svg>
+            <span>Cloudinary Video</span>
+          </button>
+          <button class="upload-tab-btn" data-upload-mode="direct_video">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            <span>Direct Video URL</span>
+          </button>
+        </div>
+
+        <!-- Dynamic Inputs based on mode -->
+        
+        <!-- Mode: Cloudinary Widget Trigger -->
+        <div id="cloudinaryUploadSection" style="display: none;">
+          <div class="cloudinary-trigger-box">
+            <div style="font-size: 2.2rem; color: var(--accent-cyan);">☁️</div>
+            <div style="font-weight: 700; color: #fff;">Cloudinary Video Upload Widget</div>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); max-width: 380px;">
+              Directly upload high-definition MP4 or WebM videos to Cloudinary storage.
+            </p>
+            <button class="btn btn-gold" id="btnTriggerCloudinaryWidget" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Launch Cloudinary Uploader</span>
+            </button>
+            <span id="cloudinaryUploadResult" style="font-size: 0.78rem; color: var(--accent-emerald); font-weight: 600;"></span>
+          </div>
+        </div>
+
+        <!-- Mode: Direct Media URL (Photo or Video URL) -->
+        <div class="form-group" id="urlInputSection">
+          <label class="form-label" for="mediaSourceUrl">
+            <span id="mediaUrlLabel">Source Media URL (Direct Link)</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">HTTPS required</span>
+          </label>
+          <input type="url" id="mediaSourceUrl" class="form-input" placeholder="https://images.unsplash.com/... or https://res.cloudinary.com/..." required>
+        </div>
+
+        <!-- Title -->
+        <div class="form-group">
+          <label class="form-label" for="mediaTitleInput">Title *</label>
+          <input type="text" id="mediaTitleInput" class="form-input" placeholder="e.g., Luxury Teakwood 7-Seater Sofa Suite" required>
+        </div>
+
+        <!-- Description/Caption -->
+        <div class="form-group">
+          <label class="form-label" for="mediaDescInput">Description / Caption (Optional)</label>
+          <textarea id="mediaDescInput" class="form-textarea" placeholder="Highlight teakwood finish, upholstery, warranty, or custom measurements..."></textarea>
+        </div>
+
+        <!-- Aspect Ratio Selection -->
+        <div class="form-group">
+          <label class="form-label">Aspect Ratio / Orientation</label>
+          <div class="ratio-radio-group">
+            <label class="ratio-radio-label">
+              <input type="radio" name="mediaAspectRatio" value="horizontal" checked>
+              <span>🖼️ Horizontal (Landscape 16:9)</span>
+            </label>
+            <label class="ratio-radio-label">
+              <input type="radio" name="mediaAspectRatio" value="vertical">
+              <span>📱 Vertical (Portrait 9:16)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Live Preview Box -->
+        <div class="form-group">
+          <label class="form-label">Live Preview</label>
+          <div class="preview-box" id="uploadLivePreview">
+            <span style="color: var(--text-muted); font-size: 0.85rem;">Enter a valid URL above to preview</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-glass" data-close-modal="uploadModalBackdrop" type="button">Cancel</button>
+        <button class="btn btn-gold" id="btnSubmitAddMedia" type="button">Save to Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: EDIT MEDIA ITEM MODAL
+       ======================================================================== -->
+  <div class="modal-backdrop" id="editModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span>Edit Media Details</span>
+        </h2>
+        <button class="modal-close-btn" data-close-modal="editModalBackdrop">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="editMediaId">
+        
+        <div class="form-group">
+          <label class="form-label" for="editCategorySelect">Move to Category</label>
+          <select id="editCategorySelect" class="form-select"></select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editTitleInput">Title</label>
+          <input type="text" id="editTitleInput" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editDescInput">Description / Caption</label>
+          <textarea id="editDescInput" class="form-textarea"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editSourceUrlInput">Media URL</label>
+          <input type="url" id="editSourceUrlInput" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Orientation</label>
+          <div class="ratio-radio-group">
+            <label class="ratio-radio-label">
+              <input type="radio" name="editAspectRatio" value="horizontal">
+              <span>🖼️ Horizontal (Landscape)</span>
+            </label>
+            <label class="ratio-radio-label">
+              <input type="radio" name="editAspectRatio" value="vertical">
+              <span>📱 Vertical (Portrait)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-glass" data-close-modal="editModalBackdrop">Cancel</button>
+        <button class="btn btn-gold" id="btnSubmitEditMedia">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 3: CATEGORY MANAGER (CREATE / EDIT)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="categoryModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title" id="categoryModalTitle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span id="categoryModalHeading">Create New Category Folder</span>
+        </h2>
+        <button class="modal-close-btn" data-close-modal="categoryModalBackdrop">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="categoryEditOriginalId">
+
+        <div class="form-group">
+          <label class="form-label" for="categoryNameInput">Category Name *</label>
+          <input type="text" id="categoryNameInput" class="form-input" placeholder="e.g., Luxury Balcony & Patio" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="categoryIconInput">Icon / Emoji</label>
+          <input type="text" id="categoryIconInput" class="form-input" placeholder="e.g., 🌿 or 🪑" value="📁" maxlength="4">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="categoryDescInput">Description / Showcase Focus</label>
+          <textarea id="categoryDescInput" class="form-textarea" placeholder="Briefly describe what this room category contains..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-glass" data-close-modal="categoryModalBackdrop">Cancel</button>
+        <button class="btn btn-gold" id="btnSubmitCategory">Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 4: SETTINGS (Cloudinary Credentials & Data Options)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="settingsModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Cloudinary & Dashboard Settings</span>
+        </h2>
+        <button class="modal-close-btn" data-close-modal="settingsModalBackdrop">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: var(--radius-sm); padding: 0.85rem; font-size: 0.82rem; color: #bae6fd;">
+          💡 Cloudinary credentials are pre-configured with your project defaults (<code>og57tmj8</code>). You can customize or change them here anytime.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cfgCloudName">Cloudinary Cloud Name *</label>
+          <input type="text" id="cfgCloudName" class="form-input" placeholder="e.g., og57tmj8" value="og57tmj8">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cfgUploadPreset">Cloudinary Upload Preset *</label>
+          <input type="text" id="cfgUploadPreset" class="form-input" placeholder="e.g., dcf_products" value="dcf_products">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Ensure this upload preset is set to unsigned in your Cloudinary console</span>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 1rem; margin-top: 0.5rem;">
+          <h4 style="font-size: 0.9rem; color: #fff; margin-bottom: 0.4rem;">Reset & Factory Data</h4>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Restore standard sample furniture photos and room folders if needed.
+          </p>
+          <button class="btn btn-danger-subtle btn-sm" id="btnResetToDefaults">
+            Reset to Sample Room Data
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-glass" data-close-modal="settingsModalBackdrop">Cancel</button>
+        <button class="btn btn-gold" id="btnSaveSettings">Save Credentials</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 5: JSON EXPORT & IMPORT
+       ======================================================================== -->
+  <!-- Export Modal -->
+  <div class="modal-backdrop" id="exportModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Export Media Catalog (JSON)</span>
+        </h2>
+        <button class="modal-close-btn" data-close-modal="exportModalBackdrop">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">
+          This JSON contains all categories, ordered media items, source URLs, and orientation flags ready to plug directly into your front-end website or bot API.
+        </p>
+
+        <div class="json-code-preview" id="exportCodePreview"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-glass" id="btnCopyJSON">Copy to Clipboard</button>
+        <button class="btn btn-gold" id="btnDownloadJSON">Download .json File</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div class="modal-backdrop" id="importModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Import Media Catalog (JSON)</span>
+        </h2>
+        <button class="modal-close-btn" data-close-modal="importModalBackdrop">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Upload JSON File</label>
+          <input type="file" id="importFileInput" accept=".json" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Or Paste JSON Data Directly</label>
+          <textarea id="importJsonTextarea" class="form-textarea" style="min-height: 150px; font-family: monospace; font-size: 0.8rem;" placeholder='{"categories": [...], "media": [...]}'></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Import Mode</label>
+          <div class="ratio-radio-group">
+            <label class="ratio-radio-label">
+              <input type="radio" name="importMode" value="merge" checked>
+              <span>Merge with Existing</span>
+            </label>
+            <label class="ratio-radio-label">
+              <input type="radio" name="importMode" value="replace">
+              <span>Replace All Data</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-glass" data-close-modal="importModalBackdrop">Cancel</button>
+        <button class="btn btn-gold" id="btnExecuteImport">Execute Import</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 6: FULLSCREEN LIGHTBOX VIEWER
+       (Auto-handles Horizontal Landscape & Vertical Portrait Viewports)
+       ======================================================================== -->
+  <div class="lightbox-modal" id="lightboxModal">
+    <!-- Topbar -->
+    <div class="lightbox-topbar">
+      <div class="lightbox-title-meta">
+        <h3 class="lightbox-title" id="lightboxTitle">
+          <span>Item Title</span>
+          <span class="media-type-badge badge-photo" id="lightboxTypeBadge">Photo</span>
+          <span class="media-ratio-badge" id="lightboxRatioBadge">Horizontal</span>
+        </h3>
+        <span class="lightbox-category-tag" id="lightboxCategoryTag">Living Room</span>
+      </div>
+
+      <div class="lightbox-controls">
+        <span class="lightbox-counter" id="lightboxCounter">1 / 1</span>
+        <button class="btn btn-glass btn-icon" id="lightboxOpenUrlBtn" title="Open source media in new tab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </button>
+        <button class="btn btn-glass btn-icon" id="lightboxCloseBtn" title="Close Lightbox (Esc)">
+          &times;
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Arrows -->
+    <button class="lightbox-nav-btn lightbox-prev" id="lightboxPrevBtn" title="Previous Media (Left Arrow)">
+      &#10094;
+    </button>
+    <button class="lightbox-nav-btn lightbox-next" id="lightboxNextBtn" title="Next Media (Right Arrow)">
+      &#10095;
+    </button>
+
+    <!-- Stage Center Area -->
+    <div class="lightbox-stage" id="lightboxStage">
+      <div class="lightbox-media-container" id="lightboxMediaContainer">
+        <!-- Rendered Image or Video Player -->
+      </div>
+    </div>
+
+    <!-- Bottom Caption Bar -->
+    <div class="lightbox-caption-bar" id="lightboxCaption">
+      <!-- Item Caption / Description -->
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       TOAST NOTIFICATION CONTAINER
+       ======================================================================== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ========================================================================
+       JAVASCRIPT APPLICATION LOGIC
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ======================================================================
+         1. DEFAULT SEED DATA & CONSTANTS
+         ====================================================================== */
+      const STORAGE_KEY = 'dreamcomfort_media_admin_v1';
+      const CONFIG_KEY = 'dreamcomfort_cloudinary_cfg_v1';
+
+      // Default room categories as requested:
+      // 1. Living Room, 2. Master Bedroom, 3. Dining & Bar, 4. Home Office
+      const DEFAULT_CATEGORIES = [
+        {
+          id: 'living_room',
+          name: 'Living Room',
+          icon: '🛋️',
+          description: 'Showcase luxury Teakwood sofa sets, coffee tables, entertainment consoles, and signature centerpieces.'
+        },
+        {
+          id: 'master_bedroom',
+          name: 'Master Bedroom',
+          icon: '🛏️',
+          description: 'Royal king & queen beds, hydraulic storage cots, bedside credenzas, and handcrafted teakwood wardrobes.'
+        },
+        {
+          id: 'dining_bar',
+          name: 'Dining & Bar',
+          icon: '🍷',
+          description: 'Solid teakwood 6 & 8 seater dining tables, ergonomic dining chairs, and bespoke glass bar units.'
+        },
+        {
+          id: 'home_office',
+          name: 'Home Office',
+          icon: '💼',
+          description: 'Executive ergonomic study desks, bookshelf libraries, conference consoles, and posture task chairs.'
+        }
+      ];
+
+      // Default sample media items showcasing both Photos and Videos with Landscape & Portrait orientations
+      const DEFAULT_MEDIA = [
+        // LIVING ROOM
+        {
+          id: 'med_lr_1',
+          categoryId: 'living_room',
+          type: 'photo',
+          title: 'Royal Imperial 7-Seater Teakwood Sofa Suite',
+          description: 'Handcrafted seasoned Grade-A Teak with high-density foam and stain-resistant velvet fabric.',
+          url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1400&q=80',
+          aspectRatio: 'horizontal',
+          order: 0,
+          createdAt: '2026-10-20T10:00:00.000Z'
+        },
+        {
+          id: 'med_lr_2',
+          categoryId: 'living_room',
+          type: 'video',
+          title: 'Living Room 360° Teak Craftsmanship Walkthrough',
+          description: 'Ultra HD walkthrough of custom carved armrests and durable PU matte finish.',
+          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+          aspectRatio: 'horizontal',
+          order: 1,
+          createdAt: '2026-10-21T11:30:00.000Z'
+        },
+        {
+          id: 'med_lr_3',
+          categoryId: 'living_room',
+          type: 'photo',
+          title: 'Vertical Accent: Sculpted Teak Lounge Corner',
+          description: 'Vertical architectural showcase featuring accent armchairs and brass inlay floor lamp.',
+          url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=900&q=80',
+          aspectRatio: 'vertical',
+          order: 2,
+          createdAt: '2026-10-22T14:15:00.000Z'
+        },
+
+        // MASTER BEDROOM
+        {
+          id: 'med_mb_1',
+          categoryId: 'master_bedroom',
+          type: 'photo',
+          title: 'Majestic King Size Hydraulic Storage Teak Bed',
+          description: 'Zero-creak engineered frame with pneumatic hydraulic lift and cushioned headboard.',
+          url: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=80',
+          aspectRatio: 'horizontal',
+          order: 0,
+          createdAt: '2026-10-23T09:00:00.000Z'
+        },
+        {
+          id: 'med_mb_2',
+          categoryId: 'master_bedroom',
+          type: 'video',
+          title: 'Vertical Bedroom Ambience & Wardrobe Reel',
+          description: 'Portrait 9:16 mobile reel showcasing slide wardrobe smooth dampers and soft-closing drawers.',
+          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
+          aspectRatio: 'vertical',
+          order: 1,
+          createdAt: '2026-10-24T16:40:00.000Z'
+        },
+
+        // DINING & BAR
+        {
+          id: 'med_db_1',
+          categoryId: 'dining_bar',
+          type: 'photo',
+          title: 'Monarch 8-Seater Live-Edge Teak Dining Table',
+          description: 'Exquisite single slab wood grain with matte food-grade polyurethane seal.',
+          url: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1400&q=80',
+          aspectRatio: 'horizontal',
+          order: 0,
+          createdAt: '2026-10-25T12:00:00.000Z'
+        },
+        {
+          id: 'med_db_2',
+          categoryId: 'dining_bar',
+          type: 'photo',
+          title: 'Minimalist Teak Counter Stools & Bar Setup',
+          description: 'Ergonomic high-back wooden bar stools with brass footrests.',
+          url: 'https://images.unsplash.com/photo-1540518614846-7ede433c4ef4?auto=format&fit=crop&w=900&q=80',
+          aspectRatio: 'vertical',
+          order: 1,
+          createdAt: '2026-10-26T13:20:00.000Z'
+        },
+
+        // HOME OFFICE
+        {
+          id: 'med_ho_1',
+          categoryId: 'home_office',
+          type: 'photo',
+          title: 'Executive Teak Desk with Concealed Cable Management',
+          description: 'Built-in wireless phone chargers, dual lock drawers, and solid brass handle accents.',
+          url: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=1400&q=80',
+          aspectRatio: 'horizontal',
+          order: 0,
+          createdAt: '2026-10-27T08:30:00.000Z'
+        },
+        {
+          id: 'med_ho_2',
+          categoryId: 'home_office',
+          type: 'video',
+          title: 'Modern Workstation Setup Video Preview',
+          description: 'Ergonomic layout demo and natural ambient lighting presentation.',
+          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+          aspectRatio: 'horizontal',
+          order: 1,
+          createdAt: '2026-10-27T10:00:00.000Z'
+        }
+      ];
+
+      /* ======================================================================
+         2. STATE MANAGEMENT & LOCAL STORAGE
+         ====================================================================== */
+      const state = {
+        categories: [],
+        media: [],
+        activeCategoryId: 'living_room',
+        searchQuery: '',
+        typeFilter: 'all',     // 'all' | 'photo' | 'video'
+        ratioFilter: 'all',    // 'all' | 'horizontal' | 'vertical'
+        cloudinaryConfig: {
+          cloudName: 'og57tmj8',
+          uploadPreset: 'dcf_products'
+        },
+        uploadMode: 'photo_url', // 'photo_url' | 'cloudinary_video' | 'direct_video'
+        lightboxIndex: 0,
+        draggedItemId: null
+      };
+
+      function loadState() {
+        try {
+          const savedData = localStorage.getItem(STORAGE_KEY);
+          if (savedData) {
+            const parsed = JSON.parse(savedData);
+            state.categories = parsed.categories || DEFAULT_CATEGORIES;
+            state.media = parsed.media || DEFAULT_MEDIA;
+            if (state.categories.length > 0) {
+              state.activeCategoryId = state.categories[0].id;
+            }
+          } else {
+            state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+            state.media = JSON.parse(JSON.stringify(DEFAULT_MEDIA));
+            saveState();
+          }
+
+          const savedCfg = localStorage.getItem(CONFIG_KEY);
+          if (savedCfg) {
+            state.cloudinaryConfig = JSON.parse(savedCfg);
+          }
+        } catch (e) {
+          console.error('Error loading localStorage state:', e);
+          state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+          state.media = JSON.parse(JSON.stringify(DEFAULT_MEDIA));
+        }
+      }
+
+      function saveState() {
+        try {
+          const payload = {
+            version: '1.0',
+            updatedAt: new Date().toISOString(),
+            categories: state.categories,
+            media: state.media
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+          updateStats();
+        } catch (e) {
+          console.error('Failed to save state to localStorage:', e);
+          showToast('Failed to save to local storage: ' + e.message, 'error');
+        }
+      }
+
+      function saveCloudinaryConfig(cloudName, preset) {
+        state.cloudinaryConfig.cloudName = cloudName.trim();
+        state.cloudinaryConfig.uploadPreset = preset.trim();
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(state.cloudinaryConfig));
+        showToast('Cloudinary credentials saved successfully!', 'success');
+      }
+
+      /* ======================================================================
+         3. DOM ELEMENT REFERENCES
+         ====================================================================== */
+      const categoryListContainer = document.getElementById('categoryListContainer');
+      const mediaGridContainer = document.getElementById('mediaGridContainer');
+      const bannerTitle = document.getElementById('bannerTitle');
+      const bannerDesc = document.getElementById('bannerDesc');
+      const bannerCategoryTag = document.getElementById('bannerCategoryTag');
+      const mediaSearchInput = document.getElementById('mediaSearchInput');
+      const toastContainer = document.getElementById('toastContainer');
+      
+      // Sidebar stats
+      const totalCategoriesStat = document.getElementById('totalCategoriesStat');
+      const totalPhotosStat = document.getElementById('totalPhotosStat');
+      const totalVideosStat = document.getElementById('totalVideosStat');
+      const activeFolderStat = document.getElementById('activeFolderStat');
+
+      // Modals
+      const uploadModalBackdrop = document.getElementById('uploadModalBackdrop');
+      const editModalBackdrop = document.getElementById('editModalBackdrop');
+      const categoryModalBackdrop = document.getElementById('categoryModalBackdrop');
+      const settingsModalBackdrop = document.getElementById('settingsModalBackdrop');
+      const exportModalBackdrop = document.getElementById('exportModalBackdrop');
+      const importModalBackdrop = document.getElementById('importModalBackdrop');
+      const lightboxModal = document.getElementById('lightboxModal');
+
+      // Lightbox elements
+      const lightboxMediaContainer = document.getElementById('lightboxMediaContainer');
+      const lightboxTitle = document.getElementById('lightboxTitle');
+      const lightboxTypeBadge = document.getElementById('lightboxTypeBadge');
+      const lightboxRatioBadge = document.getElementById('lightboxRatioBadge');
+      const lightboxCategoryTag = document.getElementById('lightboxCategoryTag');
+      const lightboxCaption = document.getElementById('lightboxCaption');
+      const lightboxCounter = document.getElementById('lightboxCounter');
+      const lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
+      const lightboxNextBtn = document.getElementById('lightboxNextBtn');
+      const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
+      const lightboxOpenUrlBtn = document.getElementById('lightboxOpenUrlBtn');
+
+      /* ======================================================================
+         4. TOAST NOTIFICATION SYSTEM
+         ====================================================================== */
+      function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        let iconSvg = '';
+        if (type === 'success') {
+          iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        } else if (type === 'error') {
+          iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+        } else if (type === 'warning') {
+          iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+        } else {
+          iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+        }
+
+        toast.innerHTML = `
+          ${iconSvg}
+          <div style="flex: 1;">${message}</div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        // Trigger show animation
+        requestAnimationFrame(() => toast.classList.add('show'));
+
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 350);
+        }, 3600);
+      }
+
+      /* ======================================================================
+         5. RENDER CATEGORIES & SIDEBAR NAVIGATION
+         ====================================================================== */
+      function renderCategories() {
+        categoryListContainer.innerHTML = '';
+        
+        state.categories.forEach(cat => {
+          const count = state.media.filter(m => m.categoryId === cat.id).length;
+          const isActive = cat.id === state.activeCategoryId;
+
+          const li = document.createElement('li');
+          li.className = `category-tab-item ${isActive ? 'active' : ''}`;
+          li.dataset.categoryId = cat.id;
+
+          li.innerHTML = `
+            <div class="category-tab-left">
+              <span class="category-icon">${cat.icon || '📁'}</span>
+              <span class="category-title">${cat.name}</span>
+            </div>
+            <span class="category-badge-count">${count}</span>
+          `;
+
+          li.addEventListener('click', () => {
+            selectCategory(cat.id);
+            // On mobile close sidebar if opened
+            document.getElementById('categorySidebar').classList.remove('open');
+          });
+
+          categoryListContainer.appendChild(li);
+        });
+
+        // Also update upload & edit category dropdowns
+        populateCategorySelectOptions();
+        updateBanner();
+        updateStats();
+      }
+
+      function populateCategorySelectOptions() {
+        const uploadSelect = document.getElementById('uploadCategorySelect');
+        const editSelect = document.getElementById('editCategorySelect');
+        
+        const optionsHtml = state.categories.map(cat => 
+          `<option value="${cat.id}">${cat.icon || '📁'} ${cat.name}</option>`
+        ).join('');
+
+        if (uploadSelect) uploadSelect.innerHTML = optionsHtml;
+        if (editSelect) editSelect.innerHTML = optionsHtml;
+
+        if (uploadSelect && state.activeCategoryId) {
+          uploadSelect.value = state.activeCategoryId;
+        }
+      }
+
+      function selectCategory(categoryId) {
+        state.activeCategoryId = categoryId;
+        renderCategories();
+        renderMediaGrid();
+      }
+
+      function updateBanner() {
+        const currentCat = state.categories.find(c => c.id === state.activeCategoryId);
+        if (currentCat) {
+          bannerTitle.innerHTML = `<span>${currentCat.icon || '📁'} ${currentCat.name}</span>`;
+          bannerDesc.textContent = currentCat.description || 'Manage luxury room photos and videos.';
+          bannerCategoryTag.textContent = currentCat.name;
+        } else if (state.categories.length > 0) {
+          selectCategory(state.categories[0].id);
+        }
+      }
+
+      function updateStats() {
+        totalCategoriesStat.textContent = state.categories.length;
+        totalPhotosStat.textContent = state.media.filter(m => m.type === 'photo').length;
+        totalVideosStat.textContent = state.media.filter(m => m.type === 'video').length;
+        
+        const currentCount = state.media.filter(m => m.categoryId === state.activeCategoryId).length;
+        activeFolderStat.textContent = currentCount;
+      }
+
+      /* ======================================================================
+         6. RENDER MEDIA GRID & ORDERING
+         ====================================================================== */
+      function getActiveCategoryMedia() {
+        let items = state.media.filter(m => m.categoryId === state.activeCategoryId);
+        
+        // Sort by order index
+        items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        // Search Query filter
+        if (state.searchQuery) {
+          const q = state.searchQuery.toLowerCase();
+          items = items.filter(m => 
+            (m.title && m.title.toLowerCase().includes(q)) || 
+            (m.description && m.description.toLowerCase().includes(q))
+          );
+        }
+
+        // Type filter
+        if (state.typeFilter !== 'all') {
+          items = items.filter(m => m.type === state.typeFilter);
+        }
+
+        // Ratio filter
+        if (state.ratioFilter !== 'all') {
+          items = items.filter(m => m.aspectRatio === state.ratioFilter);
+        }
+
+        return items;
+      }
+
+      function renderMediaGrid() {
+        const items = getActiveCategoryMedia();
+        mediaGridContainer.innerHTML = '';
+
+        if (items.length === 0) {
+          mediaGridContainer.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">📭</div>
+              <h3 class="empty-title">No Media Found in this Category</h3>
+              <p class="empty-desc">
+                ${state.searchQuery ? 'No results matched your search criteria.' : 'Add your first photo or video showcase to this room folder!'}
+              </p>
+              <button class="btn btn-gold" id="btnEmptyAdd">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                <span>Add Media Now</span>
+              </button>
+            </div>
+          `;
+          const btnEmptyAdd = document.getElementById('btnEmptyAdd');
+          if (btnEmptyAdd) {
+            btnEmptyAdd.addEventListener('click', () => openUploadModal());
+          }
+          return;
+        }
+
+        const totalItemsInActiveCat = state.media.filter(m => m.categoryId === state.activeCategoryId).length;
+
+        items.forEach((item, index) => {
+          const li = document.createElement('li');
+          li.className = 'media-card';
+          li.draggable = true;
+          li.dataset.itemId = item.id;
+          li.dataset.index = index;
+
+          const isVideo = item.type === 'video';
+          const isVertical = item.aspectRatio === 'vertical';
+
+          // Media Preview element
+          let previewHtml = '';
+          if (isVideo) {
+            previewHtml = `
+              <div class="card-media-box ${isVertical ? 'vertical-preview' : ''}" data-action="lightbox">
+                <video class="card-video-preview" src="${item.url}#t=0.5" preload="metadata" muted playsinline></video>
+                <div class="video-play-overlay">
+                  <div class="play-button-circle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else {
+            previewHtml = `
+              <div class="card-media-box ${isVertical ? 'vertical-preview' : ''}" data-action="lightbox">
+                <img class="card-img-preview" src="${item.url}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80'">
+              </div>
+            `;
+          }
+
+          const ratioLabel = isVertical ? '📱 9:16 Portrait' : '🖼️ 16:9 Landscape';
+          const typeBadgeClass = isVideo ? 'badge-video' : 'badge-photo';
+          const typeLabel = isVideo ? 'Video' : 'Photo';
+
+          li.innerHTML = `
+            ${previewHtml}
+            <span class="media-type-badge ${typeBadgeClass}">
+              ${isVideo ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'}
+              ${typeLabel}
+            </span>
+            <span class="media-ratio-badge">${ratioLabel}</span>
+
+            <div class="card-body">
+              <div class="card-header-row">
+                <h4 class="card-title">${escapeHtml(item.title)}</h4>
+              </div>
+              <p class="card-desc">${escapeHtml(item.description || 'No caption provided.')}</p>
+              
+              <div class="card-meta-row">
+                <span class="card-order-tag">#${item.order + 1}</span>
+                <span>${new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
+              </div>
+            </div>
+
+            <div class="card-actions-bar">
+              <!-- Precision Reordering Up & Down -->
+              <div class="reorder-btns-group">
+                <button class="card-reorder-btn btn-move-up" title="Move Up" data-action="move-up" ${item.order === 0 ? 'disabled' : ''}>
+                  ▲
+                </button>
+                <button class="card-reorder-btn btn-move-down" title="Move Down" data-action="move-down" ${item.order >= totalItemsInActiveCat - 1 ? 'disabled' : ''}>
+                  ▼
+                </button>
+              </div>
+
+              <!-- Item tools -->
+              <div class="card-item-tools">
+                <button class="btn btn-subtle btn-sm btn-icon" title="View Fullscreen" data-action="lightbox">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </button>
+                <button class="btn btn-subtle btn-sm btn-icon" title="Copy Media URL" data-action="copy-url">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+                <button class="btn btn-subtle btn-sm btn-icon" title="Edit Item" data-action="edit">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="btn btn-danger-subtle btn-sm btn-icon" title="Delete Item" data-action="delete">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </div>
+          `;
+
+          // Card Action Listeners
+          li.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+
+            if (action === 'lightbox') {
+              openLightboxByItemId(item.id);
+            } else if (action === 'copy-url') {
+              navigator.clipboard.writeText(item.url).then(() => {
+                showToast('Media URL copied to clipboard!', 'success');
+              });
+            } else if (action === 'edit') {
+              openEditModal(item.id);
+            } else if (action === 'delete') {
+              deleteMediaItem(item.id);
+            } else if (action === 'move-up') {
+              moveItemPosition(item.id, -1);
+            } else if (action === 'move-down') {
+              moveItemPosition(item.id, 1);
+            }
+          });
+
+          // DRAG AND DROP EVENTS
+          setupDragAndDrop(li, item.id);
+
+          mediaGridContainer.appendChild(li);
+        });
+      }
+
+      /* ======================================================================
+         7. DRAG AND DROP CAPABILITY
+         ====================================================================== */
+      function setupDragAndDrop(cardElement, itemId) {
+        cardElement.addEventListener('dragstart', (e) => {
+          state.draggedItemId = itemId;
+          cardElement.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', itemId);
+        });
+
+        cardElement.addEventListener('dragend', () => {
+          cardElement.classList.remove('dragging');
+          document.querySelectorAll('.media-card').forEach(el => el.classList.remove('drag-over'));
+        });
+
+        cardElement.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          cardElement.classList.add('drag-over');
+        });
+
+        cardElement.addEventListener('dragleave', () => {
+          cardElement.classList.remove('drag-over');
+        });
+
+        cardElement.addEventListener('drop', (e) => {
+          e.preventDefault();
+          cardElement.classList.remove('drag-over');
+          const sourceId = state.draggedItemId;
+          const targetId = itemId;
+
+          if (sourceId && targetId && sourceId !== targetId) {
+            reorderMediaItems(sourceId, targetId);
+          }
+        });
+      }
+
+      function reorderMediaItems(sourceId, targetId) {
+        // Reordering within the active category
+        const catItems = state.media
+          .filter(m => m.categoryId === state.activeCategoryId)
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        const sourceIndex = catItems.findIndex(m => m.id === sourceId);
+        const targetIndex = catItems.findIndex(m => m.id === targetId);
+
+        if (sourceIndex === -1 || targetIndex === -1) return;
+
+        // Move source item to target position
+        const [movedItem] = catItems.splice(sourceIndex, 1);
+        catItems.splice(targetIndex, 0, movedItem);
+
+        // Update order indices
+        catItems.forEach((item, idx) => {
+          item.order = idx;
+        });
+
+        saveState();
+        renderMediaGrid();
+        showToast('Item order updated & saved!', 'info');
+      }
+
+      function moveItemPosition(itemId, delta) {
+        const catItems = state.media
+          .filter(m => m.categoryId === state.activeCategoryId)
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        const currentIndex = catItems.findIndex(m => m.id === itemId);
+        if (currentIndex === -1) return;
+
+        const targetIndex = currentIndex + delta;
+        if (targetIndex < 0 || targetIndex >= catItems.length) return;
+
+        const [moved] = catItems.splice(currentIndex, 1);
+        catItems.splice(targetIndex, 0, moved);
+
+        catItems.forEach((item, idx) => {
+          item.order = idx;
+        });
+
+        saveState();
+        renderMediaGrid();
+        showToast(`Moved item ${delta < 0 ? 'up' : 'down'} in category.`, 'info');
+      }
+
+      /* ======================================================================
+         8. FULLSCREEN LIGHTBOX VIEWER
+         (Handles 16:9 Landscape & 9:16 Portrait dynamically, Viewport <= 90vh/90vw)
+         ====================================================================== */
+      let currentLightboxCategoryItems = [];
+
+      function openLightboxByItemId(itemId) {
+        currentLightboxCategoryItems = getActiveCategoryMedia();
+        const index = currentLightboxCategoryItems.findIndex(m => m.id === itemId);
+        if (index !== -1) {
+          state.lightboxIndex = index;
+          renderLightboxItem();
+          lightboxModal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+
+      function closeLightbox() {
+        lightboxModal.classList.remove('active');
+        document.body.style.overflow = '';
+        // Stop any running video playback
+        const video = lightboxMediaContainer.querySelector('video');
+        if (video) {
+          video.pause();
+          video.currentTime = 0;
+        }
+      }
+
+      function nextLightboxItem() {
+        if (currentLightboxCategoryItems.length === 0) return;
+        state.lightboxIndex = (state.lightboxIndex + 1) % currentLightboxCategoryItems.length;
+        renderLightboxItem();
+      }
+
+      function prevLightboxItem() {
+        if (currentLightboxCategoryItems.length === 0) return;
+        state.lightboxIndex = (state.lightboxIndex - 1 + currentLightboxCategoryItems.length) % currentLightboxCategoryItems.length;
+        renderLightboxItem();
+      }
+
+      function renderLightboxItem() {
+        if (currentLightboxCategoryItems.length === 0) return;
+        const item = currentLightboxCategoryItems[state.lightboxIndex];
+        if (!item) return;
+
+        const isVideo = item.type === 'video';
+        const isVertical = item.aspectRatio === 'vertical';
+
+        // Update container orientation class
+        lightboxMediaContainer.className = `lightbox-media-container ${isVertical ? 'orientation-vertical' : 'orientation-horizontal'}`;
+
+        // Clear previous content
+        lightboxMediaContainer.innerHTML = '';
+
+        if (isVideo) {
+          const video = document.createElement('video');
+          video.className = 'lightbox-video';
+          video.src = item.url;
+          video.controls = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          video.style.maxHeight = isVertical ? '82vh' : '82vh';
+          video.style.maxWidth = isVertical ? 'min(90vw, 550px)' : '90vw';
+          lightboxMediaContainer.appendChild(video);
+        } else {
+          const img = document.createElement('img');
+          img.className = 'lightbox-img';
+          img.src = item.url;
+          img.alt = item.title;
+          lightboxMediaContainer.appendChild(img);
+        }
+
+        // Meta tags
+        lightboxTitle.querySelector('span:first-child').textContent = item.title;
+        lightboxTypeBadge.textContent = isVideo ? 'Video' : 'Photo';
+        lightboxTypeBadge.className = `media-type-badge ${isVideo ? 'badge-video' : 'badge-photo'}`;
+        
+        lightboxRatioBadge.textContent = isVertical ? '📱 9:16 Portrait' : '🖼️ 16:9 Landscape';
+        
+        const cat = state.categories.find(c => c.id === item.categoryId);
+        lightboxCategoryTag.textContent = cat ? `${cat.icon || '📁'} ${cat.name}` : 'Room Item';
+        
+        lightboxCaption.textContent = item.description || 'No caption provided.';
+        lightboxCounter.textContent = `${state.lightboxIndex + 1} / ${currentLightboxCategoryItems.length}`;
+
+        lightboxOpenUrlBtn.onclick = () => window.open(item.url, '_blank');
+      }
+
+      // Keyboard navigation for Lightbox
+      window.addEventListener('keydown', (e) => {
+        if (!lightboxModal.classList.contains('active')) return;
+
+        if (e.key === 'Escape') {
+          closeLightbox();
+        } else if (e.key === 'ArrowRight') {
+          nextLightboxItem();
+        } else if (e.key === 'ArrowLeft') {
+          prevLightboxItem();
+        } else if (e.key === ' ') {
+          // Space to play/pause video if active
+          const video = lightboxMediaContainer.querySelector('video');
+          if (video) {
+            e.preventDefault();
+            if (video.paused) video.play();
+            else video.pause();
+          }
+        }
+      });
+
+      lightboxCloseBtn.addEventListener('click', closeLightbox);
+      lightboxNextBtn.addEventListener('click', nextLightboxItem);
+      lightboxPrevBtn.addEventListener('click', prevLightboxItem);
+
+      lightboxModal.addEventListener('click', (e) => {
+        if (e.target === lightboxModal || e.target === document.getElementById('lightboxStage')) {
+          closeLightbox();
+        }
+      });
+
+      /* ======================================================================
+         9. ADD MEDIA & CLOUDINARY UPLOAD WIDGET
+         ====================================================================== */
+      function openUploadModal() {
+        populateCategorySelectOptions();
+        document.getElementById('uploadCategorySelect').value = state.activeCategoryId;
+        document.getElementById('mediaTitleInput').value = '';
+        document.getElementById('mediaDescInput').value = '';
+        document.getElementById('mediaSourceUrl').value = '';
+        document.getElementById('cloudinaryUploadResult').textContent = '';
+        document.querySelector('input[name="mediaAspectRatio"][value="horizontal"]').checked = true;
+        
+        setUploadMode('photo_url');
+        updateLivePreview();
+        uploadModalBackdrop.classList.add('active');
+      }
+
+      function setUploadMode(mode) {
+        state.uploadMode = mode;
+        
+        document.querySelectorAll('.upload-tab-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.uploadMode === mode);
+        });
+
+        const cloudSec = document.getElementById('cloudinaryUploadSection');
+        const urlSec = document.getElementById('urlInputSection');
+        const urlLabel = document.getElementById('mediaUrlLabel');
+        const urlInput = document.getElementById('mediaSourceUrl');
+
+        if (mode === 'cloudinary_video') {
+          cloudSec.style.display = 'block';
+          urlSec.style.display = 'flex';
+          urlLabel.textContent = 'Uploaded Video URL (Auto-filled by Cloudinary or manual)';
+          urlInput.placeholder = 'https://res.cloudinary.com/...';
+        } else if (mode === 'direct_video') {
+          cloudSec.style.display = 'none';
+          urlSec.style.display = 'flex';
+          urlLabel.textContent = 'Direct Video Link (MP4, WebM)';
+          urlInput.placeholder = 'https://example.com/video.mp4';
+        } else {
+          // Photo URL
+          cloudSec.style.display = 'none';
+          urlSec.style.display = 'flex';
+          urlLabel.textContent = 'Source Image URL (Direct Link, PostImages, Unsplash)';
+          urlInput.placeholder = 'https://i.postimg.cc/... or https://images.unsplash.com/...';
+        }
+      }
+
+      // Cloudinary Official Upload Widget Trigger
+      function launchCloudinaryWidget() {
+        const cloudName = state.cloudinaryConfig.cloudName || 'og57tmj8';
+        const uploadPreset = state.cloudinaryConfig.uploadPreset || 'dcf_products';
+
+        if (typeof cloudinary === 'undefined') {
+          showToast('Cloudinary script could not be loaded. Please check internet connection or enter Direct Video URL.', 'warning');
+          return;
+        }
+
+        try {
+          const activeCat = state.categories.find(c => c.id === state.activeCategoryId) || { name: 'general' };
+          const folderName = 'dream_comfort_' + (activeCat.id || 'media');
+
+          const widget = cloudinary.createUploadWidget({
+            cloudName: cloudName,
+            uploadPreset: uploadPreset,
+            sources: ['local', 'url', 'camera'],
+            multiple: false,
+            resourceType: 'video',
+            folder: folderName,
+            clientAllowedFormats: ['mp4', 'mov', 'webm'],
+            maxFileSize: 100000000 // 100MB
+          }, (error, result) => {
+            if (!error && result && result.event === "success") {
+              const info = result.info;
+              document.getElementById('mediaSourceUrl').value = info.secure_url;
+              
+              if (!document.getElementById('mediaTitleInput').value.trim()) {
+                document.getElementById('mediaTitleInput').value = info.original_filename ? 
+                  info.original_filename.replace(/[_-]/g, ' ') : 'Cloudinary Video Showcase';
+              }
+
+              // Auto-detect orientation from Cloudinary dimension metadata
+              if (info.width && info.height) {
+                if (info.height > info.width) {
+                  document.querySelector('input[name="mediaAspectRatio"][value="vertical"]').checked = true;
+                } else {
+                  document.querySelector('input[name="mediaAspectRatio"][value="horizontal"]').checked = true;
+                }
+              }
+
+              document.getElementById('cloudinaryUploadResult').textContent = `✓ Uploaded: ${info.public_id} (${info.format})`;
+              showToast('Video uploaded to Cloudinary successfully!', 'success');
+              updateLivePreview();
+            } else if (error) {
+              console.error('Cloudinary widget error:', error);
+              showToast('Cloudinary upload error: ' + (error.message || 'Check upload preset settings'), 'error');
+            }
+          });
+
+          widget.open();
+        } catch (err) {
+          console.error('Failed to initialize Cloudinary widget:', err);
+          showToast('Error opening Cloudinary widget: ' + err.message, 'error');
+        }
+      }
+
+      function updateLivePreview() {
+        const previewBox = document.getElementById('uploadLivePreview');
+        const url = document.getElementById('mediaSourceUrl').value.trim();
+        const isVideo = state.uploadMode === 'cloudinary_video' || state.uploadMode === 'direct_video';
+
+        if (!url) {
+          previewBox.innerHTML = '<span style="color: var(--text-muted); font-size: 0.85rem;">Enter a valid URL above to preview</span>';
+          return;
+        }
+
+        if (isVideo) {
+          previewBox.innerHTML = `
+            <video src="${url}" controls style="max-height: 100%; max-width: 100%; border-radius: 6px;"></video>
+          `;
+        } else {
+          previewBox.innerHTML = `
+            <img src="${url}" alt="Preview" style="max-height: 100%; max-width: 100%; border-radius: 6px;" onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\\'color:#f43f5e; font-size:0.85rem;\\'>Failed to load image preview</span>'">
+          `;
+          
+          // Auto detect aspect ratio on image load
+          const testImg = new Image();
+          testImg.src = url;
+          testImg.onload = function() {
+            if (this.naturalHeight > this.naturalWidth) {
+              document.querySelector('input[name="mediaAspectRatio"][value="vertical"]').checked = true;
+            } else {
+              document.querySelector('input[name="mediaAspectRatio"][value="horizontal"]').checked = true;
+            }
+          };
+        }
+      }
+
+      function handleAddMediaSubmit() {
+        const catId = document.getElementById('uploadCategorySelect').value;
+        const title = document.getElementById('mediaTitleInput').value.trim();
+        const desc = document.getElementById('mediaDescInput').value.trim();
+        const url = document.getElementById('mediaSourceUrl').value.trim();
+        const ratio = document.querySelector('input[name="mediaAspectRatio"]:checked').value;
+        const type = (state.uploadMode === 'cloudinary_video' || state.uploadMode === 'direct_video') ? 'video' : 'photo';
+
+        if (!title) {
+          showToast('Please enter an item title.', 'warning');
+          return;
+        }
+
+        if (!url) {
+          showToast('Please enter or upload a valid media URL.', 'warning');
+          return;
+        }
+
+        // Get max order in category
+        const catItems = state.media.filter(m => m.categoryId === catId);
+        const maxOrder = catItems.reduce((max, cur) => Math.max(max, cur.order ?? 0), -1);
+
+        const newItem = {
+          id: 'med_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+          categoryId: catId,
+          type: type,
+          title: title,
+          description: desc,
+          url: url,
+          aspectRatio: ratio,
+          order: maxOrder + 1,
+          createdAt: new Date().toISOString()
+        };
+
+        state.media.push(newItem);
+        saveState();
+
+        showToast(`Added "${title}" to category!`, 'success');
+        uploadModalBackdrop.classList.remove('active');
+
+        // Switch to that category if different
+        if (state.activeCategoryId !== catId) {
+          selectCategory(catId);
+        } else {
+          renderCategories();
+          renderMediaGrid();
+        }
+      }
+
+      /* ======================================================================
+         10. EDIT MEDIA ITEM
+         ====================================================================== */
+      function openEditModal(itemId) {
+        const item = state.media.find(m => m.id === itemId);
+        if (!item) return;
+
+        populateCategorySelectOptions();
+        document.getElementById('editMediaId').value = item.id;
+        document.getElementById('editCategorySelect').value = item.categoryId;
+        document.getElementById('editTitleInput').value = item.title;
+        document.getElementById('editDescInput').value = item.description || '';
+        document.getElementById('editSourceUrlInput').value = item.url;
+
+        const ratioRadio = document.querySelector(`input[name="editAspectRatio"][value="${item.aspectRatio}"]`);
+        if (ratioRadio) ratioRadio.checked = true;
+
+        editModalBackdrop.classList.add('active');
+      }
+
+      function handleEditMediaSubmit() {
+        const id = document.getElementById('editMediaId').value;
+        const item = state.media.find(m => m.id === id);
+        if (!item) return;
+
+        const newCatId = document.getElementById('editCategorySelect').value;
+        item.title = document.getElementById('editTitleInput').value.trim();
+        item.description = document.getElementById('editDescInput').value.trim();
+        item.url = document.getElementById('editSourceUrlInput').value.trim();
+        item.aspectRatio = document.querySelector('input[name="editAspectRatio"]:checked').value;
+
+        // If category changed, adjust order
+        if (item.categoryId !== newCatId) {
+          item.categoryId = newCatId;
+          const newCatItems = state.media.filter(m => m.categoryId === newCatId);
+          item.order = newCatItems.length;
+        }
+
+        saveState();
+        showToast('Media details updated successfully!', 'success');
+        editModalBackdrop.classList.remove('active');
+        renderCategories();
+        renderMediaGrid();
+      }
+
+      function deleteMediaItem(itemId) {
+        const item = state.media.find(m => m.id === itemId);
+        if (!item) return;
+
+        if (confirm(`Are you sure you want to delete "${item.title}"?`)) {
+          state.media = state.media.filter(m => m.id !== itemId);
+          
+          // Re-normalize order
+          const catItems = state.media
+            .filter(m => m.categoryId === item.categoryId)
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+          catItems.forEach((m, idx) => m.order = idx);
+
+          saveState();
+          showToast(`Deleted "${item.title}".`, 'info');
+          renderCategories();
+          renderMediaGrid();
+        }
+      }
+
+      /* ======================================================================
+         11. CATEGORY CREATION & MANAGEMENT
+         ====================================================================== */
+      function openNewCategoryModal() {
+        document.getElementById('categoryModalHeading').textContent = 'Create New Category Folder';
+        document.getElementById('categoryEditOriginalId').value = '';
+        document.getElementById('categoryNameInput').value = '';
+        document.getElementById('categoryIconInput').value = '📁';
+        document.getElementById('categoryDescInput').value = '';
+        categoryModalBackdrop.classList.add('active');
+      }
+
+      function openEditCategoryModal() {
+        const curCat = state.categories.find(c => c.id === state.activeCategoryId);
+        if (!curCat) return;
+
+        document.getElementById('categoryModalHeading').textContent = 'Edit Room Category';
+        document.getElementById('categoryEditOriginalId').value = curCat.id;
+        document.getElementById('categoryNameInput').value = curCat.name;
+        document.getElementById('categoryIconInput').value = curCat.icon || '📁';
+        document.getElementById('categoryDescInput').value = curCat.description || '';
+        categoryModalBackdrop.classList.add('active');
+      }
+
+      function handleCategorySubmit() {
+        const originalId = document.getElementById('categoryEditOriginalId').value;
+        const name = document.getElementById('categoryNameInput').value.trim();
+        const icon = document.getElementById('categoryIconInput').value.trim() || '📁';
+        const desc = document.getElementById('categoryDescInput').value.trim();
+
+        if (!name) {
+          showToast('Category name is required.', 'warning');
+          return;
+        }
+
+        if (originalId) {
+          // Editing existing
+          const cat = state.categories.find(c => c.id === originalId);
+          if (cat) {
+            cat.name = name;
+            cat.icon = icon;
+            cat.description = desc;
+            showToast(`Category "${name}" updated!`, 'success');
+          }
+        } else {
+          // Creating new
+          const newId = name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString(36);
+          const newCat = {
+            id: newId,
+            name: name,
+            icon: icon,
+            description: desc
+          };
+          state.categories.push(newCat);
+          state.activeCategoryId = newId;
+          showToast(`Created category "${name}"!`, 'success');
+        }
+
+        saveState();
+        categoryModalBackdrop.classList.remove('active');
+        renderCategories();
+        renderMediaGrid();
+      }
+
+      function deleteCurrentCategory() {
+        if (state.categories.length <= 1) {
+          showToast('You must keep at least one category folder in the catalog.', 'warning');
+          return;
+        }
+
+        const curCat = state.categories.find(c => c.id === state.activeCategoryId);
+        if (!curCat) return;
+
+        const count = state.media.filter(m => m.categoryId === curCat.id).length;
+        const confirmMsg = count > 0 
+          ? `Delete category "${curCat.name}" and all ${count} media items inside it?`
+          : `Delete empty category "${curCat.name}"?`;
+
+        if (confirm(confirmMsg)) {
+          state.categories = state.categories.filter(c => c.id !== curCat.id);
+          state.media = state.media.filter(m => m.categoryId !== curCat.id);
+          state.activeCategoryId = state.categories[0].id;
+          
+          saveState();
+          showToast(`Category "${curCat.name}" deleted.`, 'info');
+          renderCategories();
+          renderMediaGrid();
+        }
+      }
+
+      /* ======================================================================
+         12. JSON EXPORT & IMPORT
+         ====================================================================== */
+      function openExportModal() {
+        // Prepare clean structured JSON payload
+        const payload = {
+          catalogTitle: 'Dream Comfort Furniture Media Catalog',
+          exportedAt: new Date().toISOString(),
+          totalCategories: state.categories.length,
+          totalMediaItems: state.media.length,
+          categories: state.categories.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            icon: cat.icon,
+            description: cat.description,
+            items: state.media
+              .filter(m => m.categoryId === cat.id)
+              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+              .map(m => ({
+                id: m.id,
+                title: m.title,
+                description: m.description,
+                type: m.type,
+                url: m.url,
+                aspectRatio: m.aspectRatio,
+                order: m.order,
+                createdAt: m.createdAt
+              }))
+          }))
+        };
+
+        const jsonString = JSON.stringify(payload, null, 2);
+        document.getElementById('exportCodePreview').textContent = jsonString;
+        exportModalBackdrop.classList.add('active');
+      }
+
+      function downloadJSONFile() {
+        const text = document.getElementById('exportCodePreview').textContent;
+        const blob = new Blob([text], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dream_comfort_media_catalog_${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('JSON catalog file downloaded!', 'success');
+      }
+
+      function copyExportJSON() {
+        const text = document.getElementById('exportCodePreview').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('JSON payload copied to clipboard!', 'success');
+        });
+      }
+
+      function openImportModal() {
+        document.getElementById('importFileInput').value = '';
+        document.getElementById('importJsonTextarea').value = '';
+        importModalBackdrop.classList.add('active');
+      }
+
+      function handleExecuteImport() {
+        const jsonText = document.getElementById('importJsonTextarea').value.trim();
+        const mode = document.querySelector('input[name="importMode"]:checked').value; // 'merge' | 'replace'
+
+        if (!jsonText) {
+          showToast('Please paste valid JSON or choose a JSON file.', 'warning');
+          return;
+        }
+
+        try {
+          const parsed = JSON.parse(jsonText);
+          let importedCats = [];
+          let importedMedia = [];
+
+          if (parsed.categories && Array.isArray(parsed.categories)) {
+            parsed.categories.forEach(cat => {
+              importedCats.push({
+                id: cat.id || ('cat_' + Date.now() + Math.random().toString(36).slice(2, 6)),
+                name: cat.name || 'Untitled Room',
+                icon: cat.icon || '📁',
+                description: cat.description || ''
+              });
+
+              if (cat.items && Array.isArray(cat.items)) {
+                cat.items.forEach((item, idx) => {
+                  importedMedia.push({
+                    id: item.id || ('med_' + Date.now() + Math.random().toString(36).slice(2, 6)),
+                    categoryId: cat.id,
+                    type: item.type || 'photo',
+                    title: item.title || 'Untitled Media',
+                    description: item.description || '',
+                    url: item.url,
+                    aspectRatio: item.aspectRatio || 'horizontal',
+                    order: item.order ?? idx,
+                    createdAt: item.createdAt || new Date().toISOString()
+                  });
+                });
+              }
+            });
+          } else if (parsed.media && Array.isArray(parsed.media)) {
+            importedMedia = parsed.media;
+            importedCats = parsed.categories || DEFAULT_CATEGORIES;
+          }
+
+          if (importedCats.length === 0 && importedMedia.length === 0) {
+            throw new Error('Unrecognized JSON structure. Expected categories or media arrays.');
+          }
+
+          if (mode === 'replace') {
+            state.categories = importedCats.length ? importedCats : DEFAULT_CATEGORIES;
+            state.media = importedMedia;
+            state.activeCategoryId = state.categories[0].id;
+          } else {
+            // Merge
+            importedCats.forEach(newCat => {
+              if (!state.categories.some(c => c.id === newCat.id)) {
+                state.categories.push(newCat);
+              }
+            });
+            importedMedia.forEach(newMedia => {
+              if (!state.media.some(m => m.id === newMedia.id)) {
+                state.media.push(newMedia);
+              }
+            });
+          }
+
+          saveState();
+          showToast('Import successful! Catalog refreshed.', 'success');
+          importModalBackdrop.classList.remove('active');
+          renderCategories();
+          renderMediaGrid();
+
+        } catch (err) {
+          showToast('Import error: ' + err.message, 'error');
+        }
+      }
+
+      /* ======================================================================
+         13. SETTINGS & RESET
+         ====================================================================== */
+      function openSettingsModal() {
+        document.getElementById('cfgCloudName').value = state.cloudinaryConfig.cloudName;
+        document.getElementById('cfgUploadPreset').value = state.cloudinaryConfig.uploadPreset;
+        settingsModalBackdrop.classList.add('active');
+      }
+
+      function handleSaveSettings() {
+        const cn = document.getElementById('cfgCloudName').value;
+        const up = document.getElementById('cfgUploadPreset').value;
+        saveCloudinaryConfig(cn, up);
+        settingsModalBackdrop.classList.remove('active');
+      }
+
+      function handleResetDefaults() {
+        if (confirm('Reset entire catalog to default Dream Comfort Furniture sample rooms & media?')) {
+          localStorage.removeItem(STORAGE_KEY);
+          state.categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+          state.media = JSON.parse(JSON.stringify(DEFAULT_MEDIA));
+          state.activeCategoryId = state.categories[0].id;
+          saveState();
+          showToast('Reset to default room showcase data.', 'success');
+          settingsModalBackdrop.classList.remove('active');
+          renderCategories();
+          renderMediaGrid();
+        }
+      }
+
+      /* ======================================================================
+         14. EVENT LISTENERS & INITIALIZATION
+         ====================================================================== */
+      function attachEventListeners() {
+        // Mobile sidebar toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', () => {
+          document.getElementById('categorySidebar').classList.toggle('open');
+        });
+
+        // Topbar buttons
+        document.getElementById('btnOpenUploadModal').addEventListener('click', openUploadModal);
+        document.getElementById('bannerAddMediaBtn').addEventListener('click', openUploadModal);
+        document.getElementById('btnOpenSettings').addEventListener('click', openSettingsModal);
+        document.getElementById('cloudinaryBadge').addEventListener('click', openSettingsModal);
+        document.getElementById('btnExportJSON').addEventListener('click', openExportModal);
+        document.getElementById('btnImportJSON').addEventListener('click', openImportModal);
+
+        // Category tools
+        document.getElementById('btnAddCategoryBtn').addEventListener('click', openNewCategoryModal);
+        document.getElementById('btnEditCurrentCategory').addEventListener('click', openEditCategoryModal);
+        document.getElementById('btnDeleteCurrentCategory').addEventListener('click', deleteCurrentCategory);
+        document.getElementById('btnSubmitCategory').addEventListener('click', handleCategorySubmit);
+
+        // Upload Modal Controls
+        document.querySelectorAll('.upload-tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            setUploadMode(btn.dataset.uploadMode);
+          });
+        });
+        document.getElementById('btnTriggerCloudinaryWidget').addEventListener('click', launchCloudinaryWidget);
+        document.getElementById('mediaSourceUrl').addEventListener('input', updateLivePreview);
+        document.getElementById('btnSubmitAddMedia').addEventListener('click', handleAddMediaSubmit);
+
+        // Edit Modal Controls
+        document.getElementById('btnSubmitEditMedia').addEventListener('click', handleEditMediaSubmit);
+
+        // Settings Modal
+        document.getElementById('btnSaveSettings').addEventListener('click', handleSaveSettings);
+        document.getElementById('btnResetToDefaults').addEventListener('click', handleResetDefaults);
+
+        // Export/Import Modal
+        document.getElementById('btnCopyJSON').addEventListener('click', copyExportJSON);
+        document.getElementById('btnDownloadJSON').addEventListener('click', downloadJSONFile);
+        document.getElementById('btnExecuteImport').addEventListener('click', handleExecuteImport);
+        
+        // Import file upload reader
+        document.getElementById('importFileInput').addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              document.getElementById('importJsonTextarea').value = event.target.result;
+            };
+            reader.readAsText(file);
+          }
+        });
+
+        // Search Input
+        mediaSearchInput.addEventListener('input', (e) => {
+          state.searchQuery = e.target.value.trim();
+          renderMediaGrid();
+        });
+
+        // Type Filter Pills
+        document.querySelectorAll('[data-type-filter]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-type-filter]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.typeFilter = btn.dataset.typeFilter;
+            renderMediaGrid();
+          });
+        });
+
+        // Ratio Filter Pills
+        document.querySelectorAll('[data-ratio-filter]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-ratio-filter]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.ratioFilter = btn.dataset.ratioFilter;
+            renderMediaGrid();
+          });
+        });
+
+        // Close modal buttons via data-close-modal attribute
+        document.querySelectorAll('[data-close-modal]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const backdropId = btn.dataset.closeModal;
+            const el = document.getElementById(backdropId);
+            if (el) el.classList.remove('active');
+          });
+        });
+
+        // Close on backdrop click
+        [uploadModalBackdrop, editModalBackdrop, categoryModalBackdrop, settingsModalBackdrop, exportModalBackdrop, importModalBackdrop].forEach(modal => {
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+              modal.classList.remove('active');
+            }
+          });
+        });
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // Initialize App
+      function init() {
+        loadState();
+        attachEventListeners();
+        renderCategories();
+        renderMediaGrid();
+      }
+
+      // Run on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+
+    })();
+  </script>
+</body>
+</html>
