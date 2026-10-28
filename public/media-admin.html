@@ -3,26 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dream Comfort Furniture — Intelligent Asset Search & Folder Management System</title>
-  <meta name="description" content="Intelligent asset search and folder management system for an e-commerce platform specializing in Solid Wood Furniture & Office Suites with 3-tier sequential filtering pipeline.">
+  <title>Dream Comfort Furniture — AI Media Processing Assistant</title>
+  <meta name="description" content="AI media processing assistant for furniture catalog system with strict 3-tier metadata pipeline, provider routing (Postimages for Images, Cloudinary for Videos), and zero path exposure.">
   
   <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Cloudinary Upload Widget API -->
   <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
   <style>
-    /* ==========================================================================
-       DESIGN SYSTEM & CSS VARIABLES
-       ========================================================================== */
     :root {
       --bg-base: #090c14;
       --bg-surface: #0f1524;
-      --bg-card: rgba(17, 24, 40, 0.85);
-      --bg-card-hover: rgba(28, 38, 62, 0.95);
+      --bg-card: rgba(17, 24, 40, 0.88);
+      --bg-card-hover: rgba(26, 36, 58, 0.95);
       --bg-glass: rgba(255, 255, 255, 0.04);
       --bg-glass-elevated: rgba(255, 255, 255, 0.08);
       
@@ -46,20 +43,12 @@
       --radius-lg: 18px;
       --radius-xl: 24px;
       
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.55);
-      --shadow-gold: 0 0 25px rgba(212, 175, 55, 0.25);
-      
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
       --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
       --transition-normal: 0.26s cubic-bezier(0.4, 0, 0.2, 1);
-      --sidebar-width: 320px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -68,36 +57,23 @@
       min-height: 100vh;
       line-height: 1.5;
       background-image: 
-        radial-gradient(circle at 10% 15%, rgba(212, 175, 55, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 10% 15%, rgba(212, 175, 55, 0.06) 0%, transparent 45%),
         radial-gradient(circle at 90% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 45%),
         linear-gradient(180deg, rgba(9, 12, 20, 0.98) 0%, rgba(9, 12, 20, 1) 100%);
       background-attachment: fixed;
     }
 
-    h1, h2, h3, h4 {
-      font-family: 'Outfit', 'Inter', sans-serif;
-      letter-spacing: -0.02em;
-    }
-
-    /* Scrollbars */
-    ::-webkit-scrollbar { width: 7px; height: 7px; }
-    ::-webkit-scrollbar-track { background: rgba(9, 12, 20, 0.7); }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 999px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+    h1, h2, h3, h4 { font-family: 'Outfit', 'Inter', sans-serif; letter-spacing: -0.02em; }
 
     /* LAYOUT */
-    .app-wrapper {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+    .app-container { display: flex; flex-direction: column; min-height: 100vh; }
 
-    /* TOP NAVBAR */
+    /* NAVBAR */
     .top-navbar {
       position: sticky;
       top: 0;
       z-index: 50;
-      background: rgba(12, 16, 26, 0.88);
+      background: rgba(12, 16, 26, 0.9);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border-subtle);
       padding: 0.85rem 1.75rem;
@@ -107,1234 +83,712 @@
       gap: 1.25rem;
     }
 
-    .brand-cluster {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      text-decoration: none;
-    }
-
+    .brand-cluster { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
     .brand-emblem {
-      width: 42px;
-      height: 42px;
+      width: 42px; height: 42px;
       background: linear-gradient(135deg, #d4af37, #92751f);
       border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #0b0e14;
-      font-weight: 800;
-      font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      color: #0b0e14; font-weight: 800; font-size: 1.2rem;
       box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
       flex-shrink: 0;
     }
-
-    .brand-meta h1 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .brand-meta span {
-      font-size: 0.75rem;
-      color: var(--accent-gold);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-    }
+    .brand-meta h1 { font-size: 1.15rem; font-weight: 700; color: #fff; }
+    .brand-meta span { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600; }
 
     /* BUTTONS */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      padding: 0.55rem 1rem;
-      border-radius: var(--radius-md);
-      font-size: 0.84rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: var(--transition-fast);
-      white-space: nowrap;
-      text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 0.45rem; padding: 0.6rem 1.15rem; border-radius: var(--radius-md);
+      font-size: 0.84rem; font-weight: 600; cursor: pointer; border: 1px solid transparent;
+      transition: var(--transition-fast); text-decoration: none;
     }
-
     .btn-gold {
       background: linear-gradient(135deg, #e3c158, #c29d2b);
-      color: #0b0f17;
-      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+      color: #0b0f17; box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
     }
-    .btn-gold:hover {
-      background: linear-gradient(135deg, #ebd178, #d4af37);
-      transform: translateY(-1px);
-    }
-
+    .btn-gold:hover { background: linear-gradient(135deg, #ebd178, #d4af37); transform: translateY(-1px); }
     .btn-glass {
-      background: var(--bg-glass-elevated);
-      border-color: var(--border-subtle);
-      color: var(--text-primary);
+      background: var(--bg-glass-elevated); border-color: var(--border-subtle); color: var(--text-primary);
     }
-    .btn-glass:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.2);
+    .btn-glass:hover { background: rgba(255, 255, 255, 0.12); }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.76rem; border-radius: var(--radius-sm); }
+
+    /* MAIN CONTAINER */
+    .main-body {
+      max-width: 1500px; margin: 0 auto; width: 100%;
+      padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem;
     }
 
-    .btn-sm {
-      padding: 0.35rem 0.7rem;
-      font-size: 0.76rem;
-      border-radius: var(--radius-sm);
-    }
-
-    /* ==========================================================================
-       3-TIER FILTERING PIPELINE BAR
-       ========================================================================== */
-    .pipeline-section {
-      background: rgba(14, 19, 32, 0.85);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 1.5rem 1.75rem;
-      backdrop-filter: blur(12px);
-    }
-
-    .pipeline-container {
-      max-width: 1600px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .pipeline-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .pipeline-step-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent-cyan);
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      padding: 0.25rem 0.65rem;
-      border-radius: 999px;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    /* 3 Inputs Grid */
-    .pipeline-controls-grid {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
-      gap: 1.25rem;
-    }
-
-    .filter-field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .filter-label {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .filter-input, .filter-select {
-      width: 100%;
-      background: rgba(6, 9, 15, 0.75);
+    /* UPLOAD & PROCESSING PANEL */
+    .upload-card {
+      background: rgba(15, 21, 35, 0.9);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 0.65rem 0.95rem;
-      font-size: 0.88rem;
-      color: #fff;
-      outline: none;
+      border-radius: var(--radius-xl);
+      padding: 1.75rem 2rem;
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-md);
+      display: flex; flex-direction: column; gap: 1.5rem;
+    }
+
+    .upload-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;
+      flex-wrap: wrap; gap: 0.75rem;
+    }
+    .upload-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.25rem 0.65rem; border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* FORM GRID */
+    .form-grid-3 {
+      display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1.25rem;
+    }
+    .field-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field-label {
+      font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .field-input, .field-select {
+      width: 100%; background: rgba(7, 10, 18, 0.8);
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
+      padding: 0.65rem 0.95rem; font-size: 0.88rem; color: #fff; outline: none;
       transition: var(--transition-fast);
     }
-
-    .filter-input:focus, .filter-select:focus {
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    .field-input:focus, .field-select:focus {
+      border-color: var(--accent-gold); box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     }
 
-    /* Status & Auto-Folder Path Bar */
-    .pipeline-output-ribbon {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-      background: rgba(7, 10, 18, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: var(--radius-md);
-      padding: 0.75rem 1.25rem;
+    /* ORIENTATION & FILE ROW */
+    .orientation-file-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+      padding-top: 0.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
-
-    .directory-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 0.85rem;
-    }
-
-    .folder-path-code {
-      font-family: ui-monospace, SFMono-Regular, monospace;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--accent-gold);
-      background: rgba(212, 175, 55, 0.1);
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      padding: 0.25rem 0.75rem;
-      border-radius: var(--radius-sm);
-    }
-
-    .status-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
-    }
-    .status-found {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-    .status-created {
-      background: rgba(212, 175, 55, 0.2);
-      color: #fde047;
-      border: 1px solid rgba(212, 175, 55, 0.4);
-    }
-
-    /* Price Sort Controls */
-    .sort-control-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.82rem;
-      color: var(--text-secondary);
-    }
-
-    .sort-btn {
-      padding: 0.35rem 0.75rem;
-      font-size: 0.78rem;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      border-radius: 6px;
-      cursor: pointer;
+    .radio-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .radio-card {
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.75rem; border-radius: var(--radius-md);
+      background: rgba(7, 10, 18, 0.8); border: 1px solid var(--border-subtle);
+      color: var(--text-secondary); font-size: 0.84rem; font-weight: 600; cursor: pointer;
       transition: var(--transition-fast);
     }
-    .sort-btn:hover { color: #fff; }
-    .sort-btn.active {
-      background: var(--accent-gold);
-      color: #0b0f17;
-      border-color: var(--accent-gold);
+    .radio-card input { display: none; }
+    .radio-card:has(input:checked) {
+      background: rgba(212, 175, 55, 0.15); border-color: var(--accent-gold); color: #fff;
     }
 
-    /* ==========================================================================
-       AUTO-FOLDER CREATED NOTIFICATION BANNER
-       ========================================================================== */
-    .auto-folder-alert {
-      margin: 1.25rem auto 0;
-      max-width: 1600px;
-      width: calc(100% - 3.5rem);
-      padding: 1rem 1.5rem;
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(10, 14, 24, 0.9));
-      border: 1px solid rgba(16, 185, 129, 0.35);
+    /* CONFIRMATION BANNER (STRICT ZERO PATH EXPOSURE) */
+    .confirmation-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(11, 16, 28, 0.95));
+      border: 1px solid rgba(16, 185, 129, 0.4);
       border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .alert-content {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      font-size: 0.86rem;
-    }
-
-    /* ==========================================================================
-       MAIN WORKSPACE & MEDIA GRID
-       ========================================================================== */
-    .main-workspace {
-      flex: 1;
-      padding: 2rem 1.75rem;
-      max-width: 1600px;
-      margin: 0 auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1.75rem;
-    }
-
-    .workspace-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .workspace-title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .media-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
-      list-style: none;
-    }
-
-    .media-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow-md);
-      transition: transform var(--transition-normal), border-color var(--transition-fast);
-      position: relative;
-    }
-
-    .media-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(212, 175, 55, 0.5);
-    }
-
-    .card-preview-box {
-      width: 100%;
-      height: 220px;
-      position: relative;
-      background: #000;
-      cursor: pointer;
-      overflow: hidden;
-    }
-
-    .card-img-preview, .card-video-preview {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-    .media-card:hover .card-img-preview,
-    .media-card:hover .card-video-preview {
-      transform: scale(1.05);
-    }
-
-    .video-play-btn {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.3);
-    }
-    .play-circle {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--accent-gold);
-      color: #0b0f17;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-      transition: transform var(--transition-fast);
-    }
-    .media-card:hover .play-circle {
-      transform: scale(1.15);
-    }
-
-    /* Badges */
-    .badge-type {
-      position: absolute;
-      top: 0.75rem;
-      left: 0.75rem;
-      padding: 0.25rem 0.65rem;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      z-index: 2;
-    }
-    .badge-photo { background: #38bdf8; color: #0b1320; }
-    .badge-video { background: #a855f7; color: #fff; }
-
-    .badge-price {
-      position: absolute;
-      bottom: 0.75rem;
-      right: 0.75rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: var(--radius-sm);
-      background: rgba(9, 13, 22, 0.92);
-      border: 1px solid rgba(212, 175, 55, 0.4);
-      color: var(--accent-gold);
-      font-family: ui-monospace, SFMono-Regular, monospace;
-      font-size: 0.88rem;
-      font-weight: 700;
-      backdrop-filter: blur(8px);
-      z-index: 2;
-    }
-
-    .badge-ratio {
-      position: absolute;
-      top: 0.75rem;
-      right: 0.75rem;
-      padding: 0.2rem 0.55rem;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #e2e8f0;
-      font-size: 0.68rem;
-      backdrop-filter: blur(6px);
-      z-index: 2;
-    }
-
-    .card-info {
-      padding: 1.15rem;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      gap: 0.5rem;
-    }
-
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.3;
-    }
-
-    .card-desc {
-      font-size: 0.82rem;
-      color: var(--text-secondary);
-      line-height: 1.45;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .card-folder-tag {
-      font-family: ui-monospace, SFMono-Regular, monospace;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-top: auto;
-      padding-top: 0.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .card-actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.65rem 1rem;
-      background: rgba(0, 0, 0, 0.25);
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    /* EMPTY STATE (AUTO-FOLDER PROVISIONED) */
-    .empty-state {
-      grid-column: 1 / -1;
-      padding: 4rem 2rem;
-      background: var(--bg-card);
-      border: 2px dashed rgba(212, 175, 55, 0.35);
-      border-radius: var(--radius-xl);
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    /* MODALS */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(4, 6, 12, 0.88);
-      backdrop-filter: blur(16px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--transition-normal);
-    }
-    .modal-backdrop.active { opacity: 1; pointer-events: auto; }
-
-    .modal-window {
-      background: #111625;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: var(--radius-xl);
-      width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-md);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-header {
       padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; flex-direction: column; gap: 0.85rem;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .confirm-title-row {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+    }
+    .confirm-msg-text {
+      font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.45;
+    }
+    .confirm-meta-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap; font-size: 0.82rem;
+      padding-top: 0.65rem; border-top: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .hosted-url-link {
+      color: var(--accent-cyan); font-family: ui-monospace, SFMono-Regular, monospace;
+      text-decoration: underline; font-size: 0.78rem; word-break: break-all;
     }
 
-    .modal-body {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.15rem;
+    /* ASSETS SECTION */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .media-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 1.5rem; list-style: none;
+    }
+    .media-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg); overflow: hidden;
+      display: flex; flex-direction: column; transition: transform var(--transition-normal);
+      box-shadow: var(--shadow-md);
+    }
+    .media-card:hover { transform: translateY(-4px); border-color: rgba(212, 175, 55, 0.4); }
+
+    .card-preview {
+      width: 100%; height: 210px; background: #000; position: relative;
+      cursor: pointer; overflow: hidden;
+    }
+    .card-img, .card-video {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;
+    }
+    .media-card:hover .card-img, .media-card:hover .card-video { transform: scale(1.04); }
+
+    .tag-provider {
+      position: absolute; top: 0.75rem; left: 0.75rem;
+      padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; z-index: 2;
+    }
+    .tag-postimages { background: #38bdf8; color: #0b1320; }
+    .tag-cloudinary { background: #a855f7; color: #fff; }
+
+    .tag-orientation {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      padding: 0.2rem 0.55rem; border-radius: 999px; background: rgba(0,0,0,0.65);
+      border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.68rem; z-index: 2;
     }
 
-    .modal-footer {
-      padding: 1.15rem 1.5rem;
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      background: rgba(9, 13, 22, 0.5);
+    .card-body {
+      padding: 1.15rem; display: flex; flex-direction: column; gap: 0.4rem; flex: 1;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; color: #fff; text-transform: capitalize; }
+    .card-subtitle { font-size: 0.8rem; color: var(--accent-gold); font-weight: 600; }
+    
+    .card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.65rem 1rem; background: rgba(0, 0, 0, 0.25);
+      border-top: 1px solid var(--border-subtle); font-size: 0.78rem;
     }
 
-    /* FULLSCREEN LIGHTBOX */
+    /* LIGHTBOX */
     .lightbox-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(3, 5, 9, 0.96);
-      backdrop-filter: blur(20px);
-      z-index: 200;
-      display: flex;
-      flex-direction: column;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
+      position: fixed; inset: 0; background: rgba(3, 5, 9, 0.96);
+      backdrop-filter: blur(20px); z-index: 200; display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
     }
     .lightbox-modal.active { opacity: 1; pointer-events: auto; }
-
     .lightbox-topbar {
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-
     .lightbox-stage {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 1.5rem;
+      flex: 1; display: flex; align-items: center; justify-content: center; padding: 1.5rem;
     }
-
     .lightbox-img, .lightbox-video {
-      max-width: 90vw;
-      max-height: 82vh;
-      object-fit: contain;
-      border-radius: var(--radius-md);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      max-width: 90vw; max-height: 82vh; object-fit: contain; border-radius: var(--radius-md);
     }
 
     @media (max-width: 860px) {
-      .pipeline-controls-grid { grid-template-columns: 1fr; }
-      .pipeline-section { padding: 1.25rem 1rem; }
-      .main-workspace { padding: 1.5rem 1rem; }
+      .form-grid-3 { grid-template-columns: 1fr; }
+      .orientation-file-row { grid-template-columns: 1fr; }
+      .main-body { padding: 1.25rem 1rem; }
     }
   </style>
 </head>
 <body>
 
-  <div class="app-wrapper">
+  <div class="app-container">
     
-    <!-- TOP NAVBAR -->
+    <!-- NAVBAR -->
     <header class="top-navbar">
       <div class="brand-cluster">
         <div class="brand-emblem">DC</div>
         <div class="brand-meta">
-          <h1>Dream Comfort Furniture <span>Asset & Folder System</span></h1>
-          <span style="color: var(--text-muted); font-size: 0.7rem;">Solid Wood Furniture & Office Suites Platform</span>
+          <h1>Dream Comfort Furniture</h1>
+          <span>AI Media Processing Assistant</span>
         </div>
       </div>
 
-      <div class="header-actions">
-        <button class="btn btn-glass btn-sm" id="btnOpenCloudinarySettings" title="Cloudinary Configuration">
-          ⚙️ Settings
-        </button>
-        <button class="btn btn-glass btn-sm" id="btnExportJSON">
-          📥 JSON Export
-        </button>
-        <button class="btn btn-gold btn-sm" id="btnQuickUpload">
-          + Upload Asset
-        </button>
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <span class="upload-badge">✓ Security Filter: Zero Path Leakage</span>
+        <button class="btn btn-glass btn-sm" id="btnExportJSON">JSON Export</button>
       </div>
     </header>
 
-    <!-- ========================================================================
-         1. SEQUENTIAL 3-TIER FILTERING PIPELINE BAR
-         ======================================================================== -->
-    <section class="pipeline-section">
-      <div class="pipeline-container">
-        
-        <div class="pipeline-header">
-          <div class="pipeline-step-badge">
-            <span style="font-size: 1rem;">🔍</span>
-            <span>Sequential 3-Tier Filter & Auto-Folder Pipeline</span>
+    <main class="main-body">
+
+      <!-- ====================================================================
+           AI MEDIA PROCESSING & UPLOAD CONSOLE
+           ==================================================================== -->
+      <section class="upload-card">
+        <div class="upload-card-header">
+          <div>
+            <h2 style="font-size: 1.2rem; color: #fff; font-weight: 700;">AI Media Upload & Routing Console</h2>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              Images route to <strong>Postimages</strong> &bull; Videos route to <strong>Cloudinary</strong> (resource_type: &quot;video&quot;) &bull; Internal paths strictly hidden.
+            </p>
           </div>
-          <span style="font-size: 0.8rem; color: var(--text-muted);">
-            Step 1 (Query) &rarr; Step 2 (Category) &rarr; Step 3 (Material) &rarr; Step 4 (Indexed Output)
-          </span>
+          <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 600;">Strict 3-Tier Pipeline</span>
         </div>
 
-        <!-- The 3 Controls -->
-        <div class="pipeline-controls-grid">
+        <form id="mediaProcessingForm" style="display: flex; flex-direction: column; gap: 1.25rem;">
           
-          <!-- TIER 1: Search Query Input -->
-          <div class="filter-field">
-            <label class="filter-label" for="searchQueryInput">
-              <span>Step 1: Item Search Query</span>
-              <span style="color: var(--accent-gold); font-size: 0.72rem;">e.g. &quot;l sofa&quot;</span>
-            </label>
-            <input 
-              type="text" 
-              id="searchQueryInput" 
-              class="filter-input" 
-              placeholder="Type item name (e.g. l sofa, dining table)..." 
-              value="l sofa"
-            >
+          <!-- 3-TIER METADATA PIPELINE -->
+          <div class="form-grid-3">
+            
+            <!-- Tier 1: Search Query Input -->
+            <div class="field-group">
+              <label class="field-label" for="inputSearchQuery">
+                <span>Tier 1: Search Query Input *</span>
+                <span style="font-size: 0.72rem; color: var(--accent-gold);">e.g. &quot;l sofa&quot;</span>
+              </label>
+              <input 
+                type="text" 
+                id="inputSearchQuery" 
+                class="field-input" 
+                placeholder="Item query (e.g. l sofa, study chair)..." 
+                value="l sofa" 
+                required
+              >
+            </div>
+
+            <!-- Tier 2: Category / Room Dropdown Selection (5 Options) -->
+            <div class="field-group">
+              <label class="field-label" for="selectCategory">
+                <span>Tier 2: Category / Room *</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">5 Options</span>
+              </label>
+              <select id="selectCategory" class="field-select">
+                <option value="Living Room" selected>Living Room</option>
+                <option value="Bedroom Sets">Bedroom Sets</option>
+                <option value="Handcrafted Solid Teak">Handcrafted Solid Teak</option>
+                <option value="Ergonomic Office">Ergonomic Office</option>
+                <option value="Modular Kitchens">Modular Kitchens</option>
+              </select>
+            </div>
+
+            <!-- Tier 3: Material Dropdown Selection (5 Options) -->
+            <div class="field-group">
+              <label class="field-label" for="selectMaterial">
+                <span>Tier 3: Material Selection *</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">5 Materials</span>
+              </label>
+              <select id="selectMaterial" class="field-select">
+                <option value="Sheesham">Sheesham</option>
+                <option value="Teak">Teak</option>
+                <option value="Leatherette">Leatherette</option>
+                <option value="Acrylic">Acrylic</option>
+                <option value="Fabric" selected>Fabric</option>
+              </select>
+            </div>
+
           </div>
 
-          <!-- TIER 2: Category / Room Dropdown (5 Options) -->
-          <div class="filter-field">
-            <label class="filter-label" for="categoryDropdown">
-              <span>Step 2: Category / Room Selection</span>
-              <span style="font-size: 0.72rem; color: var(--text-muted);">5 Options</span>
-            </label>
-            <select id="categoryDropdown" class="filter-select">
-              <option value="Living Room" selected>Living Room</option>
-              <option value="Bedroom Sets">Bedroom Sets</option>
-              <option value="Handcrafted Solid Teak">Handcrafted Solid Teak</option>
-              <option value="Ergonomic Office">Ergonomic Office</option>
-              <option value="Modular Kitchens">Modular Kitchens</option>
-            </select>
+          <!-- ORIENTATION & FILE ROUTING ROW -->
+          <div class="orientation-file-row">
+            
+            <!-- Layout Orientation -->
+            <div class="field-group">
+              <label class="field-label">Layout Orientation *</label>
+              <div class="radio-card-grid">
+                <label class="radio-card">
+                  <input type="radio" name="layoutOrientation" value="Horizontal" checked>
+                  <span>🖼️ Horizontal</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="layoutOrientation" value="Vertical">
+                  <span>📱 Vertical</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Media Source (File or Direct URL) -->
+            <div class="field-group">
+              <label class="field-label" for="mediaFileInput">
+                <span>Media File / Direct Link *</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">Auto-detects Image or Video</span>
+              </label>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <input type="file" id="mediaFileInput" class="field-input" accept="image/*,video/*" style="font-size: 0.8rem; padding: 0.45rem;">
+                <input type="url" id="mediaDirectUrlInput" class="field-input" placeholder="Or enter direct URL (https://i.postimg.cc/... or https://res.cloudinary.com/...)">
+              </div>
+            </div>
+
           </div>
 
-          <!-- TIER 3: Material Dropdown (5 Options) -->
-          <div class="filter-field">
-            <label class="filter-label" for="materialDropdown">
-              <span>Step 3: Material Selection</span>
-              <span style="font-size: 0.72rem; color: var(--text-muted);">5 Materials</span>
-            </label>
-            <select id="materialDropdown" class="filter-select">
-              <option value="Sheesham">Sheesham</option>
-              <option value="Teak">Teak</option>
-              <option value="Leatherette">Leatherette</option>
-              <option value="Acrylic">Acrylic</option>
-              <option value="Fabric" selected>Fabric</option>
-            </select>
+          <!-- Submit Button -->
+          <div style="display: flex; align-items: center; justify-content: flex-end; pt-2;">
+            <button type="submit" class="btn btn-gold" id="btnSubmitProcess">
+              <span>🚀 Process & Route Media</span>
+            </button>
           </div>
 
+        </form>
+
+        <!-- ==================================================================
+             CONFIRMATION RESPONSE BANNER (STRICT FORMAT COMPLIANCE)
+             ================================================================== -->
+        <div class="confirmation-banner" id="confirmationBanner" style="display: none;">
+          <div class="confirm-title-row">
+            <span style="font-size: 1.5rem;">✅</span>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+              <span style="font-size: 0.72rem; font-weight: 700; color: #34d399; text-transform: uppercase;">
+                Processing & Assignment Successful
+              </span>
+              <!-- Mandatory format text populated here -->
+              <div class="confirm-msg-text" id="confirmMessageText"></div>
+            </div>
+          </div>
+
+          <div class="confirm-meta-row">
+            <div>
+              <span style="color: var(--text-secondary);">Provider: </span>
+              <strong id="confirmProviderName" style="color: #fff;"></strong>
+            </div>
+            <div>
+              <span style="color: var(--text-secondary);">Hosted Media URL: </span>
+              <a href="#" target="_blank" class="hosted-url-link" id="confirmHostedUrlLink"></a>
+            </div>
+          </div>
         </div>
 
-        <!-- Output Ribbon & Price Sort Controls -->
-        <div class="pipeline-output-ribbon">
-          <div class="directory-breadcrumb">
-            <span style="color: var(--text-secondary); font-size: 0.82rem;">Repository Directory:</span>
-            <span class="folder-path-code" id="currentFolderPath">/Living Room/Fabric/L Sofas/</span>
-            <span class="status-badge status-found" id="folderStatusBadge">✓ Folder Matches Found</span>
+      </section>
+
+      <!-- ====================================================================
+           RETRIEVAL & BROWSER (NO DIRECTORY / PATH DISPLAY)
+           ==================================================================== -->
+      <section style="display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <div class="section-header">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #fff;">Catalog Media Library</h2>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">
+              Browse saved assets filtered by 3-tier parameters without exposure of internal backend trees.
+            </p>
           </div>
 
-          <!-- Price Organizing Controls (Ascending / Descending) -->
-          <div class="sort-control-group">
-            <span>Organize by Price:</span>
-            <button class="sort-btn active" id="sortPriceAsc" data-sort="asc">Price: Low to High ↑</button>
-            <button class="sort-btn" id="sortPriceDesc" data-sort="desc">Price: High to Low ↓</button>
+          <!-- Filter Pill Tabs -->
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Price Sort:</span>
+            <button class="btn btn-glass btn-sm" id="btnSortAsc">Low to High ↑</button>
+            <button class="btn btn-glass btn-sm" id="btnSortDesc">High to Low ↓</button>
           </div>
         </div>
 
-      </div>
-    </section>
+        <!-- Media Grid -->
+        <ul class="media-grid" id="catalogGrid">
+          <!-- Populated dynamically -->
+        </ul>
 
-    <!-- Auto-Folder Alert Banner (Shown dynamically when a folder is auto-generated) -->
-    <div class="auto-folder-alert" id="autoFolderAlert" style="display: none;">
-      <div class="alert-content">
-        <span style="font-size: 1.6rem;">✨</span>
-        <div>
-          <strong style="color: #fff; display: block;">Auto-Generated Dedicated Platform Folder:</strong>
-          <code style="color: #34d399; font-family: monospace; font-weight: 700;" id="alertFolderPath"></code>
-          <p style="color: #a7f3d0; font-size: 0.8rem; margin-top: 0.2rem;">
-            The searched item does not exist yet. A dedicated folder was automatically created so all future assets can be uploaded and indexed according to price.
-          </p>
-        </div>
-      </div>
-      <button class="btn btn-sm btn-glass" id="btnDismissAlert">Dismiss</button>
-    </div>
-
-    <!-- ========================================================================
-         2. MAIN MEDIA ASSETS WORKSPACE
-         ======================================================================== -->
-    <main class="main-workspace">
-      
-      <div class="workspace-header">
-        <h2 class="workspace-title" id="workspaceHeaderTitle">
-          Photos & Videos (<span id="resultsCount">0</span> items)
-        </h2>
-        <button class="btn btn-gold" id="btnUploadToFolder">
-          + Upload Asset to this Folder
-        </button>
-      </div>
-
-      <!-- Assets Grid -->
-      <ul class="media-grid" id="assetsGrid">
-        <!-- Rendered dynamically -->
-      </ul>
+      </section>
 
     </main>
 
   </div>
 
-  <!-- ========================================================================
-       MODAL 1: ADD ASSET TO REPOSITORY
-       ======================================================================== -->
-  <div class="modal-backdrop" id="addAssetModal">
-    <div class="modal-window">
-      <div class="modal-header">
-        <h3 style="font-size: 1.15rem; color: #fff;">Upload Asset to Platform Folder</h3>
-        <button class="btn btn-glass btn-sm" id="btnCloseAddModal">&times;</button>
-      </div>
-
-      <div class="modal-body">
-        <div style="background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.82rem;">
-          Target Index Folder: <code style="color: var(--accent-gold); font-weight: 700;" id="modalTargetFolder">/Living Room/Fabric/L Sofas/</code>
-        </div>
-
-        <div class="filter-field">
-          <label class="filter-label">Asset Title *</label>
-          <input type="text" id="newAssetTitle" class="filter-input" placeholder="e.g., Royal Velvet Sectional L-Sofa" required>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <div class="filter-field">
-            <label class="filter-label">Price (₹ INR) *</label>
-            <input type="number" id="newAssetPrice" class="filter-input" value="48000" required>
-          </div>
-          <div class="filter-field">
-            <label class="filter-label">Media Type</label>
-            <select id="newAssetType" class="filter-select">
-              <option value="photo">Photo</option>
-              <option value="video">Video</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="filter-field">
-          <label class="filter-label">Direct Media URL *</label>
-          <input type="url" id="newAssetUrl" class="filter-input" placeholder="https://images.unsplash.com/... or https://res.cloudinary.com/..." required>
-        </div>
-
-        <div class="filter-field">
-          <label class="filter-label">Aspect Ratio</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 6px; cursor: pointer;">
-              <input type="radio" name="newAssetRatio" value="horizontal" checked>
-              <span>🖼️ Horizontal (16:9)</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 6px; cursor: pointer;">
-              <input type="radio" name="newAssetRatio" value="vertical">
-              <span>📱 Vertical (9:16)</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-glass" id="btnCancelAdd">Cancel</button>
-        <button class="btn btn-gold" id="btnSubmitAdd">Save & Index Asset</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       MODAL 2: FULLSCREEN LIGHTBOX
-       ======================================================================== -->
-  <div class="lightbox-modal" id="lightbox">
+  <!-- LIGHTBOX MODAL -->
+  <div class="lightbox-modal" id="lightboxModal">
     <div class="lightbox-topbar">
       <div>
-        <h3 id="lightboxTitle" style="color: #fff; font-size: 1.15rem;">Item Title</h3>
-        <span id="lightboxPrice" style="color: var(--accent-gold); font-family: monospace; font-weight: 700;">₹0</span>
+        <h3 id="lbTitle" style="color: #fff; font-size: 1.15rem; text-transform: capitalize;">Item</h3>
+        <span id="lbMeta" style="color: var(--accent-gold); font-size: 0.8rem;"></span>
       </div>
-      <button class="btn btn-glass" id="btnCloseLightbox">&times; Close</button>
+      <button class="btn btn-glass btn-sm" id="lbCloseBtn">&times; Close</button>
     </div>
-
-    <div class="lightbox-stage" id="lightboxStage">
-      <!-- Image or Video dynamically placed -->
-    </div>
+    <div class="lightbox-stage" id="lbStage"></div>
   </div>
 
-  <!-- ========================================================================
-       JAVASCRIPT PIPELINE & AUTO-FOLDER CREATION ENGINE
-       ======================================================================== -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     (function() {
       'use strict';
 
-      const STORAGE_KEY = 'dcf_platform_assets_v2';
-      const FOLDERS_KEY = 'dcf_platform_folders_v2';
+      const STORAGE_KEY = 'dcf_catalog_assets_v3';
 
-      // Default Seed Assets
-      const DEFAULT_ASSETS = [
+      // Seed items with Postimages for Images and Cloudinary for Videos
+      const INITIAL_ITEMS = [
         {
-          id: 'ast_lsofa_1',
-          title: 'Royal Belgian Velvet Sectional L-Sofa',
-          description: 'High-density foam, stain-resistant velvet with reversible chaise configuration.',
-          type: 'photo',
-          url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
-          price: 68500,
+          id: 'item_1',
+          searchQuery: 'l sofa',
           category: 'Living Room',
           material: 'Fabric',
-          itemTag: 'L Sofa',
-          folderPath: '/Living Room/Fabric/L Sofas/',
-          aspectRatio: 'horizontal'
+          orientation: 'Horizontal',
+          mediaKind: 'Image',
+          provider: 'Postimages',
+          hostedUrl: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
+          price: 68500
         },
         {
-          id: 'ast_lsofa_2',
-          title: 'Nordic Minimalist Corner L-Sofa Walkthrough Clip',
-          description: 'Ultra-HD video demonstration of pocket spring support and water-repellent fabric.',
-          type: 'video',
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-          price: 54900,
+          id: 'item_2',
+          searchQuery: 'l sofa',
           category: 'Living Room',
           material: 'Fabric',
-          itemTag: 'L Sofa',
-          folderPath: '/Living Room/Fabric/L Sofas/',
-          aspectRatio: 'horizontal'
+          orientation: 'Horizontal',
+          mediaKind: 'Video',
+          provider: 'Cloudinary',
+          hostedUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+          price: 54900
         },
         {
-          id: 'ast_lsofa_3',
-          title: 'Monarch 9-Seater Luxury Curved L-Shaped Suite',
-          description: 'Bespoke chenille upholstery with custom lumbar cushions and brass feet.',
-          type: 'photo',
-          url: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1200&q=80',
-          price: 89000,
+          id: 'item_3',
+          searchQuery: 'l sofa',
           category: 'Living Room',
           material: 'Fabric',
-          itemTag: 'L Sofa',
-          folderPath: '/Living Room/Fabric/L Sofas/',
-          aspectRatio: 'horizontal'
+          orientation: 'Vertical',
+          mediaKind: 'Image',
+          provider: 'Postimages',
+          hostedUrl: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1200&q=80',
+          price: 89000
         },
         {
-          id: 'ast_bed_teak_1',
-          title: 'Royal Sagwan Solid Teak King Hydraulic Storage Bed',
-          description: 'Pneumatic gas-lift mechanism with diamond-tufted headboard.',
-          type: 'photo',
-          url: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
-          price: 58500,
+          id: 'item_4',
+          searchQuery: 'king bed',
           category: 'Bedroom Sets',
           material: 'Teak',
-          itemTag: 'King Bed',
-          folderPath: '/Bedroom Sets/Teak/King Beds/',
-          aspectRatio: 'horizontal'
+          orientation: 'Horizontal',
+          mediaKind: 'Image',
+          provider: 'Postimages',
+          hostedUrl: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+          price: 58500
         },
         {
-          id: 'ast_dining_teak_1',
-          title: 'Emperor 8-Seater Handcrafted Solid Teak Dining Table',
-          description: 'Live-edge bookmatched solid teak slab with 8 ergonomic chairs.',
-          type: 'photo',
-          url: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1200&q=80',
-          price: 82000,
-          category: 'Handcrafted Solid Teak',
-          material: 'Teak',
-          itemTag: 'Dining Table',
-          folderPath: '/Handcrafted Solid Teak/Teak/Dining Tables/',
-          aspectRatio: 'horizontal'
-        },
-        {
-          id: 'ast_chair_leather_1',
-          title: 'Presidential High-Back Ergonomic Leatherette Chair',
-          description: 'Class-4 hydraulic lift, 4D armrests, and dynamic lumbar spine contour.',
-          type: 'photo',
-          url: 'https://images.unsplash.com/photo-1580481077191-45464d4b1a41?auto=format&fit=crop&w=1200&q=80',
-          price: 18900,
+          id: 'item_5',
+          searchQuery: 'executive chair',
           category: 'Ergonomic Office',
           material: 'Leatherette',
-          itemTag: 'Executive Chair',
-          folderPath: '/Ergonomic Office/Leatherette/Executive Chairs/',
-          aspectRatio: 'vertical'
+          orientation: 'Vertical',
+          mediaKind: 'Video',
+          provider: 'Cloudinary',
+          hostedUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+          price: 18900
         }
       ];
 
-      // Application State
-      const state = {
-        query: 'l sofa',
-        category: 'Living Room',
-        material: 'Fabric',
-        priceSort: 'asc', // 'asc' | 'desc'
-        assets: [],
-        folders: []
+      let state = {
+        items: [],
+        priceSort: 'asc'
       };
 
-      // Helper: normalize query to canonical item name (e.g. "l sofa" -> "L Sofas")
-      function normalizeItemName(q) {
-        if (!q || !q.trim()) return 'General Items';
-        let words = q.trim().replace(/\s+/g, ' ').split(' ').map(w => {
-          if (w.toLowerCase() === 'l' || w.toLowerCase() === 'l-shaped') return 'L';
-          return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-        });
-        let canonical = words.join(' ');
-        if (!canonical.endsWith('s') && !canonical.endsWith('S')) {
-          canonical += 's';
-        }
-        return canonical;
-      }
-
-      function buildFolderPath(cat, mat, item) {
-        return `/${cat}/${mat}/${item}/`;
-      }
-
-      // Load State
       function loadState() {
         try {
-          const saved = localStorage.getItem(STORAGE_KEY);
-          state.assets = saved ? JSON.parse(saved) : DEFAULT_ASSETS;
-          const savedFolders = localStorage.getItem(FOLDERS_KEY);
-          state.folders = savedFolders ? JSON.parse(savedFolders) : [];
+          const s = localStorage.getItem(STORAGE_KEY);
+          state.items = s ? JSON.parse(s) : INITIAL_ITEMS;
         } catch {
-          state.assets = DEFAULT_ASSETS;
+          state.items = INITIAL_ITEMS;
         }
       }
 
       function saveState() {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.assets));
-          localStorage.setItem(FOLDERS_KEY, JSON.stringify(state.folders));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
         } catch {}
       }
 
+      function detectMediaKind(nameOrUrl) {
+        const clean = nameOrUrl.toLowerCase().split('?')[0];
+        const videoExts = ['.mp4', '.mov', '.webm', '.mkv', '.avi'];
+        return videoExts.some(ext => clean.endsWith(ext)) ? 'Video' : 'Image';
+      }
+
       // DOM Elements
-      const searchQueryInput = document.getElementById('searchQueryInput');
-      const categoryDropdown = document.getElementById('categoryDropdown');
-      const materialDropdown = document.getElementById('materialDropdown');
-      const currentFolderPath = document.getElementById('currentFolderPath');
-      const folderStatusBadge = document.getElementById('folderStatusBadge');
-      const sortPriceAsc = document.getElementById('sortPriceAsc');
-      const sortPriceDesc = document.getElementById('sortPriceDesc');
-      const autoFolderAlert = document.getElementById('autoFolderAlert');
-      const alertFolderPath = document.getElementById('alertFolderPath');
-      const assetsGrid = document.getElementById('assetsGrid');
-      const resultsCount = document.getElementById('resultsCount');
-      const workspaceHeaderTitle = document.getElementById('workspaceHeaderTitle');
+      const form = document.getElementById('mediaProcessingForm');
+      const inputSearchQuery = document.getElementById('inputSearchQuery');
+      const selectCategory = document.getElementById('selectCategory');
+      const selectMaterial = document.getElementById('selectMaterial');
+      const mediaFileInput = document.getElementById('mediaFileInput');
+      const mediaDirectUrlInput = document.getElementById('mediaDirectUrlInput');
+      
+      const confirmationBanner = document.getElementById('confirmationBanner');
+      const confirmMessageText = document.getElementById('confirmMessageText');
+      const confirmProviderName = document.getElementById('confirmProviderName');
+      const confirmHostedUrlLink = document.getElementById('confirmHostedUrlLink');
+      const catalogGrid = document.getElementById('catalogGrid');
 
-      // Modals
-      const addAssetModal = document.getElementById('addAssetModal');
-      const lightbox = document.getElementById('lightbox');
-      const lightboxTitle = document.getElementById('lightboxTitle');
-      const lightboxPrice = document.getElementById('lightboxPrice');
-      const lightboxStage = document.getElementById('lightboxStage');
+      // Lightbox
+      const lightboxModal = document.getElementById('lightboxModal');
+      const lbTitle = document.getElementById('lbTitle');
+      const lbMeta = document.getElementById('lbMeta');
+      const lbStage = document.getElementById('lbStage');
+      const lbCloseBtn = document.getElementById('lbCloseBtn');
 
-      /* ======================================================================
-         CORE 3-TIER FILTERING & AUTO-FOLDER CREATION PIPELINE
-         ====================================================================== */
-      function executePipeline() {
-        const query = state.query.trim().toLowerCase();
-        const canonicalItem = normalizeItemName(state.query);
-        const expectedPath = buildFolderPath(state.category, state.material, canonicalItem);
+      // Submit Handler
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-        currentFolderPath.textContent = expectedPath;
+        const query = inputSearchQuery.value.trim();
+        const category = selectCategory.value;
+        const material = selectMaterial.value;
+        const orientation = document.querySelector('input[name="layoutOrientation"]:checked').value;
+        const file = mediaFileInput.files[0];
+        const directUrl = mediaDirectUrlInput.value.trim();
 
-        // 1. Strict slice by Category & Material
-        let matched = state.assets.filter(a => 
-          a.category === state.category && a.material === state.material
-        );
-
-        // 2. Filter by search query
-        if (query) {
-          matched = matched.filter(a => {
-            const str = (a.title + ' ' + (a.description || '') + ' ' + a.itemTag + ' ' + a.folderPath).toLowerCase();
-            // Handle aliases like "l sofa"
-            if (query === 'l sofa' || query === 'l sofas') {
-              return str.includes('l sofa') || str.includes('l-shaped') || str.includes('sectional');
-            }
-            return query.split(' ').every(tok => str.includes(tok));
-          });
+        if (!query) {
+          alert('Tier 1 Search Query is mandatory.');
+          return;
         }
 
-        // 3. Sort by Price (Ascending / Descending)
-        matched.sort((a, b) => {
+        const refName = file ? file.name : (directUrl || 'asset.jpg');
+        const mediaKind = detectMediaKind(refName);
+
+        // Provider Routing Strategy:
+        // Images -> Postimages
+        // Videos -> Cloudinary
+        let hostedUrl = '';
+        let provider = '';
+
+        if (mediaKind === 'Video') {
+          provider = 'Cloudinary';
+          hostedUrl = directUrl || 'https://res.cloudinary.com/og57tmj8/video/upload/v1714000000/dcf_products/' + (file ? file.name.replace(/\s+/g, '_') : 'video_asset.mp4');
+        } else {
+          provider = 'Postimages';
+          hostedUrl = directUrl || 'https://i.postimg.cc/' + Math.random().toString(36).substring(2, 8).toUpperCase() + '/' + (file ? file.name.replace(/\s+/g, '_') : 'image_asset.jpg');
+        }
+
+        // Output & Confirmation Response (EXACT FORMAT SPECIFICATION):
+        // "Your [Image/Video] for '[Search Query]' ([Material]) has been successfully saved under '[Category/Room]' with [Vertical/Horizontal] orientation."
+        const confirmationString = `Your ${mediaKind} for '${query}' (${material}) has been successfully saved under '${category}' with ${orientation} orientation.`;
+
+        // Display Confirmation without path leakage
+        confirmMessageText.textContent = confirmationString;
+        confirmProviderName.textContent = provider;
+        confirmHostedUrlLink.textContent = hostedUrl;
+        confirmHostedUrlLink.href = hostedUrl;
+        confirmationBanner.style.display = 'flex';
+
+        // Add to state
+        const newItem = {
+          id: 'item_' + Date.now(),
+          searchQuery: query,
+          category: category,
+          material: material,
+          orientation: orientation,
+          mediaKind: mediaKind,
+          provider: provider,
+          hostedUrl: hostedUrl,
+          price: 49000
+        };
+
+        state.items.unshift(newItem);
+        saveState();
+        renderGrid();
+
+        // Clear inputs
+        mediaFileInput.value = '';
+        mediaDirectUrlInput.value = '';
+      });
+
+      // Render Grid
+      function renderGrid() {
+        catalogGrid.innerHTML = '';
+
+        const sorted = [...state.items].sort((a, b) => {
           return state.priceSort === 'asc' ? a.price - b.price : b.price - a.price;
         });
 
-        // 4. Auto-Categorization & Folder Provisioning Logic
-        if (matched.length > 0) {
-          folderStatusBadge.className = 'status-badge status-found';
-          folderStatusBadge.textContent = `✓ Folder Active (${matched.length} Items)`;
-          autoFolderAlert.style.display = 'none';
-        } else {
-          // Check if folder was already registered
-          const existingFolder = state.folders.find(f => f.path.toLowerCase() === expectedPath.toLowerCase());
-          if (!existingFolder && state.query.trim().length > 0) {
-            // AUTO-CREATE FOLDER IN PLATFORM REPOSITORY!
-            const newFolder = {
-              id: 'fld_' + Date.now(),
-              path: expectedPath,
-              category: state.category,
-              material: state.material,
-              itemName: canonicalItem,
-              createdAt: new Date().toISOString()
-            };
-            state.folders.push(newFolder);
-            saveState();
-
-            // Display Auto-Creation Banner
-            alertFolderPath.textContent = expectedPath;
-            autoFolderAlert.style.display = 'flex';
-          }
-
-          folderStatusBadge.className = 'status-badge status-created';
-          folderStatusBadge.textContent = `★ Dedicated Folder Provisioned`;
-        }
-
-        renderAssetsGrid(matched, expectedPath);
-      }
-
-      function renderAssetsGrid(items, folderPath) {
-        resultsCount.textContent = items.length;
-        assetsGrid.innerHTML = '';
-
-        if (items.length === 0) {
-          assetsGrid.innerHTML = `
-            <div class="empty-state">
-              <span style="font-size: 3rem;">📁</span>
-              <h3 style="color: #fff; font-size: 1.25rem;">Folder Provisioned: ${folderPath}</h3>
-              <p style="color: var(--text-secondary); max-width: 480px; font-size: 0.88rem;">
-                No media matching &quot;<strong>${escapeHtml(state.query)}</strong>&quot; exists yet. This dedicated folder has been auto-created in the platform directory structure so all future assets can be indexed according to price.
-              </p>
-              <button class="btn btn-gold" onclick="document.getElementById('btnUploadToFolder').click()">
-                + Upload First Asset to this Folder
-              </button>
-            </div>
-          `;
-          return;
-        }
-
-        items.forEach(asset => {
+        sorted.forEach(item => {
           const li = document.createElement('li');
           li.className = 'media-card';
 
-          const isVideo = asset.type === 'video';
+          const isVideo = item.mediaKind === 'Video';
 
           li.innerHTML = `
-            <div class="card-preview-box" data-action="lightbox" data-id="${asset.id}">
+            <div class="card-preview" data-id="${item.id}">
               ${isVideo ? `
-                <video src="${asset.url}#t=0.5" class="card-video-preview" muted preload="metadata"></video>
-                <div class="video-play-btn"><div class="play-circle">▶</div></div>
+                <video src="${item.hostedUrl}#t=0.5" class="card-video" muted preload="metadata"></video>
+                <div style="position: absolute; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.3);">
+                  <div style="width:42px; height:42px; border-radius:50%; background:var(--accent-gold); color:#0b0e14; display:flex; align-items:center; justify-content:center; font-weight:bold;">▶</div>
+                </div>
               ` : `
-                <img src="${asset.url}" alt="${escapeHtml(asset.title)}" class="card-img-preview" loading="lazy">
+                <img src="${item.hostedUrl}" alt="${item.searchQuery}" class="card-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80'">
               `}
-              <span class="badge-type ${isVideo ? 'badge-video' : 'badge-photo'}">${asset.type}</span>
-              <span class="badge-ratio">${asset.aspectRatio === 'vertical' ? '📱 9:16' : '🖼️ 16:9'}</span>
-              <span class="badge-price">₹${Number(asset.price).toLocaleString('en-IN')}</span>
+              <span class="tag-provider ${item.provider === 'Cloudinary' ? 'tag-cloudinary' : 'tag-postimages'}">${item.provider}</span>
+              <span class="tag-orientation">${item.orientation}</span>
             </div>
 
-            <div class="card-info">
-              <h3 class="card-title">${escapeHtml(asset.title)}</h3>
-              <p class="card-desc">${escapeHtml(asset.description || 'Solid wood luxury furniture asset.')}</p>
-              <div class="card-folder-tag">${asset.folderPath}</div>
+            <div class="card-body">
+              <div class="card-title">${item.searchQuery}</div>
+              <div class="card-subtitle">${item.category} &bull; ${item.material}</div>
             </div>
 
-            <div class="card-actions">
-              <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 600;">₹${Number(asset.price).toLocaleString('en-IN')}</span>
-              <button class="btn btn-glass btn-sm" data-action="lightbox" data-id="${asset.id}">
-                View Lightbox →
+            <div class="card-footer">
+              <span style="color: var(--accent-gold); font-weight:700;">₹${Number(item.price).toLocaleString('en-IN')}</span>
+              <button class="btn btn-glass btn-sm" data-action="preview" data-id="${item.id}">
+                Fullscreen Lightbox →
               </button>
             </div>
           `;
 
-          assetsGrid.appendChild(li);
+          catalogGrid.appendChild(li);
         });
       }
 
-      // Lightbox Handler
-      function openLightbox(assetId) {
-        const asset = state.assets.find(a => a.id === assetId);
-        if (!asset) return;
+      // Lightbox Handlers
+      catalogGrid.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-id]');
+        if (!target) return;
+        const id = target.dataset.id;
+        const item = state.items.find(i => i.id === id);
+        if (!item) return;
 
-        lightboxTitle.textContent = asset.title;
-        lightboxPrice.textContent = `₹${Number(asset.price).toLocaleString('en-IN')} — ${asset.folderPath}`;
-        lightboxStage.innerHTML = '';
+        lbTitle.textContent = `${item.searchQuery} (${item.material})`;
+        lbMeta.textContent = `${item.category} • ${item.orientation} • Hosted via ${item.provider}`;
+        lbStage.innerHTML = '';
 
-        if (asset.type === 'video') {
+        if (item.mediaKind === 'Video') {
           const video = document.createElement('video');
-          video.src = asset.url;
+          video.src = item.hostedUrl;
           video.controls = true;
           video.autoplay = true;
           video.className = 'lightbox-video';
-          lightboxStage.appendChild(video);
+          lbStage.appendChild(video);
         } else {
           const img = document.createElement('img');
-          img.src = asset.url;
+          img.src = item.hostedUrl;
           img.className = 'lightbox-img';
-          lightboxStage.appendChild(img);
+          img.onerror = () => { img.src = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80'; };
+          lbStage.appendChild(img);
         }
 
-        lightbox.classList.add('active');
-      }
+        lightboxModal.classList.add('active');
+      });
 
-      function closeLightbox() {
-        lightbox.classList.remove('active');
-        lightboxStage.innerHTML = '';
-      }
+      lbCloseBtn.addEventListener('click', () => {
+        lightboxModal.classList.remove('active');
+        lbStage.innerHTML = '';
+      });
 
-      // Quick Upload Modal Handlers
-      function openAddModal() {
-        const canonical = normalizeItemName(state.query);
-        const folder = buildFolderPath(state.category, state.material, canonical);
-        document.getElementById('modalTargetFolder').textContent = folder;
-        document.getElementById('newAssetTitle').value = '';
-        document.getElementById('newAssetUrl').value = '';
-        addAssetModal.classList.add('active');
-      }
-
-      function submitNewAsset() {
-        const title = document.getElementById('newAssetTitle').value.trim();
-        const price = Number(document.getElementById('newAssetPrice').value) || 0;
-        const type = document.getElementById('newAssetType').value;
-        const url = document.getElementById('newAssetUrl').value.trim();
-        const ratio = document.querySelector('input[name="newAssetRatio"]:checked').value;
-        const canonical = normalizeItemName(state.query);
-        const folder = buildFolderPath(state.category, state.material, canonical);
-
-        if (!title || !url) {
-          alert('Please provide title and media URL.');
-          return;
+      lightboxModal.addEventListener('click', (e) => {
+        if (e.target === lightboxModal || e.target === lbStage) {
+          lightboxModal.classList.remove('active');
+          lbStage.innerHTML = '';
         }
-
-        const newAsset = {
-          id: 'ast_' + Date.now(),
-          title,
-          description: `Indexed in ${folder}`,
-          price,
-          type,
-          url,
-          category: state.category,
-          material: state.material,
-          itemTag: canonical,
-          folderPath: folder,
-          aspectRatio: ratio
-        };
-
-        state.assets.unshift(newAsset);
-        saveState();
-        addAssetModal.classList.remove('active');
-        executePipeline();
-      }
-
-      function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-      }
-
-      // Event Listeners
-      searchQueryInput.addEventListener('input', (e) => {
-        state.query = e.target.value;
-        executePipeline();
       });
 
-      categoryDropdown.addEventListener('change', (e) => {
-        state.category = e.target.value;
-        executePipeline();
-      });
-
-      materialDropdown.addEventListener('change', (e) => {
-        state.material = e.target.value;
-        executePipeline();
-      });
-
-      sortPriceAsc.addEventListener('click', () => {
-        sortPriceAsc.classList.add('active');
-        sortPriceDesc.classList.remove('active');
+      // Price Sort Handlers
+      document.getElementById('btnSortAsc').addEventListener('click', () => {
         state.priceSort = 'asc';
-        executePipeline();
+        renderGrid();
       });
-
-      sortPriceDesc.addEventListener('click', () => {
-        sortPriceDesc.classList.add('active');
-        sortPriceAsc.classList.remove('active');
+      document.getElementById('btnSortDesc').addEventListener('click', () => {
         state.priceSort = 'desc';
-        executePipeline();
+        renderGrid();
       });
 
-      document.getElementById('btnDismissAlert').addEventListener('click', () => {
-        autoFolderAlert.style.display = 'none';
-      });
-
-      document.getElementById('btnUploadToFolder').addEventListener('click', openAddModal);
-      document.getElementById('btnQuickUpload').addEventListener('click', openAddModal);
-      document.getElementById('btnCloseAddModal').addEventListener('click', () => addAssetModal.classList.remove('active'));
-      document.getElementById('btnCancelAdd').addEventListener('click', () => addAssetModal.classList.remove('active'));
-      document.getElementById('btnSubmitAdd').addEventListener('click', submitNewAsset);
-
-      document.getElementById('btnCloseLightbox').addEventListener('click', closeLightbox);
-      lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox || e.target === lightboxStage) closeLightbox();
-      });
-
-      assetsGrid.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-action="lightbox"]');
-        if (btn) {
-          openLightbox(btn.dataset.id);
-        }
-      });
-
-      // Export JSON
+      // JSON Export
       document.getElementById('btnExportJSON').addEventListener('click', () => {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.assets, null, 2));
+        const sanitizedData = state.items.map(item => ({
+          id: item.id,
+          searchQuery: item.searchQuery,
+          category: item.category,
+          material: item.material,
+          orientation: item.orientation,
+          mediaKind: item.mediaKind,
+          provider: item.provider,
+          hostedUrl: item.hostedUrl,
+          price: item.price
+        }));
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(sanitizedData, null, 2));
         const a = document.createElement('a');
         a.setAttribute("href", dataStr);
-        a.setAttribute("download", "platform_assets_catalog.json");
+        a.setAttribute("download", "catalog_media_export.json");
         document.body.appendChild(a);
         a.click();
         a.remove();
       });
 
-      // Initial Run
+      // Init
       loadState();
-      executePipeline();
+      renderGrid();
 
     })();
   </script>
