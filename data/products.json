@@ -1,47 +1,9 @@
 [
   {
-    "slug": "sofa",
-    "name": "sofa",
-    "category": "Living Room",
-    "material": "Teak",
-    "dimensions": "84\"W x 38\"D x 36\"H",
-    "price": 45000,
-    "mrp": 60000,
-    "memberPrice": 38000,
-    "bv": 19000,
-    "pv": 190,
-    "stock": 5,
-    "featured": false,
-    "badge": "New Arrival",
-    "description": "Exquisite hand-carved piece seasoned to 8-10% equilibrium moisture content with lifetime termite warranty.",
-    "images": [
-      "https://res.cloudinary.com/og57tmj8/image/upload/v1793219352/products/pe236jnci9d33oil8utn.jpg"
-    ]
-  },
-  {
-    "slug": "lsofa",
-    "name": "Lsofa",
-    "category": "Living Room",
-    "material": "Sheesham",
-    "dimensions": "84\"W x 38\"D x 36\"H",
-    "price": 45000,
-    "mrp": 60000,
-    "memberPrice": 38000,
-    "bv": 19000,
-    "pv": 190,
-    "stock": 5,
-    "featured": false,
-    "badge": "New Arrival",
-    "description": "Exquisite hand-carved piece seasoned to 8-10% equilibrium moisture content with lifetime termite warranty.",
-    "images": [
-      "https://res.cloudinary.com/og57tmj8/image/upload/v1793215758/products/u7rcu1ae3lcfy6bvl0df.jpg"
-    ]
-  },
-  {
     "slug": "l-sofa",
-    "name": "l sofa",
+    "name": "L sofa",
     "category": "Living Room",
-    "material": "Sheesham",
+    "material": "Fabric",
     "dimensions": "84\"W x 38\"D x 36\"H",
     "price": 45000,
     "mrp": 60000,
@@ -53,7 +15,7 @@
     "badge": "New Arrival",
     "description": "Exquisite hand-carved piece seasoned to 8-10% equilibrium moisture content with lifetime termite warranty.",
     "images": [
-      "https://res.cloudinary.com/og57tmj8/image/upload/v1793214959/products/w1lxhficyrigizezh70j.jpg"
+      "https://i.postimg.cc/xdNSdFdX/IMG-20261022-WA0198.jpg"
     ]
   },
   {
