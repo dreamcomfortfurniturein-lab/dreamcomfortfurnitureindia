@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/lib/cart-context";
 import products from "@/data/products.json";
@@ -8,8 +8,28 @@ import products from "@/data/products.json";
 export default function FeaturedMasterpieces() {
   const { addItem, setIsCartDrawerOpen } = useCart();
   const [addedSlug, setAddedSlug] = useState<string | null>(null);
+  const [productsList, setProductsList] = useState<any[]>(products);
 
-  const signaturePieces = products.slice(0, 4);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("dcf_admin_products");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) setProductsList(parsed);
+      }
+    } catch {}
+
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.products) && data.products.length > 0) {
+          setProductsList(data.products);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const signaturePieces = productsList.slice(0, 4);
 
   const handleAddToCart = (p: typeof products[0]) => {
     addItem({

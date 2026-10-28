@@ -13,6 +13,7 @@ function ProductsContent() {
 
   const { addItem, isMemberPricing, setIsMemberPricing } = useCart();
 
+  const [productsList, setProductsList] = useState<any[]>(products);
   const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
   const [selectedMaterial, setSelectedMaterial] = useState<string>("All");
   const [maxPrice, setMaxPrice] = useState<number>(150000);
@@ -24,11 +25,35 @@ function ProductsContent() {
     if (urlCategory && urlCategory !== "All") setSelectedCategory(urlCategory);
   }, [urlSearch, urlCategory]);
 
-  const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("dcf_admin_products");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setProductsList(parsed);
+        }
+      }
+    } catch {}
+
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && Array.isArray(data.products) && data.products.length > 0) {
+          setProductsList(data.products);
+          try {
+            localStorage.setItem("dcf_admin_products", JSON.stringify(data.products));
+          } catch {}
+        }
+      })
+      .catch((err) => console.warn("Live products sync:", err));
+  }, []);
+
+  const categories = ["All", ...Array.from(new Set(productsList.map((p) => p.category)))];
   const materials = ["All", "Sheesham", "Teak", "Leatherette", "Acrylic", "Fabric"];
 
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
+    return productsList.filter((p) => {
       const matchCategory = selectedCategory === "All" || p.category === selectedCategory;
       const matchMaterial =
         selectedMaterial === "All" ||
@@ -39,7 +64,7 @@ function ProductsContent() {
         p.description.toLowerCase().includes(searchQuery.toLowerCase());
       return matchCategory && matchMaterial && matchPrice && matchSearch;
     });
-  }, [selectedCategory, selectedMaterial, maxPrice, searchQuery]);
+  }, [productsList, selectedCategory, selectedMaterial, maxPrice, searchQuery]);
 
   function handleShare(slug: string, productName: string) {
     const origin = typeof window !== "undefined" ? window.location.origin : "https://dreamcomfortfurnitureindia.com";

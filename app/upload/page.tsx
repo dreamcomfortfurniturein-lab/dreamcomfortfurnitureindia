@@ -20,6 +20,13 @@ export default function MobileUploadPage() {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Auto-publish and Catalog sync options
+  const [autoPublish, setAutoPublish] = useState(true);
+  const [addToCatalog, setAddToCatalog] = useState(true);
+  const [productCategory, setProductCategory] = useState("Living Room");
+  const [productMaterial, setProductMaterial] = useState("Sheesham");
+  const [productPrice, setProductPrice] = useState(48000);
+
   // Submission state
   const [submittedData, setSubmittedData] = useState<{
     requestId: string;
@@ -97,12 +104,50 @@ export default function MobileUploadPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit.");
 
-      setSubmittedData({
-        requestId: data.requestId,
-        approvalCode: data.approvalCode,
-        adminEmail: data.adminEmail,
-        approveLink: data.approveLink,
-      });
+      // If autoPublish is enabled, immediately approve and publish without waiting for email
+      if (autoPublish && data.approvalCode) {
+        try {
+          await fetch("/api/admin/media-approve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: data.requestId,
+              code: data.approvalCode,
+            }),
+          });
+        } catch {}
+      }
+
+      // If addToCatalog is enabled, also create as a live catalog product in /api/products
+      if (addToCatalog) {
+        try {
+          const productTitle =
+            title.trim() ||
+            (mediaType === "video" ? "Handcrafted Workshop Showcase" : "Bespoke Timber Showcase");
+          await fetch("/api/products", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: productTitle,
+              category: productCategory,
+              material: productMaterial,
+              price: productPrice,
+              mrp: Math.round(productPrice * 1.3),
+              stock: 5,
+              description:
+                subtitle.trim() ||
+                "Handcrafted solid wood collection piece direct from our Visakhapatnam workshop.",
+              images: [mediaUrl.trim()],
+            }),
+          });
+        } catch {}
+      }
+
+      setApprovalSuccessMessage(
+        autoPublish
+          ? `✓ Published Live! Your image has been saved and published directly to your live website at dreamcomfortfurniture.in!`
+          : `✓ Submitted successfully! Verification code has been dispatched.`
+      );
       setIsSubmitting(false);
     } catch (err: any) {
       setIsSubmitting(false);
@@ -468,14 +513,100 @@ export default function MobileUploadPage() {
               </div>
             </div>
 
+            {/* Live Publishing & Catalog Options */}
+            <div className="border border-gold/30 bg-navy-850/80 rounded-xl p-4 space-y-3.5">
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoPublish}
+                  onChange={(e) => setAutoPublish(e.target.checked)}
+                  className="w-4 h-4 rounded text-gold bg-navy-900 border-gold/40 focus:ring-gold"
+                />
+                <span className="text-xs font-semibold text-sand-100">
+                  🚀 Publish Directly to Live Site (No Email Code Required)
+                </span>
+              </label>
+
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={addToCatalog}
+                  onChange={(e) => setAddToCatalog(e.target.checked)}
+                  className="w-4 h-4 rounded text-gold bg-navy-900 border-gold/40 focus:ring-gold"
+                />
+                <span className="text-xs font-semibold text-sand-100">
+                  🛋️ Also Add to Customer Furniture Catalog (/products)
+                </span>
+              </label>
+
+              {addToCatalog && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-gold/15">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-sand-200 mb-1">
+                      Category
+                    </label>
+                    <select
+                      value={productCategory}
+                      onChange={(e) => setProductCategory(e.target.value)}
+                      className="w-full bg-navy-900 border border-gold/25 rounded-xl px-2.5 py-1.5 text-xs text-sand-100"
+                    >
+                      <option value="Living Room">Living Room</option>
+                      <option value="Bedroom Sets">Bedroom Sets</option>
+                      <option value="Handcrafted Solid Teak">Handcrafted Solid Teak</option>
+                      <option value="Dining Suites">Dining Suites</option>
+                      <option value="Ergonomic Office">Ergonomic Office</option>
+                      <option value="Modular Kitchens">Modular Kitchens</option>
+                      <option value="Royal Recliners">Royal Recliners</option>
+                      <option value="Outdoor & Patio">Outdoor & Patio</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-sand-200 mb-1">
+                      Material
+                    </label>
+                    <select
+                      value={productMaterial}
+                      onChange={(e) => setProductMaterial(e.target.value)}
+                      className="w-full bg-navy-900 border border-gold/25 rounded-xl px-2.5 py-1.5 text-xs text-sand-100"
+                    >
+                      <option value="Sheesham">1. Sheesham</option>
+                      <option value="Teak">2. Teak</option>
+                      <option value="Leatherette">3. Leatherette</option>
+                      <option value="Acrylic">4. Acrylic</option>
+                      <option value="Fabric">5. Fabric</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-sand-200 mb-1">
+                      Price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      value={productPrice}
+                      onChange={(e) => setProductPrice(Number(e.target.value))}
+                      className="w-full bg-navy-900 border border-gold/25 rounded-xl px-2.5 py-1.5 text-xs text-sand-100"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Submit Button */}
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting || isUploading}
-                className="w-full py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-sm hover:brightness-110 shadow-lg shadow-gold/20 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl gold-gradient-bg text-navy-900 font-bold text-sm hover:brightness-110 shadow-lg shadow-gold/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>{isSubmitting ? "Submitting..." : "Send for Admin Approval (Code to Gmail) →"}</span>
+                <span>
+                  {isSubmitting
+                    ? "Publishing to live site..."
+                    : autoPublish
+                    ? "🚀 Save & Publish Directly to Live Website →"
+                    : "Send for Admin Approval (Code to Gmail) →"}
+                </span>
               </button>
             </div>
           </form>

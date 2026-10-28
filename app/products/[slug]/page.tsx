@@ -1,14 +1,31 @@
 import Link from "next/link";
-import products from "@/data/products.json";
+import fs from "fs";
+import path from "path";
+import initialProducts from "@/data/products.json";
+
+export const dynamic = "force-dynamic";
+
+function getLiveProducts() {
+  try {
+    const filePath = path.join(process.cwd(), "data", "products.json");
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, "utf-8");
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return initialProducts;
+}
 import { notFound } from "next/navigation";
 import AddToCartButton from "./add-to-cart-button";
 
 export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+  return initialProducts.map((p) => ({ slug: p.slug }));
 }
 
 export default function ProductDetail({ params }: { params: { slug: string } }) {
-  const product = products.find((p) => p.slug === params.slug);
+  const allProducts = getLiveProducts();
+  const product = allProducts.find((p: any) => p.slug === params.slug);
   if (!product) return notFound();
 
   return (
@@ -42,7 +59,7 @@ export default function ProductDetail({ params }: { params: { slug: string } }) 
 
             {product.images.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
-                {product.images.map((img, i) => (
+                {product.images.map((img: string, i: number) => (
                   <div
                     key={i}
                     className="aspect-square rounded-xl overflow-hidden border border-slate-700 bg-navy-950"

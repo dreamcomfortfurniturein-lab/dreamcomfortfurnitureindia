@@ -189,6 +189,9 @@ export default function AdminDashboardPage() {
   const [deleteConfirmSlug, setDeleteConfirmSlug] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoFileInputRef = useRef<HTMLInputElement>(null);
+  const productPhotoInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingProductPhoto, setIsUploadingProductPhoto] = useState(false);
+  const [uploadProductPhotoProgress, setUploadProductPhotoProgress] = useState<number | null>(null);
 
   // Initialize data on mount
   useEffect(() => {
@@ -198,6 +201,17 @@ export default function AdminDashboardPage() {
         setCurrentAuthEmail(activeUser.email);
         setCurrentAuthRole("master_admin");
       }
+
+      // Fetch live products from server API to stay in sync with live domain
+      fetch("/api/products")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.success && Array.isArray(data.products) && data.products.length > 0) {
+            setProducts(data.products);
+            localStorage.setItem("dcf_admin_products", JSON.stringify(data.products));
+          }
+        })
+        .catch(() => {});
 
       const storedProducts = localStorage.getItem("dcf_admin_products");
       if (storedProducts) {
@@ -641,13 +655,80 @@ export default function AdminDashboardPage() {
 
     persistProducts(updatedList);
     setIsProductModalOpen(false);
+
+    // Persist permanently to live server catalog API so it appears across customer website & actual domain
+    fetch("/api/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(finalProduct),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success) {
+          showToast(`✓ Published "${finalProduct.name}" live to domain!`, "success");
+        }
+      })
+      .catch((err) => {
+        console.warn("Failed to sync product with live API:", err);
+      });
   }
 
-  function handleDeleteProduct(slug: string) {
+  async function handleDeleteProduct(slug: string) {
     const updated = products.filter((p) => p.slug !== slug);
     persistProducts(updated);
     setDeleteConfirmSlug(null);
     showToast("Product deleted from catalog.", "info");
+
+    try {
+      await fetch(`/api/products?slug=${encodeURIComponent(slug)}`, {
+        method: "DELETE",
+      });
+    } catch {}
+  }
+
+  async function handleProductPhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploadingProductPhoto(true);
+    setUploadProductPhotoProgress(10);
+
+    const uploadedUrls: string[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        const result = await uploadMediaToCloudinary(
+          file,
+          "image",
+          "products",
+          (percent) => {
+            const overall = Math.round(((i + percent / 100) / files.length) * 100);
+            setUploadProductPhotoProgress(overall);
+          }
+        );
+        uploadedUrls.push(result.secure_url);
+      } catch (err: any) {
+        showToast(`Failed to upload ${file.name}: ${err.message}`, "error");
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      setProductForm((prev) => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls],
+      }));
+      showToast(
+        `✓ Uploaded & attached ${uploadedUrls.length} photo(s) directly from phone!`,
+        "success"
+      );
+    }
+
+    setIsUploadingProductPhoto(false);
+    setUploadProductPhotoProgress(null);
+    if (productPhotoInputRef.current) {
+      productPhotoInputRef.current.value = "";
+    }
   }
 
   function addImageToProductForm(url: string) {
@@ -2117,15 +2198,57 @@ CLOUDINARY_API_SECRET=your_api_secret_here`}
               </div>
 
               {/* Product Images Selection */}
-              <div className="border border-gold/20 rounded-xl p-4 bg-navy-850 space-y-3">
-                <label className="block text-xs font-semibold text-sand-200">
-                  Product Photos (Cloudinary or Postimages URLs)
-                </label>
+              <div className="border border-gold/20 rounded-xl p-4 bg-navy-850 space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-semibold text-sand-200">
+                    Product Photos (Camera, Phone Gallery or Cloudinary)
+                  </label>
+                  <span className="text-[11px] text-gold/80 font-medium">
+                    {productForm.images.length} photo(s) attached
+                  </span>
+                </div>
 
-                <div className="flex gap-2">
+                {/* Hidden Phone File Input */}
+                <input
+                  ref={productPhotoInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleProductPhotoUpload}
+                  className="hidden"
+                />
+
+                {/* 1. Direct Phone / Mobile Upload Button */}
+                <div className="flex flex-col sm:flex-row gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => productPhotoInputRef.current?.click()}
+                    disabled={isUploadingProductPhoto}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl gold-gradient-bg text-navy-900 font-bold text-xs sm:text-sm hover:brightness-110 shadow-lg transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <span>📷</span>
+                    <span>
+                      {isUploadingProductPhoto
+                        ? `Uploading from Phone (${uploadProductPhotoProgress}%)...`
+                        : "Upload Photos from Mobile (Camera / Gallery)"}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={openCloudinaryWidget}
+                    className="px-4 py-3 rounded-xl bg-navy-800 border border-gold/30 hover:border-gold text-sand-100 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  >
+                    <span>☁️</span>
+                    <span>Cloudinary Studio</span>
+                  </button>
+                </div>
+
+                {/* 2. Manual URL Paste */}
+                <div className="flex gap-2 pt-1">
                   <input
                     type="url"
-                    placeholder="Paste Cloudinary or Postimages URL (https://...)"
+                    placeholder="Or paste Cloudinary/Postimages photo link (https://...)"
                     value={tempProductImageUrl}
                     onChange={(e) => setTempProductImageUrl(e.target.value)}
                     className="flex-1 bg-navy-900 border border-gold/20 rounded-xl px-3 py-2 text-xs text-sand-100 focus:outline-none focus:border-gold"
@@ -2133,28 +2256,70 @@ CLOUDINARY_API_SECRET=your_api_secret_here`}
                   <button
                     type="button"
                     onClick={() => addImageToProductForm(tempProductImageUrl)}
-                    className="bg-gold hover:bg-gold-dark text-navy-900 font-semibold px-4 py-2 rounded-xl text-xs transition-colors"
+                    className="bg-navy-800 hover:bg-gold hover:text-navy-900 border border-gold/30 text-gold font-semibold px-4 py-2 rounded-xl text-xs transition-colors"
                   >
-                    Add Image
+                    Attach Link
                   </button>
                 </div>
 
-                {/* Thumbnails attached */}
+                {/* 3. Quick-attach from Media Gallery if available */}
+                {mediaGallery.length > 0 && (
+                  <div className="pt-2 border-t border-gold/10">
+                    <span className="text-[11px] text-sand-300/70 block mb-2">
+                      Quick Attach from Studio Uploads (tap to add):
+                    </span>
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {mediaGallery.slice(0, 8).map((media) => {
+                        const isAttached = productForm.images.includes(media.url);
+                        return (
+                          <div
+                            key={media.id}
+                            onClick={() => !isAttached && addImageToProductForm(media.url)}
+                            className={`relative w-12 h-12 rounded-lg overflow-hidden border cursor-pointer shrink-0 transition-all ${
+                              isAttached
+                                ? "border-emerald-500 opacity-50 cursor-not-allowed"
+                                : "border-gold/30 hover:border-gold hover:scale-105"
+                            }`}
+                            title={isAttached ? "Already attached" : "Click to attach"}
+                          >
+                            <img src={media.url} alt="" className="w-full h-full object-cover" />
+                            {isAttached && (
+                              <div className="absolute inset-0 bg-emerald-950/60 flex items-center justify-center text-[10px] text-emerald-300 font-bold">
+                                ✓
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Attached Thumbnails Preview */}
                 {productForm.images.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {productForm.images.map((img, idx) => (
-                      <div key={idx} className="relative group w-16 h-16 rounded-lg overflow-hidden border border-gold/30">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={img} alt="" className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => removeImageFromProductForm(idx)}
-                          className="absolute inset-0 bg-rose-900/80 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
+                  <div className="pt-2 border-t border-gold/15">
+                    <span className="text-[11px] text-sand-300/80 block mb-2 font-medium">
+                      Attached Product Photos ({productForm.images.length}):
+                    </span>
+                    <div className="flex flex-wrap gap-2.5">
+                      {productForm.images.map((img, idx) => (
+                        <div key={idx} className="relative group w-20 h-20 rounded-xl overflow-hidden border border-gold/40 shadow-md bg-navy-900">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={img} alt="" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeImageFromProductForm(idx)}
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-900/90 hover:bg-rose-700 text-white text-[11px] flex items-center justify-center transition-colors"
+                            title="Remove photo"
+                          >
+                            ✕
+                          </button>
+                          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-navy-950/80 text-[9px] text-gold font-mono">
+                            #{idx + 1}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
