@@ -125,7 +125,8 @@ export async function processAndRouteMedia(
     throw new Error("Invalid Layout Orientation. Must be 'Vertical' or 'Horizontal'.");
   }
 
-  const referenceName = fileName || file?.name || directUrl || "asset.jpg";
+  const referenceName =
+    fileName || (file && "name" in file ? (file as File).name : "") || directUrl || "asset.jpg";
   const mediaKind = detectMediaKind(referenceName, file?.type);
 
   // 1. Secret backend storage indexing (COMPLETELY OBFUSCATED FROM USER OUTPUT)

@@ -25,7 +25,7 @@ function ProductsContent() {
   }, [urlSearch, urlCategory]);
 
   const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
-  const materials = ["All", "Sheesham", "Teak", "Leatherette", "Acrylic"];
+  const materials = ["All", "Sheesham", "Teak", "Leatherette", "Acrylic", "Fabric"];
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {

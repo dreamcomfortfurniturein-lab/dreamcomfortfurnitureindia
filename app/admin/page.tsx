@@ -68,6 +68,16 @@ const DEFAULT_CATEGORIES = [
   "Outdoor & Patio",
 ];
 
+const DEFAULT_MATERIALS = [
+  "Sheesham",
+  "Teak",
+  "Leatherette",
+  "Acrylic",
+  "Fabric",
+] as const;
+
+type DefaultMaterial = (typeof DEFAULT_MATERIALS)[number];
+
 const INITIAL_VIDEOS: VideoMeta[] = [
   {
     id: "vid-1",
@@ -126,15 +136,17 @@ export default function AdminDashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedAdminMaterial, setSelectedAdminMaterial] = useState("All");
 
   // Product modal (Create / Edit)
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProductSlug, setEditingProductSlug] = useState<string | null>(null);
+  const [selectedMaterialType, setSelectedMaterialType] = useState<DefaultMaterial>("Sheesham");
   const [productForm, setProductForm] = useState<Product>({
     slug: "",
     name: "",
     category: "Living Room",
-    material: "",
+    material: "Sheesham",
     dimensions: "",
     price: 0,
     mrp: 0,
@@ -524,13 +536,43 @@ export default function AdminDashboardPage() {
   // -------------------------------------------------------------
   // CATALOG CRUD OPERATIONS
   // -------------------------------------------------------------
+  function detectMaterial(matStr: string): DefaultMaterial {
+    const lower = (matStr || "").toLowerCase();
+    if (lower.includes("fabric") || lower.includes("velvet") || lower.includes("upholstery") || lower.includes("linen")) return "Fabric";
+    if (lower.includes("sheesham") || lower.includes("rosewood")) return "Sheesham";
+    if (lower.includes("teak") || lower.includes("sagwan")) return "Teak";
+    if (lower.includes("leatherette") || lower.includes("leather")) return "Leatherette";
+    if (lower.includes("acrylic")) return "Acrylic";
+    return "Sheesham";
+  }
+
+  function handleMaterialChange(newMat: DefaultMaterial) {
+    setSelectedMaterialType(newMat);
+    const current = (productForm.material || "").trim();
+    const isStandard =
+      !current ||
+      DEFAULT_MATERIALS.some((m) => m.toLowerCase() === current.toLowerCase());
+    if (isStandard) {
+      setProductForm((prev) => ({ ...prev, material: newMat }));
+    } else {
+      const oldDetected = detectMaterial(current);
+      if (current.toLowerCase().includes(oldDetected.toLowerCase())) {
+        const regex = new RegExp(oldDetected, "gi");
+        setProductForm((prev) => ({ ...prev, material: current.replace(regex, newMat) }));
+      } else {
+        setProductForm((prev) => ({ ...prev, material: `${newMat} - ${current}` }));
+      }
+    }
+  }
+
   function openAddProductModal() {
     setEditingProductSlug(null);
+    setSelectedMaterialType("Sheesham");
     setProductForm({
       slug: "",
       name: "",
       category: "Living Room",
-      material: "Solid Teakwood & Velvet",
+      material: "Sheesham",
       dimensions: "84\"W x 38\"D x 36\"H",
       price: 45000,
       mrp: 60000,
@@ -549,6 +591,7 @@ export default function AdminDashboardPage() {
 
   function openEditProductModal(product: Product) {
     setEditingProductSlug(product.slug);
+    setSelectedMaterialType(detectMaterial(product.material));
     setProductForm({ ...product });
     setTempProductImageUrl("");
     setIsProductModalOpen(true);
@@ -569,8 +612,11 @@ export default function AdminDashboardPage() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
 
+    const finalMaterial = productForm.material.trim() || selectedMaterialType;
+
     const finalProduct: Product = {
       ...productForm,
+      material: finalMaterial,
       slug: generatedSlug,
       images: productForm.images.length > 0
         ? productForm.images
@@ -719,11 +765,14 @@ export default function AdminDashboardPage() {
   // Filtered products list
   const filteredProducts = products.filter((p) => {
     const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
+    const matchesMaterial =
+      selectedAdminMaterial === "All" ||
+      (p.material && p.material.toLowerCase().includes(selectedAdminMaterial.toLowerCase()));
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.material.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
+    return matchesCategory && matchesMaterial && matchesSearch;
   });
 
   return (
@@ -1083,19 +1132,37 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-                <label className="text-xs text-sand-300/70 whitespace-nowrap">Category:</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="bg-navy-800 border border-gold/20 text-sand-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold"
-                >
-                  {DEFAULT_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+                <div className="flex items-center gap-1.5">
+                  <label className="text-xs text-sand-300/70 whitespace-nowrap">Category:</label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="bg-navy-800 border border-gold/20 text-sand-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold"
+                  >
+                    {DEFAULT_CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <label className="text-xs text-sand-300/70 whitespace-nowrap">Material:</label>
+                  <select
+                    value={selectedAdminMaterial}
+                    onChange={(e) => setSelectedAdminMaterial(e.target.value)}
+                    className="bg-navy-800 border border-gold/20 text-sand-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold"
+                  >
+                    <option value="All">All Materials</option>
+                    {DEFAULT_MATERIALS.map((mat) => (
+                      <option key={mat} value={mat}>
+                        {mat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -1107,6 +1174,7 @@ export default function AdminDashboardPage() {
                   onClick={() => {
                     setSearchQuery("");
                     setSelectedCategory("All");
+                    setSelectedAdminMaterial("All");
                   }}
                   className="mt-3 text-gold text-xs underline"
                 >
@@ -1918,21 +1986,21 @@ CLOUDINARY_API_SECRET=your_api_secret_here`}
             </div>
 
             <form onSubmit={handleSaveProduct} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-sand-200 mb-1">
-                    Product Title *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={productForm.name}
-                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                    placeholder="e.g. Royal Sheesham Maharaja 7-Seater Sofa Suite"
-                    className="w-full bg-navy-800 border border-gold/20 rounded-xl px-3.5 py-2.5 text-sm text-sand-100 focus:outline-none focus:border-gold"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-sand-200 mb-1">
+                  Product Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={productForm.name}
+                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                  placeholder="e.g. Royal Sheesham Maharaja 7-Seater Sofa Suite"
+                  className="w-full bg-navy-800 border border-gold/20 rounded-xl px-3.5 py-2.5 text-sm text-sand-100 focus:outline-none focus:border-gold"
+                />
+              </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-sand-200 mb-1">
                     Category *
@@ -1945,6 +2013,23 @@ CLOUDINARY_API_SECRET=your_api_secret_here`}
                     {DEFAULT_CATEGORIES.filter((c) => c !== "All").map((c) => (
                       <option key={c} value={c}>
                         {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-sand-200 mb-1">
+                    Material *
+                  </label>
+                  <select
+                    value={selectedMaterialType}
+                    onChange={(e) => handleMaterialChange(e.target.value as DefaultMaterial)}
+                    className="w-full bg-navy-800 border border-gold/20 rounded-xl px-3.5 py-2.5 text-sm text-sand-100 focus:outline-none focus:border-gold"
+                  >
+                    {DEFAULT_MATERIALS.map((mat) => (
+                      <option key={mat} value={mat}>
+                        {mat}
                       </option>
                     ))}
                   </select>
@@ -1993,13 +2078,13 @@ CLOUDINARY_API_SECRET=your_api_secret_here`}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-sand-200 mb-1">
-                    Wood / Material Specifications
+                    Wood / Material Specifications (Details)
                   </label>
                   <input
                     type="text"
                     value={productForm.material}
                     onChange={(e) => setProductForm({ ...productForm, material: e.target.value })}
-                    placeholder="e.g. 100% Solid Indian Teak (Sagwan) & Brass Inlay"
+                    placeholder="e.g. 100% Solid Indian Timber, Polish & Upholstery Details"
                     className="w-full bg-navy-800 border border-gold/20 rounded-xl px-3.5 py-2.5 text-sm text-sand-100 focus:outline-none focus:border-gold"
                   />
                 </div>

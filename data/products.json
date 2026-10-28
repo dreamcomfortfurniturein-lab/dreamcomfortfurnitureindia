@@ -3,7 +3,7 @@
     "slug": "royal-sheesham-maharaja-sofa-set",
     "name": "Royal Sheesham Maharaja 7-Seater Sofa Suite",
     "category": "Living Room",
-    "material": "Grade-A Sheesham Wood & Velvet Upholstery",
+    "material": "Grade-A Sheesham Wood & Velvet Fabric Upholstery",
     "price": 68500,
     "mrp": 89999,
     "memberPrice": 54800,
@@ -146,6 +146,25 @@
     "description": "Ergonomic motorized sit-to-stand desk with 4 memory presets, digital height LED display, anti-collision sensor, and genuine solid teak wood tabletop.",
     "images": [
       "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "belgian-velvet-luxury-fabric-sectional-sofa",
+    "name": "Belgian Royal Velvet L-Shaped Fabric Modular Suite",
+    "category": "Living Room",
+    "material": "Fabric (Belgian Stain-Resistant Velvet & High-Density Foam)",
+    "price": 52000,
+    "mrp": 69000,
+    "memberPrice": 41600,
+    "bv": 20800,
+    "pv": 208,
+    "stock": 7,
+    "featured": true,
+    "badge": "Fabric Luxe",
+    "description": "Deep-cushioned modular L-shaped sofa suite hand-tailored in stain-resistant Belgian velvet fabric with pocket-spring ergonomic seating and reversible chaise.",
+    "images": [
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1200&q=80"
     ]
   }
 ]
