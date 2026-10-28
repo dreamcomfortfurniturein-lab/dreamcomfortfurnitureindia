@@ -193,6 +193,9 @@ export default function AdminDashboardPage() {
   const [isUploadingProductPhoto, setIsUploadingProductPhoto] = useState(false);
   const [uploadProductPhotoProgress, setUploadProductPhotoProgress] = useState<number | null>(null);
 
+  // Publish to Live Site state
+  const [isPublishing, setIsPublishing] = useState(false);
+
   // Initialize data on mount
   useEffect(() => {
     try {
@@ -690,6 +693,33 @@ export default function AdminDashboardPage() {
         method: "DELETE",
       });
     } catch {}
+  }
+
+  // ── Publish to Live Site ──────────────────────────────────────────────────
+  async function handlePublishToLiveSite() {
+    if (isPublishing) return;
+    setIsPublishing(true);
+    showToast("Publishing catalog to live site…", "info");
+    try {
+      const res = await fetch("/api/publish-products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ products }),
+      });
+      const data = await res.json();
+      if (data?.success) {
+        showToast(
+          `✅ Published successfully! Live site is rebuilding… (${data.productsCount} products)`,
+          "success"
+        );
+      } else {
+        showToast(`❌ Publish failed: ${data?.error || "Unknown error"}`, "error");
+      }
+    } catch (err) {
+      showToast(`❌ Network error: ${String(err)}`, "error");
+    } finally {
+      setIsPublishing(false);
+    }
   }
 
   async function handleProductPhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -1201,6 +1231,34 @@ export default function AdminDashboardPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                   <span>Add New Product</span>
+                </button>
+
+                {/* Publish to Live Site */}
+                <button
+                  onClick={handlePublishToLiveSite}
+                  disabled={isPublishing}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg border ${
+                    isPublishing
+                      ? "bg-navy-700 border-green-500/30 text-green-300/60 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-500 border-green-500 text-white shadow-green-900/40"
+                  }`}
+                >
+                  {isPublishing ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      <span>Publishing…</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12V4m0 0L8 8m4-4l4 4" />
+                      </svg>
+                      <span>Publish to Live Site</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
