@@ -1,8 +1,8 @@
 [
   {
-    "slug": "l-sofa",
-    "name": "L sofa",
-    "category": "Living Room",
+    "slug": "single-seat-sofa-cum-bed",
+    "name": "Single seat sofa cum bed",
+    "category": "Royal Recliners",
     "material": "Fabric",
     "dimensions": "84\"W x 38\"D x 36\"H",
     "price": 45000,
@@ -15,7 +15,7 @@
     "badge": "New Arrival",
     "description": "Exquisite hand-carved piece seasoned to 8-10% equilibrium moisture content with lifetime termite warranty.",
     "images": [
-      "https://i.postimg.cc/xdNSdFdX/IMG-20261022-WA0198.jpg"
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80"
     ]
   },
   {
