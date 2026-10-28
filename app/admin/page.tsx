@@ -202,20 +202,26 @@ export default function AdminDashboardPage() {
         setCurrentAuthRole("master_admin");
       }
 
-      // Fetch live products from server API to stay in sync with live domain
-      fetch("/api/products")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.success && Array.isArray(data.products) && data.products.length > 0) {
-            setProducts(data.products);
-            localStorage.setItem("dcf_admin_products", JSON.stringify(data.products));
-          }
-        })
-        .catch(() => {});
-
+      // Load products — localStorage is the primary source of truth for the admin
+      // IMPORTANT: Do NOT overwrite from API after loading because it would erase products
+      // the admin just created (race condition). The admin WRITES to the API; not reads from it.
       const storedProducts = localStorage.getItem("dcf_admin_products");
       if (storedProducts) {
-        setProducts(JSON.parse(storedProducts));
+        try {
+          const parsed = JSON.parse(storedProducts);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setProducts(parsed);
+          } else {
+            throw new Error("empty");
+          }
+        } catch {
+          const seeded: Product[] = (initialProductsData as any[]).map((p) => ({
+            ...p,
+            dimensions: p.dimensions || "84\"W x 38\"D x 36\"H",
+          }));
+          setProducts(seeded);
+          localStorage.setItem("dcf_admin_products", JSON.stringify(seeded));
+        }
       } else {
         const seeded: Product[] = (initialProductsData as any[]).map((p) => ({
           ...p,
@@ -845,14 +851,20 @@ export default function AdminDashboardPage() {
 
   // Filtered products list
   const filteredProducts = products.filter((p) => {
+    const name = (p.name || "").toLowerCase();
+    const material = (p.material || "").toLowerCase();
+    const description = (p.description || "").toLowerCase();
+    const query = searchQuery.toLowerCase();
+
     const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
     const matchesMaterial =
       selectedAdminMaterial === "All" ||
-      (p.material && p.material.toLowerCase().includes(selectedAdminMaterial.toLowerCase()));
+      material.includes(selectedAdminMaterial.toLowerCase());
     const matchesSearch =
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.material.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      query === "" ||
+      name.includes(query) ||
+      material.includes(query) ||
+      description.includes(query);
     return matchesCategory && matchesMaterial && matchesSearch;
   });
 
