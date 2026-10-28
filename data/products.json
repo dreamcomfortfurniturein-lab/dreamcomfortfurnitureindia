@@ -1,40 +1,21 @@
 [
   {
-    "slug": "single-seat-sofa-cum-bed",
-    "name": "Single seat sofa cum bed",
-    "category": "Royal Recliners",
-    "material": "Fabric",
+    "slug": "royal-chair",
+    "name": "Royal chair",
+    "category": "Dining Suites",
+    "material": "Sheesham",
     "dimensions": "84\"W x 38\"D x 36\"H",
     "price": 45000,
     "mrp": 60000,
     "memberPrice": 38000,
     "bv": 19000,
     "pv": 190,
-    "stock": 5,
+    "stock": 1,
     "featured": false,
     "badge": "New Arrival",
     "description": "Exquisite hand-carved piece seasoned to 8-10% equilibrium moisture content with lifetime termite warranty.",
     "images": [
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80"
-    ]
-  },
-  {
-    "slug": "royal-sheesham-maharaja-sofa-set",
-    "name": "Royal Sheesham Maharaja 7-Seater Sofa Suite",
-    "category": "Living Room",
-    "material": "Grade-A Sheesham Wood & Velvet Fabric Upholstery",
-    "price": 68500,
-    "mrp": 89999,
-    "memberPrice": 54800,
-    "bv": 27400,
-    "pv": 274,
-    "stock": 8,
-    "featured": true,
-    "badge": "Best Seller",
-    "description": "Hand-carved royal Sheesham wood luxury sofa set with brass floral inlays, high-density feather cushions, and stain-resistant velvet fabric. Backed by a 10-year termite warranty.",
-    "images": [
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=1200&q=80"
+      "https://res.cloudinary.com/og57tmj8/image/upload/v1793221456/products/mo4skdmw4gija1u2qbpq.jpg"
     ]
   },
   {
@@ -76,25 +57,6 @@
     ]
   },
   {
-    "slug": "aeroflex-executive-ergonomic-desk-chair",
-    "name": "AeroFlex Executive President Leatherette & Walnut Desk Suite",
-    "category": "Ergonomic Office",
-    "material": "Top-Grain Leatherette, Walnut Veneer & Steel Base",
-    "price": 38900,
-    "mrp": 49999,
-    "memberPrice": 31120,
-    "bv": 15560,
-    "pv": 156,
-    "stock": 14,
-    "featured": true,
-    "badge": "Ergonomic Pro",
-    "description": "Executive high-back office chair with multi-angle synchro-tilt mechanism, 4D adjustable armrests, and matching solid walnut executive study table with wire-management ports.",
-    "images": [
-      "https://images.unsplash.com/photo-1580481077195-c328ad017599?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80"
-    ]
-  },
-  {
     "slug": "royal-grandeur-modular-island-kitchen",
     "name": "Grandeur Acrylic & Teak Modular Kitchen System",
     "category": "Modular Kitchens",
@@ -129,24 +91,6 @@
     "description": "Intricate lattice jali design inspired by Rajasthani palace architecture. Spacious internal shelving with brass ring pulls and magnetic door catches.",
     "images": [
       "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=1200&q=80"
-    ]
-  },
-  {
-    "slug": "haveli-brass-inlay-coffee-table",
-    "name": "Haveli Solid Teak Coffee Table with Brass Filigree",
-    "category": "Handcrafted Solid Teak",
-    "material": "Seasoned Teak Wood & Brushed Brass",
-    "price": 19500,
-    "mrp": 26000,
-    "memberPrice": 15600,
-    "bv": 7800,
-    "pv": 78,
-    "stock": 18,
-    "featured": false,
-    "badge": "Handmade",
-    "description": "Hand-polished centre coffee table with subtle geometric brass inlay, lower open magazine shelf, and hand-beveled edges.",
-    "images": [
-      "https://images.unsplash.com/photo-1533090161767-e6ffed986b88?auto=format&fit=crop&w=1200&q=80"
     ]
   },
   {
